@@ -1,0 +1,2041 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Light mode: warm paper rather than pure white.
+   Pure white against an almost-white sidebar gave no separation and made the
+   uppercase type feel harsh, so the page carries a slight warm cast and the
+   sidebar sits a clear step deeper. */
+:root {
+  color-scheme: light;
+  --background: oklch(0.978 0.005 90);
+  --foreground: oklch(0.206 0.006 70);
+  --card: oklch(0.992 0.004 90);
+  --card-foreground: oklch(0.206 0.006 70);
+  --popover: oklch(0.992 0.004 90);
+  --popover-foreground: oklch(0.206 0.006 70);
+  --primary: oklch(0.206 0.006 70);
+  --primary-foreground: oklch(0.985 0.004 90);
+  --secondary: oklch(0.941 0.01 88);
+  --secondary-foreground: oklch(0.206 0.006 70);
+  --muted: oklch(0.941 0.01 88);
+  --muted-foreground: oklch(0.52 0.015 80);
+  --accent: oklch(0.925 0.014 86);
+  --accent-foreground: oklch(0.206 0.006 70);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.883 0.018 85);
+  --input: oklch(0.883 0.018 85);
+  --ring: oklch(0.62 0.02 80);
+  /* Media wells / image placeholders — replaces hardcoded bg-neutral-800 */
+  --surface: oklch(0.9 0.016 85);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.941 0.01 88);
+  --sidebar-foreground: oklch(0.206 0.006 70);
+  --sidebar-primary: oklch(0.206 0.006 70);
+  --sidebar-primary-foreground: oklch(0.985 0.004 90);
+  --sidebar-accent: oklch(0.925 0.014 86);
+  --sidebar-accent-foreground: oklch(0.206 0.006 70);
+  --sidebar-border: oklch(0.878 0.018 85);
+  --sidebar-ring: oklch(0.62 0.02 80);
+}
+
+.dark {
+  color-scheme: dark;
+  --surface: oklch(0.269 0 0);
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+    --surface: oklch(0.269 0 0);
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Global Animations */
+@layer utilities {
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-slideUp {
+    animation: slideUp 0.6s ease-out;
+  }
+
+  .animate-slideDown {
+    animation: slideDown 0.6s ease-out;
+  }
+
+  .animate-scaleIn {
+    animation: scaleIn 0.5s ease-out;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+}
+
+
+/* ─── Layout system ───────────────────────────────────────────────────────
+   One card, one radius, one border, one gap. The reference we are working
+   toward coheres because every block is the same object and all colour comes
+   from the work rather than the chrome — so the chrome here is monochrome and
+   the only variables are surface, line, and type weight.
+
+   Before: 26 rounded-sm against 5 rounded-lg and 5 rounded-full, twelve
+   spacing steps, and gradient nav pills in three hues. */
+
+:root {
+  /* Surfaces */
+  --card-line: color-mix(in srgb, var(--foreground) 14%, transparent);
+  --card-line-strong: color-mix(in srgb, var(--foreground) 30%, transparent);
+  --card-fill: color-mix(in srgb, var(--foreground) 3.5%, transparent);
+  --card-fill-hover: color-mix(in srgb, var(--foreground) 6%, transparent);
+
+
+  /* The only radius in the system */
+  /* Matched to the print in the about section, which sits at 2px. */
+  --r: 2px;
+  --r-sm: 2px;
+
+  /* Restricted spacing scale. Nothing outside this ladder. */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+
+  --pad: var(--s4);
+  --gap: var(--s3);
+}
+
+html {
+  font-family: var(--font-ui), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ── Type ────────────────────────────────────────────────────────────────
+   Two families doing different jobs. The mono carries data, labels and UI;
+   the serif carries anything that should be *read* rather than scanned. */
+
+.t-display {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 3.4vw, 2.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  color: var(--foreground);
+}
+
+.t-head {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-size: 1.75rem;
+  line-height: 1.16;
+  letter-spacing: -0.005em;
+  color: var(--foreground);
+}
+
+/* Identity, not speech: the one place the serif stays upright. */
+.t-name {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+  color: var(--foreground);
+}
+
+.t-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 42%, transparent);
+}
+
+.t-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--foreground);
+}
+
+.t-body {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: color-mix(in srgb, var(--foreground) 74%, transparent);
+}
+
+.t-meta {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--foreground) 46%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Big tabular numeral, for card indices and figures */
+.t-num {
+  font-size: 2.25rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────
+   Every block on the site is this. */
+
+.card {
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  background: var(--card-fill);
+  padding: var(--pad);
+}
+
+/* Interactive variants: state is carried by line and fill, never by hue. */
+.card-link {
+  display: block;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  background: transparent;
+  padding: var(--s3) var(--s4);
+  text-decoration: none;
+  transition: border-color 220ms ease, background-color 220ms ease;
+}
+
+.card-link:hover {
+  border-color: var(--card-line-strong);
+  background: var(--card-fill);
+}
+
+.card-link[data-active='true'] {
+  border-color: var(--card-line-strong);
+  background: var(--card-fill-hover);
+}
+
+/* A media well: the one place colour is allowed, because it comes from work. */
+.well {
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+/* Rules and stacks */
+.rule {
+  height: 1px;
+  background: var(--card-line);
+  border: 0;
+  margin: 0;
+}
+
+.stack > * + * { margin-top: var(--gap); }
+.stack-lg > * + * { margin-top: var(--s5); }
+
+/* A caption row: label left, description centre, year right — set in tabular
+   figures so columns align down the page. */
+.caption-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) auto;
+  gap: var(--s4);
+  align-items: start;
+  padding-top: var(--s3);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 640px) {
+  .caption-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .caption-row > :nth-child(2) { grid-column: 1 / -1; }
+}
+
+
+/* ─── Lenis smooth scroll ─────────────────────────────────────────────── */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+/* Nested scrollers (side nav, chat) opt out and scroll natively */
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+
+/* ─── Crosshair cursor ────────────────────────────────────────────────── */
+
+/* Tuned per theme. `html.dark` (0,1,1) deliberately outranks `:root` (0,1,0).
+
+   The position markers switch blend mode, not just colour. Difference blending
+   only reads well on dark: white marks invert to solid black on a white page,
+   which looks harsh rather than light. So light mode drops the blend entirely
+   and paints an explicit grey, while dark mode keeps difference for its
+   automatic inversion over imagery. */
+:root {
+  --cursor-accent: #6d28d9;
+  --cursor-accent-hot: #7c3aed;
+  --cursor-rest-opacity: 0.75;
+  --cursor-glow-core: 80%;
+  --cursor-glow-bloom: 52%;
+  --cursor-fill: 10%;
+
+  --cursor-blend: normal;
+  --cursor-mark: #9aa0a8;
+  --cursor-guide: rgba(0, 0, 0, 0.13);
+  /* Keeps the grey marks readable when they cross a pale photo */
+  --cursor-mark-shadow: drop-shadow(0 0 1px rgba(0, 0, 0, 0.28));
+}
+
+html.dark {
+  --cursor-accent: #7c5cff;
+  --cursor-accent-hot: #a78bfa;
+  --cursor-rest-opacity: 0.55;
+  --cursor-glow-core: 70%;
+  --cursor-glow-bloom: 45%;
+  --cursor-fill: 14%;
+
+  --cursor-blend: difference;
+  --cursor-mark: #fff;
+  --cursor-guide: rgba(255, 255, 255, 0.22);
+  --cursor-mark-shadow: none;
+}
+
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none;
+}
+
+/* Native cursors that carry meaning are preserved; the crosshair fades itself
+   out over these so the two never stack. */
+html.has-custom-cursor .cursor-col-resize { cursor: col-resize; }
+html.has-custom-cursor .cursor-zoom-in { cursor: zoom-in; }
+html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
+
+.cursor-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 200ms ease;
+}
+
+.cursor-layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* `difference` on dark (auto-inverts over imagery); `normal` on light, where
+   inversion would turn the marks solid black. */
+.cursor-layer-blend {
+  mix-blend-mode: var(--cursor-blend);
+  filter: var(--cursor-mark-shadow);
+}
+
+/* Normal blend: real colour, real glow */
+.cursor-layer-plain {
+  mix-blend-mode: normal;
+}
+
+/* Guide rules */
+.cursor-guide {
+  position: absolute;
+  background: var(--cursor-guide);
+  will-change: transform;
+}
+.cursor-guide-h { left: 0; top: 0; width: 100%; height: 1px; }
+.cursor-guide-v { left: 0; top: 0; width: 1px; height: 100%; }
+
+/* The "+" — light grey on light, white (inverted) on dark */
+.cursor-core {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 18px;
+  height: 18px;
+  will-change: transform;
+}
+.cursor-core-h,
+.cursor-core-v { position: absolute; background: var(--cursor-mark); }
+.cursor-core-h { left: 0; top: 50%; width: 100%; height: 1px; transform: translateY(-50%); }
+.cursor-core-v { left: 50%; top: 0; width: 1px; height: 100%; transform: translateX(-50%); }
+
+/* Ring — transform is driven per-frame by the spring in JS, so only colour and
+   glow are transitioned here. */
+.cursor-ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--cursor-accent);
+  opacity: var(--cursor-rest-opacity);
+  will-change: transform;
+  transition: opacity 200ms ease, border-color 200ms ease,
+              box-shadow 240ms ease, background-color 240ms ease;
+}
+
+.cursor-ring[data-hover='true'] {
+  opacity: 1;
+  border-color: var(--cursor-accent-hot);
+  background-color: color-mix(in srgb, var(--cursor-accent) var(--cursor-fill), transparent);
+  box-shadow:
+    0 0 12px 0 color-mix(in srgb, var(--cursor-accent) var(--cursor-glow-core), transparent),
+    0 0 34px 4px color-mix(in srgb, var(--cursor-accent) var(--cursor-glow-bloom), transparent),
+    inset 0 0 12px 0 color-mix(in srgb, var(--cursor-accent) 35%, transparent);
+}
+
+.cursor-ring[data-press='true'] {
+  border-color: var(--cursor-accent-hot);
+  box-shadow:
+    0 0 18px 2px color-mix(in srgb, var(--cursor-accent-hot) 90%, transparent),
+    0 0 46px 10px color-mix(in srgb, var(--cursor-accent) var(--cursor-glow-bloom), transparent);
+}
+
+/* Click burst */
+.cursor-burst {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  margin-left: -17px;
+  margin-top: -17px;
+  border: 1px solid var(--cursor-accent-hot);
+  box-shadow: 0 0 16px 2px color-mix(in srgb, var(--cursor-accent) var(--cursor-glow-bloom), transparent);
+  animation: cursor-burst 560ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cursor-burst {
+  from { opacity: 0.95; transform: scale(0.4) rotate(0deg); }
+  to { opacity: 0; transform: scale(2.7) rotate(45deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-root { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portrait-stack[data-splash='true'] .portrait-splash {
+    animation: none;
+  }
+}
+
+/* ─── Overscroll-to-advance ───────────────────────────────────────────── */
+
+/* Docked chrome, not an overlay. It spans the content column (left/width are
+   measured each frame in ScrollAdvance) and pins to whichever edge is being
+   pushed — bottom when advancing, top when going back. A scrim fades the
+   content out beneath it, so nothing ever collides with the readout. */
+.scroll-advance {
+  --sa: 0;
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+
+.scroll-advance[data-dir='down'] {
+  bottom: 0;
+}
+
+/* top is set from JS: docked below the breadcrumb, whose height varies */
+.scroll-advance[data-dir='up'] {
+  top: 0;
+}
+
+.scroll-advance[data-active='false'] {
+  opacity: 0;
+}
+
+.scroll-advance[data-active='false'] .scroll-advance-hit {
+  pointer-events: none;
+}
+
+.scroll-advance:has(.scroll-advance-hit:focus-visible) {
+  opacity: 1;
+}
+.scroll-advance:has(.scroll-advance-hit:focus-visible) .scroll-advance-hit {
+  pointer-events: auto;
+}
+
+/* Scrim — masks content passing under the panel */
+.scroll-advance::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 190%;
+  pointer-events: none;
+  background: linear-gradient(to top, var(--background) 42%, transparent 100%);
+}
+
+.scroll-advance[data-dir='down']::before {
+  bottom: 0;
+}
+
+.scroll-advance[data-dir='up']::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--background) 42%, transparent 100%);
+}
+
+/* Instrument strip: action — progress — destination */
+.scroll-advance-hit {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  width: 100%;
+  padding: 1.15rem 1.75rem 1.35rem;
+  pointer-events: auto;
+  text-decoration: none;
+}
+
+/* Hairline separating the panel from the content it sits over */
+.scroll-advance-hit::before {
+  content: '';
+  position: absolute;
+  left: 1.75rem;
+  right: 1.75rem;
+  height: 1px;
+  background: var(--border);
+  opacity: calc(0.4 + var(--sa) * 0.6);
+}
+
+.scroll-advance[data-dir='down'] .scroll-advance-hit::before {
+  top: 0;
+}
+.scroll-advance[data-dir='up'] .scroll-advance-hit::before {
+  bottom: 0;
+}
+
+.scroll-advance-action,
+.scroll-advance-target {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+
+.scroll-advance-action {
+  opacity: calc(0.35 + var(--sa) * 0.4);
+}
+
+.scroll-advance-target {
+  opacity: calc(0.4 + var(--sa) * 0.6);
+}
+
+/* ── The bar ─────────────────────────────────────────────────────────── */
+
+.scroll-advance-bar {
+  position: relative;
+  display: block;
+  flex: 1;
+  height: 16px;
+}
+
+.scroll-advance[data-dir='up'] .scroll-advance-bar {
+  transform: scaleX(-1);
+}
+
+.scroll-advance-track {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  transform: translateY(-50%);
+}
+
+.scroll-advance-fill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 1px;
+  width: calc(var(--sa) * 100%);
+  background: var(--foreground);
+  transform: translateY(-50%);
+}
+
+/* Explicit start and finish marks */
+.scroll-advance-cap {
+  position: absolute;
+  top: 50%;
+  width: 1px;
+  height: 14px;
+  background: var(--foreground);
+  transform: translateY(-50%);
+}
+
+.scroll-advance-cap-start {
+  left: 0;
+  opacity: calc(0.4 + var(--sa) * 0.6);
+}
+
+.scroll-advance-cap-end {
+  right: 0;
+  /* Brightens and grows as the head closes on it */
+  opacity: calc(0.28 + var(--sa) * 0.72);
+  height: calc(14px + var(--sa) * 6px);
+}
+
+.scroll-advance-head {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--sa) * 100%);
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  opacity: calc(0.25 + var(--sa) * 0.75);
+}
+
+.scroll-advance-head-h,
+.scroll-advance-head-v {
+  position: absolute;
+  background: var(--foreground);
+}
+
+.scroll-advance-head-h {
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 1px;
+  transform: translate(-50%, -50%);
+}
+
+.scroll-advance-head-v {
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+}
+
+/* ── Commit ──────────────────────────────────────────────────────────── */
+
+/* Accent is reserved for state: only at the moment it commits */
+.scroll-advance[data-state='firing'] .scroll-advance-fill,
+.scroll-advance[data-state='firing'] .scroll-advance-head-h,
+.scroll-advance[data-state='firing'] .scroll-advance-head-v,
+.scroll-advance[data-state='firing'] .scroll-advance-cap-end {
+  background: var(--cursor-accent);
+}
+
+/* One decisive gesture as it lets go, rather than the panel simply vanishing */
+.scroll-advance[data-state='firing'] .scroll-advance-hit {
+  animation: sa-commit 300ms cubic-bezier(0.32, 0, 0.2, 1) forwards;
+}
+
+@keyframes sa-commit {
+  0% { transform: scale(1); opacity: 1; }
+  30% { transform: scale(1.035); opacity: 1; }
+  100% { transform: scale(0.97); opacity: 0; }
+}
+
+/* ── Scroll-scrubbed page exit ───────────────────────────────────────── */
+
+/* Driven by the same value as the gauge, so the transition is scrubbed by the
+   scroll and reverses if the user lets go. During the release beat --page-exit
+   is pushed past 1, which carries the page well clear of the frame.
+   perspective() is applied per-element rather than on an ancestor so it cannot
+   affect anything else's containing block. */
+[data-page-content] {
+  transform: perspective(1500px)
+    translate3d(0, calc(var(--page-exit, 0) * var(--page-exit-dir, -1) * 150px), 0)
+    translateZ(calc(var(--page-exit, 0) * -420px))
+    rotateX(calc(var(--page-exit, 0) * var(--page-exit-dir, -1) * -5deg));
+  /* Deliberately still ~0.4 at full charge. Fading to zero by then would make
+     the release beat animate an already-invisible page — the payoff has to be
+     visible, so the page only clears during the release overshoot. */
+  opacity: calc(1 - var(--page-exit, 0) * 0.62);
+  transform-origin: 50% 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-page-content] {
+    transform: none;
+    opacity: 1;
+  }
+  .scroll-advance-cap-end {
+    height: 14px;
+  }
+  .scroll-advance[data-state='firing'] .scroll-advance-hit {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* ─── The transport ───────────────────────────────────────────────────── */
+
+.player {
+  position: relative;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r-sm);
+  background: var(--card-fill);
+  padding: var(--s4) var(--s3) var(--s3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Corner screws. Structural: they mark the bounding box and read as the
+   fixings holding the faceplate on, echoing the crosshair cursor. */
+.player-screw {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  opacity: 0.5;
+  transition: opacity 260ms ease;
+}
+.player-screw::before,
+.player-screw::after {
+  content: '';
+  position: absolute;
+  background: var(--foreground);
+}
+.player-screw::before { left: 0; top: 3px; width: 7px; height: 1px; }
+.player-screw::after { left: 3px; top: 0; width: 1px; height: 7px; }
+
+.player-screw-tl { left: -4px; top: -4px; }
+.player-screw-tr { right: -4px; top: -4px; }
+.player-screw-bl { left: -4px; bottom: -4px; }
+.player-screw-br { right: -4px; bottom: -4px; }
+
+.player[data-on='true'] .player-screw { opacity: 0.9; }
+
+.player-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+
+.player-transport {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.player-transport button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 22px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: none;
+  color: color-mix(in srgb, var(--foreground) 62%, transparent);
+  transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.player-transport button:hover {
+  color: var(--foreground);
+  border-color: var(--card-line);
+  background: var(--card-fill-hover);
+}
+
+.player-play {
+  width: 30px !important;
+  border-color: var(--card-line) !important;
+}
+
+.player[data-on='true'] .player-play {
+  color: var(--foreground);
+  border-color: var(--card-line-strong) !important;
+  background: var(--card-fill-hover);
+}
+
+/* Level meter: four bars on offset cycles so it never reads as a spinner */
+.player-meter {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+  color: color-mix(in srgb, var(--foreground) 45%, transparent);
+}
+.player-meter i {
+  display: block;
+  width: 2px;
+  height: 2px;
+  background: currentColor;
+}
+.player[data-on='true'] .player-meter { color: var(--foreground); }
+.player[data-on='true'] .player-meter i { animation: player-bar 1.4s ease-in-out infinite; }
+.player[data-on='true'] .player-meter i:nth-child(2) { animation-delay: .21s; animation-duration: 1.1s; }
+.player[data-on='true'] .player-meter i:nth-child(3) { animation-delay: .47s; animation-duration: 1.75s; }
+.player[data-on='true'] .player-meter i:nth-child(4) { animation-delay: .12s; animation-duration: 1.3s; }
+
+@keyframes player-bar {
+  0%, 100% { height: 2px; }
+  50% { height: 12px; }
+}
+
+/* Display window. The title pans only when it overflows — measured in JS,
+   never assumed, so short titles sit still instead of drifting for no reason. */
+.player-window {
+  position: relative;
+  display: flex;
+  gap: var(--s6);
+  overflow: hidden;
+  margin-top: var(--s3);
+  padding: 5px var(--s2);
+  border: 1px solid var(--card-line);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--background) 60%, transparent);
+  white-space: nowrap;
+  mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 10px), transparent);
+}
+
+.player-track {
+  flex: none;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+}
+
+.player[data-on='true'] .player-track {
+  color: var(--foreground);
+}
+
+.player-window[data-pan='true'] .player-track {
+  animation: player-pan 14s linear infinite;
+}
+
+@keyframes player-pan {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-100% - var(--s6))); }
+}
+
+.player-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--s2);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 38%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player[data-on='true'] .player-meter i { animation: none; height: 7px; }
+  .player-window[data-pan='true'] .player-track { animation: none; }
+}
+
+/* ─── Corner marks: the selected state ────────────────────────────────── */
+
+/* One signal for "this one", used on nav items, case studies and the
+   transport. Replaces border-weight changes, which were too quiet to read
+   against a monochrome card. */
+.marks {
+  position: absolute;
+  inset: -4px;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 260ms ease, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mark {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+}
+
+.mark::before,
+.mark::after {
+  content: '';
+  position: absolute;
+  background: var(--foreground);
+}
+.mark::before { left: 0; top: 3px; width: 7px; height: 1px; }
+.mark::after { left: 3px; top: 0; width: 1px; height: 7px; }
+
+.mark-tl { left: 0; top: 0; }
+.mark-tr { right: 0; top: 0; }
+.mark-bl { left: 0; bottom: 0; }
+.mark-br { right: 0; bottom: 0; }
+
+/* Shown when the host is selected, or previewed faintly on hover */
+[data-active='true'] > .marks {
+  opacity: 0.9;
+  transform: scale(1);
+}
+
+.card-link:hover > .marks {
+  opacity: 0.35;
+  transform: scale(1);
+}
+
+/* ─── Nav items ───────────────────────────────────────────────────────── */
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3) var(--s3);
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  text-decoration: none;
+  transition: border-color 240ms ease, background-color 240ms ease;
+}
+
+.nav-item:hover {
+  border-color: var(--card-line-strong);
+  background: var(--card-fill);
+}
+
+.nav-item[data-active='true'] {
+  border-color: var(--card-line-strong);
+  background: var(--card-fill-hover);
+}
+
+/* The icon plate. Square, hairline, and the stage for the mechanism. */
+.nav-plate {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+  overflow: hidden;
+  transition: color 260ms ease, border-color 260ms ease;
+}
+
+.nav-item:hover .nav-plate,
+.nav-item[data-active='true'] .nav-plate {
+  color: var(--foreground);
+  border-color: var(--card-line-strong);
+}
+
+/* A hairline sweeps the plate as you arrive — the loupe passing over */
+.nav-plate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 42%,
+    color-mix(in srgb, var(--foreground) 26%, transparent) 50%,
+    transparent 58%
+  );
+  background-size: 260% 100%;
+  background-position: 130% 0;
+  opacity: 0;
+}
+
+.nav-item:hover .nav-plate::after {
+  animation: plate-sweep 700ms cubic-bezier(0.32, 0, 0.28, 1);
+}
+
+@keyframes plate-sweep {
+  0% { background-position: 130% 0; opacity: 0; }
+  25% { opacity: 1; }
+  100% { background-position: -60% 0; opacity: 0; }
+}
+
+/* ── Mechanisms ───────────────────────────────────────────────────────── */
+
+/* Every moving part rotates about its own centre, which SVG will not do
+   without transform-box.
+   
+   Scoped to .nav-plate this was a desktop-only fix. The mobile rail has no
+   plate, so its mechanisms fell back to transform-origin 0 0 and pivoted about
+   the viewBox corner instead of themselves — the aperture blades swung out of
+   frame and the bolt slot ended up eleven pixels outside the icon entirely.
+   Any mech part, wherever it is drawn, turns about its own centre. */
+[class^='mech'],
+[class*=' mech'] {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1), opacity 320ms ease;
+}
+
+/* Aperture: the blades stop down at rest and open when you arrive. */
+.mech-blades { transform: rotate(14deg) scale(1.1); }
+.nav-item:hover .mech-blades,
+.nav-item[data-active='true'] .mech-blades { transform: rotate(-16deg) scale(0.82); }
+
+/* Contact sheet: the chinagraph select draws itself on. */
+.mech-select {
+  stroke-dasharray: 15;
+  stroke-dashoffset: 15;
+  opacity: 0;
+  transition: stroke-dashoffset 620ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+}
+.nav-item:hover .mech-select,
+.nav-item[data-active='true'] .mech-select { stroke-dashoffset: 0; opacity: 1; }
+
+/* Bolt: turned one hex flat, as if by a spanner. */
+.nav-item:hover .mech-bolt,
+.nav-item[data-active='true'] .mech-bolt { transform: rotate(30deg); }
+.mech-slot { transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1); }
+.nav-item:hover .mech-slot,
+.nav-item[data-active='true'] .mech-slot { transform: rotate(90deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  [class^='mech'],
+  .mech-select { transition: none; }
+  .nav-item:hover .nav-plate::after { animation: none; }
+  .marks { transition: none; }
+}
+
+/* Quiet inline link — serif italic, underlined, small. Used for asides that
+   should read as a spoken offer rather than a button. */
+.link-quiet {
+  display: inline-block;
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.3;
+  color: color-mix(in srgb, var(--foreground) 58%, transparent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--foreground) 30%, transparent);
+  transition: color 200ms ease, text-decoration-color 200ms ease;
+}
+
+.link-quiet:hover {
+  color: var(--foreground);
+  text-decoration-color: color-mix(in srgb, var(--foreground) 65%, transparent);
+}
+
+/* Contact sits with the CV: both are ways to reach him, not page content. */
+.contact-row {
+  display: flex;
+  gap: var(--s3);
+  margin-top: var(--s4);
+}
+
+.contact-chip {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  opacity: 0.82;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.contact-chip:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+/* ─── Orion button ────────────────────────────────────────────────────────
+   The bloom is clipped to the button: the head sits inside it and the stem is
+   cut by the bottom edge, so it reads as growing out of the button rather than
+   dangling below it.
+
+   Geometry, not guesswork: the head centre sits 34% down the artwork, so for a
+   34px button the offsets below place the head with clearance top and bottom
+   and leave roughly 10px of stem visible before the edge cuts it. */
+
+.orion-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px 7px 36px;
+  overflow: hidden;
+}
+
+/* Orion sits on the button's bottom edge like a shelf. He is fully visible
+   here rather than clipped — a cat cut in half by a border reads as a bug. */
+.orion-cat {
+  position: absolute;
+  left: 5px;
+  bottom: 0;
+  display: block;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Perks up as you arrive */
+.orion-btn:hover .orion-cat {
+  transform: translateY(-2px) scale(1.04);
+}
+
+.orion-btn:active .orion-cat {
+  transform: translateY(0) scale(1.01);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orion-cat { transition: none; }
+  .orion-btn:hover .orion-cat { transform: none; }
+}
+
+/* ─── Orion mark ──────────────────────────────────────────────────────────
+   The chat header carries the same bloom as the button that opens it: same
+   plate, same clip, stem cut by the bottom edge. While Orion is thinking the
+   flower sways — the drawer's own loading state rather than bouncing dots. */
+
+.orion-mark {
+  position: relative;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  border: 1px solid var(--card-line);
+  background: var(--card-fill);
+  border-radius: var(--r-sm);
+}
+
+/* Orion's replies read as the page's own voice; yours sit on a plate. */
+.msg {
+  max-width: 30ch;
+  padding: var(--s3) var(--s4);
+  border-radius: var(--r-sm);
+}
+
+.msg-user {
+  border: 1px solid var(--card-line);
+  background: var(--card-fill);
+}
+
+.msg-orion {
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+}
+
+/* ─── Orion, the cat ──────────────────────────────────────────────────────
+   A pet, so it moves on its own clock: the eyes blink whether or not anyone
+   is watching. Arriving wakes it — the tail flicks and the ears twitch twice.
+   While a translation is pending the tail keeps a slower, steadier sway.
+
+   Origins are in the icon's own user units; transform-box: view-box makes
+   them resolve against the viewBox rather than each part's tight bounding
+   box, so the tail turns from where it meets the body. */
+
+.cat-tail,
+.cat-ear-l,
+.cat-ear-r,
+.cat-eyes {
+  transform-box: view-box;
+}
+
+.cat-tail {
+  transform-origin: 27.6px 42px;
+  animation: cat-idle-tail 9s ease-in-out infinite;
+}
+
+/* On patrol the body is already moving; a second idle loop on top of it reads
+   as two animations rather than one animal. */
+.cat-prowl .cat-tail,
+.cat-prowl .cat-ear-r {
+  animation: none;
+}
+
+.cat-ear-l { transform-origin: 12.8px 10.5px; }
+
+.cat-ear-r {
+  transform-origin: 27.2px 10.5px;
+  animation: cat-idle-ear 11s ease-out infinite;
+}
+
+/* Never fully still. The periods do not divide into the blink's 6.4s, so the
+   tail, the ear and the eyes never fall into step with each other. */
+@keyframes cat-idle-tail {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(-2deg); }
+}
+
+@keyframes cat-idle-ear {
+  0%, 86%, 100% { transform: rotate(0deg); }
+  90% { transform: rotate(9deg); }
+  94% { transform: rotate(-3deg); }
+}
+
+.cat-eyes {
+  transform-origin: 20px 15px;
+  animation: cat-blink 6.4s infinite;
+}
+
+@keyframes cat-blink {
+  0%, 94%, 100% { transform: scaleY(1); }
+  96%, 97% { transform: scaleY(0.08); }
+}
+
+@keyframes cat-flick {
+  0%, 100% { transform: rotate(-13deg); }
+  50% { transform: rotate(9deg); }
+}
+
+@keyframes cat-twitch-l {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(-10deg); }
+  62% { transform: rotate(4deg); }
+}
+
+@keyframes cat-twitch-r {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(10deg); }
+  62% { transform: rotate(-4deg); }
+}
+
+.cat-wake:hover .cat-tail { animation: cat-flick 820ms ease-in-out infinite; }
+.cat-wake:hover .cat-ear-l { animation: cat-twitch-l 620ms ease-out 2; }
+.cat-wake:hover .cat-ear-r { animation: cat-twitch-r 620ms ease-out 80ms 2; }
+
+/* Waiting on the words to arrive */
+.orion-mark[data-thinking='true'] .cat-tail {
+  animation: cat-flick 1700ms ease-in-out infinite;
+}
+
+/* The plate the cat sits on — same window as the button's bloom. */
+.orion-mark {
+  display: grid;
+  place-items: center;
+}
+
+/* ─── What Orion says ─────────────────────────────────────────────────────
+   The meow lands first, in the serif that carries every other spoken line on
+   the site. The English replaces it a beat later — same message, subtitled. */
+
+/* ─── What Orion says ─────────────────────────────────────────────────────
+   Both languages are set in the same monospace family at the same size, and
+   each meow carries the character count of the word it stands for. A meow and
+   its translation therefore occupy identical width, so swapping them one word
+   at a time changes nothing else on the line — the paragraph resolves in place
+   instead of reflowing under the reader. That is the whole reason the lengths
+   are matched. */
+
+.said {
+  max-width: 32ch;
+  padding: 0;
+}
+
+.said-line {
+  animation: say-line 320ms var(--ease-light, ease-out) both;
+}
+
+.said-word {
+  font-size: 13px;
+  line-height: 1.75;
+  white-space: pre;
+}
+
+.said-meow {
+  font-style: italic;
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+}
+
+.said-en {
+  font-style: normal;
+  color: var(--foreground);
+  animation: say-word 260ms var(--ease-light, ease-out) both;
+}
+
+.said-translating {
+  animation: say-line 260ms var(--ease-light, ease-out) both;
+  opacity: 0.75;
+}
+
+@keyframes say-line {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The word does not move — only its weight of ink changes, because moving it
+   would defeat the point of matching the widths. */
+@keyframes say-word {
+  from { opacity: 0.25; }
+  to { opacity: 1; }
+}
+
+/* ─── The patrol ──────────────────────────────────────────────────────────
+   Sits above the drawer's content and is clipped by the drawer's own edges,
+   which is what lets him leave one side and arrive from the other. */
+
+.cat-prowl {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  display: block;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+/* His bed. Empty while he is out. */
+.orion-mark {
+  position: relative;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--card-line);
+  background: var(--card-fill);
+  border-radius: var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .said-line,
+  .said-en,
+  .cat-eyes,
+  .cat-tail,
+  .cat-ear-r,
+  .cat-wake:hover .cat-tail,
+  .cat-wake:hover .cat-ear-l,
+  .cat-wake:hover .cat-ear-r,
+  .orion-mark[data-thinking='true'] .cat-tail { animation: none; }
+  .msg-meow, .msg-en { animation: none; }
+}
+
+/* ─── Orion's gaits ───────────────────────────────────────────────────────
+   Travel is driven from JS; the gait itself is a CSS cycle so it keeps its own
+   cadence no matter how far or how fast he happens to be going. A cat gallop
+   alternates between gathered — spine up, legs under — and extended, so the
+   front and back legs run in opposition and the body rises on the gather. */
+
+.cat-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  display: block;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.cat-pose {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 50% 100%;
+}
+
+.leg-front,
+.leg-back,
+.tail-s,
+.body-s {
+  transform-box: view-box;
+}
+
+.leg-front { transform-origin: 42px 20px; }
+.leg-back { transform-origin: 22px 20px; }
+.tail-s { transform-origin: 15px 18px; }
+
+/* The head pivots at the neck. Cats hold their heads level through almost any
+   body movement — countering the body's pitch here is the single detail that
+   stops a jump looking like a thrown object. */
+.head-s { transform-origin: 46px 16px; }
+.head-s { transform-box: view-box; }
+
+[data-gait='run'] .leg-front { animation: run-front 240ms linear infinite; }
+[data-gait='run'] .leg-back { animation: run-back 240ms linear infinite; }
+[data-gait='run'] .tail-s { animation: run-tail 480ms ease-in-out infinite; }
+[data-gait='run'] .cat-side { animation: run-body 240ms ease-in-out infinite; }
+
+@keyframes run-front {
+  0%, 100% { transform: rotate(21deg); }
+  50% { transform: rotate(-18deg); }
+}
+
+@keyframes run-back {
+  0%, 100% { transform: rotate(-16deg); }
+  50% { transform: rotate(23deg); }
+}
+
+@keyframes run-tail {
+  0%, 100% { transform: rotate(-11deg); }
+  50% { transform: rotate(9deg); }
+}
+
+/* The gather lifts the body a little; that rise is what sells the gallop. */
+@keyframes run-body {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-2.2px) scaleY(0.945); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-gait='run'] .leg-front,
+  [data-gait='run'] .leg-back,
+  [data-gait='run'] .tail-s,
+  [data-gait='run'] .cat-side { animation: none; }
+}
+
+/* ─── Case study, as a record ─────────────────────────────────────────────
+   Structured after a catalogue entry rather than a blog post: a numbered bar
+   that stays put while you read, a title, one line saying what it was, a spec
+   table of the facts, the prose, and then the screens on their own with
+   nothing written over them. */
+
+.record-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding: var(--s4) var(--s6);
+  background: var(--background);
+  border-bottom: 1px solid var(--card-line);
+}
+
+/* Tabular figures so the counter does not jitter between entries. */
+.record-no {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.record-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.record-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r-sm);
+  background: var(--card-fill);
+  color: var(--foreground);
+  transition:
+    background var(--dur-light, 300ms) var(--ease-light, ease-out),
+    border-color var(--dur-light, 300ms) var(--ease-light, ease-out),
+    opacity var(--dur-light, 300ms) var(--ease-light, ease-out);
+}
+
+.record-btn:hover {
+  background: var(--card-fill-hover);
+  border-color: var(--card-line-strong);
+}
+
+.record-btn[aria-disabled='true'] {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* The close is a circle because everything else here is square. */
+.record-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--card-line-strong);
+  border-radius: 999px;
+  color: var(--foreground);
+  transition: background var(--dur-light, 300ms) var(--ease-light, ease-out);
+}
+
+.record-close:hover {
+  background: var(--card-fill-hover);
+}
+
+/* The one display moment on the page. Roman, not italic — this is a name. */
+.case-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.75rem, 7vw, 5.25rem);
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  color: var(--foreground);
+}
+
+/* One line saying what the thing was. Italic, the site's speaking voice. */
+.case-deck {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.0625rem, 2vw, 1.375rem);
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--foreground) 72%, transparent);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+}
+
+/* The facts, ruled off above and below like a specification block. */
+.spec {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s5) var(--s4);
+  padding: var(--s5) 0;
+  border-top: 1px solid var(--card-line);
+  border-bottom: 1px solid var(--card-line);
+}
+
+@media (min-width: 900px) {
+  .spec {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.spec-value {
+  margin-top: var(--s2);
+  line-height: 1.6;
+}
+
+/* Reading size, wider leading than the interface text around it. */
+.case-prose {
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.75;
+  color: color-mix(in srgb, var(--foreground) 88%, transparent);
+}
+
+.case-prose p + p {
+  margin-top: var(--s4);
+}
+
+/* ─── The screens ─────────────────────────────────────────────────────────
+   Below the record, the work is left to speak. No captions over the images,
+   no cards around them — a plate, a hairline, and a number. */
+
+.plate {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  background: var(--card-fill);
+}
+
+.plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.plate-no {
+  position: absolute;
+  right: var(--s3);
+  bottom: var(--s3);
+  padding: 2px 7px;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--background) 78%, transparent);
+  font-variant-numeric: tabular-nums;
+  backdrop-filter: blur(6px);
+}
+
+/* ─── Phone chrome ────────────────────────────────────────────────────────
+   Who at the top, where at the bottom. Both fixed, both out of the way of the
+   content, and the bottom one inside the thumb's arc — which is the whole
+   reason navigation moved down here from a tab strip at the top. */
+
+.m-masthead {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: calc(env(safe-area-inset-top, 0px) + var(--s3)) var(--s4) var(--s3);
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--card-line);
+}
+
+.m-name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  color: var(--foreground);
+}
+
+.m-chev {
+  display: inline-flex;
+  opacity: 0.5;
+  transition: transform var(--dur-light, 320ms) var(--ease-light, ease-out);
+}
+
+.m-chev[data-open='true'] {
+  transform: rotate(180deg);
+}
+
+/* The studio card. Height is animated via grid rather than max-height so it
+   fits its own content exactly instead of a guessed ceiling. */
+.m-studio {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 59;
+  display: grid;
+  grid-template-rows: 0fr;
+  background: var(--sidebar);
+  border-bottom: 1px solid var(--card-line);
+  transition:
+    grid-template-rows var(--dur-medium, 420ms) var(--ease-medium, ease-out),
+    opacity 200ms ease-out;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.m-studio[data-open='true'] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.m-studio-inner {
+  overflow: hidden;
+  padding: 0 var(--s4);
+}
+
+.m-studio[data-open='true'] .m-studio-inner {
+  padding-top: calc(var(--masthead-h, 58px) + var(--s2));
+  padding-bottom: var(--s5);
+}
+
+.m-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 58;
+  background: color-mix(in srgb, var(--background) 55%, transparent);
+}
+
+.m-rail {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 60;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2px;
+  padding: var(--s2) var(--s2) calc(env(safe-area-inset-bottom, 0px) + var(--s2));
+  background: color-mix(in srgb, var(--background) 90%, transparent);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--card-line);
+}
+
+.m-rail-item {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  padding: 9px 4px 7px;
+  border-radius: var(--r-sm);
+  color: color-mix(in srgb, var(--foreground) 52%, transparent);
+  transition: color var(--dur-light, 300ms) var(--ease-light, ease-out);
+  /* A comfortable tap target regardless of how small the glyph is. */
+  min-height: 52px;
+}
+
+.m-rail-item[data-active='true'] {
+  color: var(--foreground);
+}
+
+/* Corner crosses mark the active section, exactly as on desktop. */
+.m-rail-item .marks {
+  opacity: 0;
+  transition: opacity var(--dur-light, 300ms) var(--ease-light, ease-out);
+}
+
+.m-rail-item[data-active='true'] .marks {
+  opacity: 1;
+}
+
+.m-rail-cat {
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+}
+
+/* Content clears both bars, using their measured heights — see MobileChrome.
+   The fallbacks are only for the first paint before the effect runs. The extra
+   --s4 on top is breathing room: clearing the bar exactly puts the first line
+   flush against it, which reads as clipped even when it is not. */
+@media (max-width: 767px) {
+  [data-page-content] {
+    padding-top: calc(var(--masthead-h, 58px) + var(--s4));
+    padding-bottom: calc(var(--rail-h, 74px) + var(--s4));
+  }
+}
+
+/* ─── Mr. Toast's surface ─────────────────────────────────────────────────
+   A right-hand rail on a desktop, where there is a column to spare, and a
+   bottom sheet on a phone, where there is not — and where the thing you want
+   to reach should rise to meet your thumb rather than sit against an edge. */
+
+.chat-surface {
+  position: fixed;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--sidebar);
+}
+
+@media (min-width: 768px) {
+  .chat-surface {
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: var(--chat-w, 324px);
+  }
+  .chat-grip {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .chat-surface {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* svh, not vh: vh ignores the phone's collapsing address bar and the
+       sheet ends up taller than the screen. */
+    height: 86svh;
+    border-top: 1px solid var(--card-line-strong);
+    border-radius: 16px 16px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    animation: sheet-up var(--dur-medium, 460ms) var(--ease-medium, ease-out) both;
+  }
+
+  .chat-grip {
+    display: block;
+    width: 38px;
+    height: 4px;
+    margin: 9px auto 2px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--foreground) 26%, transparent);
+    flex: none;
+  }
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-surface { animation: none; }
+}
+
+/* Only a phone gets a scrim; on a desktop the rail sits beside the page
+   rather than over it, and dimming the work would be wrong. */
+.chat-scrim {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .chat-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 69;
+    background: color-mix(in srgb, var(--background) 45%, transparent);
+    animation: scrim-in 320ms ease-out both;
+  }
+}
+
+@keyframes scrim-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ─── Framed shots ────────────────────────────────────────────────────────
+   The corner crosses are the site's "this is a bounded thing" mark — on nav
+   and cards they appear on selection, but a screen in a case study is always
+   the subject, so here they simply stay on. Slightly larger than the 7px used
+   on controls, because these frames are an order of magnitude bigger and the
+   marks would otherwise read as specks. */
+
+.shot > .marks {
+  opacity: 1;
+  transform: none;
+  inset: -6px;
+}
+
+.shot > .marks .mark {
+  width: 9px;
+  height: 9px;
+}
+
+.shot > .marks .mark::before {
+  left: 0;
+  top: 4px;
+  width: 9px;
+  height: 1px;
+}
+
+.shot > .marks .mark::after {
+  left: 4px;
+  top: 0;
+  width: 1px;
+  height: 9px;
+}
+
+/* ─── Mechanisms on a phone ───────────────────────────────────────────────
+   The nav glyphs are working mechanisms: the aperture stops down at rest and
+   opens as you arrive, the contact sheet draws its chinagraph select on, the
+   bolt turns a hex flat. All of that is scoped to .nav-item and driven by
+   hover — neither of which exists on a phone, so in the mobile rail every one
+   of them sat frozen in its unresolved rest pose: the aperture skewed 14° and
+   oversized, the chinagraph at opacity 0 and never drawn, the bolt untouched.
+   They read as broken drawings rather than as mechanisms at rest.
+
+   Here they simply sit resolved. Selection is carried by the corner marks and
+   the colour change, neither of which needs a pointer. */
+
+.m-rail-item .mech-blades {
+  transform: rotate(-16deg) scale(0.82);
+}
+
+.m-rail-item .mech-select {
+  stroke-dashoffset: 0;
+  opacity: 1;
+}
+
+.m-rail-item .mech-bolt {
+  transform: rotate(30deg);
+}
+
+.m-rail-item .mech-slot {
+  transform: rotate(90deg);
+}
+
+/* A square crop, so the print keeps its shape at any column width. */
+.portrait-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+/* ─── About, on one column ────────────────────────────────────────────────
+   The two-column layout puts the print, Philosophy and Outside Work on the
+   left and the description, Experience and Skills on the right. Below the
+   breakpoint that grid collapses to source order, which meant a phone read
+   photo → Philosophy → Outside Work → description → Experience: the two least
+   urgent cards sat directly under the photo and pushed everything a recruiter
+   actually opens the page for below the fold.
+
+   display: contents dissolves both column wrappers so all six cards land in
+   one flow and can be ordered on their own merits, without disturbing the
+   desktop arrangement at all. */
+
+@media (max-width: 1023px) {
+  .about-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .about-col {
+    display: contents;
+  }
+
+  /* .stack spaces its children with margins; the flex gap above now does it,
+     and leaving both on would double every gap. */
+  .about-grid > .about-col > * + * {
+    margin-top: 0;
+  }
+
+  .ord-portrait { order: 1; }
+  .ord-about { order: 2; }
+  .ord-experience { order: 3; }
+  .ord-skills { order: 4; }
+  .ord-philosophy { order: 5; }
+  .ord-outside { order: 6; }
+}
