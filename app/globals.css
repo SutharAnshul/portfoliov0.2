@@ -2335,3 +2335,159 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   .bcell { grid-column: 1 / -1; }
   .bstats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+/* ─── Spacing ladder ──────────────────────────────────────────────────────
+   Drawn to true proportion against the largest step, so 4XL is twenty times
+   the length of 2XS because it is twenty times the value. A table of numbers
+   tells you 48 exceeds 32; only the bars show the scale doubling at the top
+   and stepping in fours at the bottom. */
+
+.spacing { display: grid; gap: 7px; }
+
+.sp-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 40px 48px;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.sp-token { opacity: 0.85; }
+
+.sp-bar {
+  /* A span is inline, and width does not apply to inline boxes — without
+     this every bar measured zero and the ladder drew nothing. */
+  display: block;
+  height: 9px;
+  border-radius: 2px;
+  /* The file draws the ladder in pink; keeping it makes the card read as a
+     page from that document rather than as a chart invented here. */
+  background: linear-gradient(90deg, #F9A8A8, #F4C3C3);
+}
+
+.sp-val { text-align: right; font-variant-numeric: tabular-nums; }
+.sp-unit { opacity: 0.5; margin-left: 1px; }
+.sp-rem { text-align: right; opacity: 0.45; font-variant-numeric: tabular-nums; }
+
+/* ─── Button sheet, seven columns ─────────────────────────────────────────
+   Focus is a state a button can be in, not a different button, so the focused
+   variants are columns of the same matrix rather than a separate strip. Seven
+   columns will not fit a card at every width, so the sheet scrolls sideways
+   inside its own card instead of forcing the board wider. */
+
+.bg-scroll {
+  overflow-x: auto;
+  margin: 0 calc(var(--s4) * -1);
+  padding: 0 var(--s4);
+}
+
+.bg-grid {
+  grid-template-columns: 74px repeat(7, minmax(112px, 1fr));
+  min-width: 720px;
+}
+
+.bg-colhead {
+  flex-direction: column;
+  gap: 1px;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.bg-colsub { opacity: 0.5; }
+
+.bg-cell { min-height: 84px; padding: var(--s3) 10px; }
+
+.bg-btn {
+  font-size: 12px !important;
+  padding: 9px 12px !important;
+  width: 100%;
+}
+
+.bg-spec { font-size: 9px; }
+.bg-spec > span { padding: 0 4px; }
+
+/* ─── Cover ───────────────────────────────────────────────────────────────
+   The product's own title card, full bleed across the content column. */
+
+.sys-cover {
+  margin: calc(var(--s5) * -1) calc(var(--s6) * -1) var(--s6);
+  overflow: hidden;
+  border-bottom: 1px solid var(--card-line);
+}
+
+.sys-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ─── Source sheets ───────────────────────────────────────────────────────
+   A strip of the real documentation pages. They are tall and thin, so the
+   thumbnails crop to their top edge — that is where every sheet puts its
+   title and its hero example. */
+
+.sheets {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 168px;
+  gap: var(--s3);
+  overflow-x: auto;
+  padding-bottom: var(--s2);
+}
+
+.sheet { display: grid; gap: 6px; text-align: left; }
+
+.sheet-thumb {
+  display: block;
+  height: 132px;
+  overflow: hidden;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  background: #fff;
+  transition: border-color var(--dur-light, 300ms) var(--ease-light, ease-out);
+}
+
+.sheet:hover .sheet-thumb { border-color: var(--card-line-strong); }
+
+.sheet-thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Crop to the top: the title and hero example live there. */
+  object-fit: cover;
+  object-position: top center;
+}
+
+.sheet-label { opacity: 0.75; }
+
+.sheet-view {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+}
+
+.sheet-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding: var(--s4) var(--s6);
+  border-bottom: 1px solid var(--card-line);
+}
+
+.sheet-full {
+  flex: 1;
+  overflow: auto;
+  padding: var(--s5) var(--s6) var(--s8);
+}
+
+.sheet-full img {
+  display: block;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: auto;
+  border-radius: var(--r);
+}

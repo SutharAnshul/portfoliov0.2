@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { Settle } from '@/components/Settle'
 import { system } from '@/lib/superhealth'
 import { Ramp } from '@/components/system/Ramp'
+import { Spacing } from '@/components/system/Spacing'
+import { Sheets } from '@/components/system/Sheets'
 import { ButtonGallery } from '@/components/system/ButtonGallery'
 import { Inventory } from '@/components/system/Inventory'
 
@@ -101,6 +103,12 @@ export default function SuperhealthSystemPage() {
       </div>
 
       <div style={{ padding: 'var(--s7) var(--s6) var(--s8)' }}>
+        <Settle boot mass="heavy">
+          <div className="sys-cover">
+            <img src="/images/superhealth/cover.png" alt="Superhealth" fetchPriority="high" />
+          </div>
+        </Settle>
+
         {/* ── Masthead ─────────────────────────────────────────────────── */}
         <Settle boot mass="medium">
           <div className="sys-head">
@@ -229,6 +237,12 @@ export default function SuperhealthSystemPage() {
             )
           })}
 
+          <Settle mass="light" delay={50} className="bcell" style={{ ['--span' as string]: 4 }}>
+            <Card label="Spacing" note="09 steps">
+              <Spacing />
+            </Card>
+          </Settle>
+
           <Settle mass="light" delay={60} className="bcell" style={{ ['--span' as string]: 4 }}>
             <Card label="Elevation" note={pad(effects.length)}>
               <div className="elevs">
@@ -247,6 +261,17 @@ export default function SuperhealthSystemPage() {
                   )
                 })}
               </div>
+            </Card>
+          </Settle>
+
+          <Settle mass="light" delay={60} className="bcell" style={{ ['--span' as string]: 12 }}>
+            <Card label="Source sheets" note="11 pages">
+              <p className="t-meta bcard-lede">
+                The system&apos;s own documentation, as drawn. Everything else here is rebuilt from
+                the file&apos;s geometry — these are the pages themselves, and for the fields whose
+                visuals sit too deep to reconstruct they are the only true record.
+              </p>
+              <Sheets />
             </Card>
           </Settle>
 

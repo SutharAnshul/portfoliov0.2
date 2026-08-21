@@ -4,21 +4,32 @@ import { useState } from 'react'
 import { buttons, type ButtonVariant } from '@/lib/superhealth-buttons'
 
 /**
- * The buttons, as drawn.
+ * The buttons, laid out the way the file lays them out.
  *
- * An earlier version of this section let you pick Type and State and then drew
- * an approximation from a flat colour. It was wrong twice over: it made the
- * reader assemble the matrix themselves, and the approximation was not the
- * component — the real Primary button is a two-stop gradient at 310°, which no
- * amount of picking states would have revealed.
+ * Two earlier attempts got this wrong. The first let you pick Type and State
+ * and drew an approximation from a flat colour — which made the reader assemble
+ * the matrix themselves, and drew the wrong thing anyway: the real Primary
+ * button is a two-stop gradient at 310°. The second rendered the real geometry
+ * but split the focused variants into a separate strip, so the ring read as an
+ * afterthought rather than as a column of the matrix.
  *
- * So this renders every variant from the file's own geometry, and the reveal
- * shows what is driving each one: the fill, the radius, the padding, and the
- * variable bound to the label colour.
+ * The documentation sheet puts focus inline — Default, Hover, Active, then the
+ * same three focused, then Disabled — because focus is a state the button can
+ * be in, not a different button. That is what this follows.
  */
 
-const ORDER = ['Hero', 'Primary', 'Secondary']
-const STATES = ['Default', 'Hover', 'Active', 'Disabled']
+const TYPES = ['Hero', 'Primary', 'Secondary']
+
+/** The seven columns of the sheet, in its order. */
+const COLUMNS: { label: string; sub?: string; state: string; focused: boolean }[] = [
+  { label: 'Default', state: 'Default', focused: false },
+  { label: 'Hover', state: 'Hover', focused: false },
+  { label: 'Active', state: 'Active', focused: false },
+  { label: 'Default', sub: 'Focused', state: 'Default', focused: true },
+  { label: 'Hover', sub: 'Focused', state: 'Hover', focused: true },
+  { label: 'Active', sub: 'Focused', state: 'Active', focused: true },
+  { label: 'Disabled', state: 'Disabled', focused: false },
+]
 
 function Button({ v, reveal }: { v: ButtonVariant; reveal: boolean }) {
   const l = v.label
@@ -37,7 +48,6 @@ function Button({ v, reveal }: { v: ButtonVariant; reveal: boolean }) {
           fontSize: l?.size ?? 14,
           lineHeight: l?.lineHeight ?? 1.2,
           letterSpacing: l?.letterSpacing ? `${l.letterSpacing}em` : undefined,
-          minHeight: v.h,
         }}
       >
         {l?.text || 'Button'}
@@ -45,17 +55,14 @@ function Button({ v, reveal }: { v: ButtonVariant; reveal: boolean }) {
 
       {reveal && (
         <div className="bg-spec t-meta">
-          <span>
-            {v.w}×{v.h}
-          </span>
           <span>r{v.radius}</span>
           <span>
-            pad {v.padY}/{v.padX}
+            {v.padY}/{v.padX}
           </span>
           {v.backgroundKind === 'gradient' && <span className="bg-grad">gradient</span>}
           {v.bindings.map((b) => (
             <span key={b.prop} className="bg-bind">
-              {b.prop} → {b.token}
+              {b.token.split('/').pop()}
             </span>
           ))}
         </div>
@@ -69,13 +76,15 @@ export function ButtonGallery() {
   const [size, setSize] = useState('Large')
 
   const sizes = [...new Set(buttons.map((b) => b.props.Size).filter(Boolean))]
-  const shown = buttons.filter((b) => b.props.Size === size && b.props.Focused !== 'True')
-  const focused = buttons.filter((b) => b.props.Size === size && b.props.Focused === 'True')
 
-  const byType = (t: string) =>
-    STATES.map((s) => shown.find((b) => b.props.Type === t && b.props.State === s)).filter(
-      Boolean,
-    ) as ButtonVariant[]
+  const find = (type: string, state: string, focused: boolean) =>
+    buttons.find(
+      (b) =>
+        b.props.Size === size &&
+        b.props.Type === type &&
+        b.props.State === state &&
+        (b.props.Focused === 'True') === focused,
+    )
 
   return (
     <div>
@@ -103,46 +112,31 @@ export function ButtonGallery() {
         </button>
       </div>
 
-      <div className="bg-grid">
-        {/* Column headers: the states, running left to right. */}
-        <div className="bg-corner t-label">Type ╲ State</div>
-        {STATES.map((s) => (
-          <div key={s} className="t-label bg-colhead">
-            {s}
-          </div>
-        ))}
+      <div className="bg-scroll" data-lenis-prevent>
+        <div className="bg-grid">
+          <div className="bg-corner" />
+          {COLUMNS.map((c) => (
+            <div key={c.label + (c.sub ?? '')} className="t-label bg-colhead">
+              {c.label}
+              {c.sub && <span className="bg-colsub">{c.sub}</span>}
+            </div>
+          ))}
 
-        {ORDER.map((t) => {
-          const row = byType(t)
-          if (!row.length) return null
-          return (
-            <div key={t} className="bg-row" style={{ display: 'contents' }}>
+          {TYPES.map((t) => (
+            <div key={t} style={{ display: 'contents' }}>
               <div className="t-title bg-rowhead">{t}</div>
-              {STATES.map((s) => {
-                const v = row.find((b) => b.props.State === s)
+              {COLUMNS.map((c) => {
+                const v = find(t, c.state, c.focused)
                 return (
-                  <div key={s}>
+                  <div key={c.label + (c.sub ?? '')}>
                     {v ? <Button v={v} reveal={reveal} /> : <div className="bg-absent t-meta">—</div>}
                   </div>
                 )
               })}
             </div>
-          )
-        })}
-      </div>
-
-      {focused.length > 0 && (
-        <div style={{ marginTop: 'var(--s6)' }}>
-          <div className="t-label" style={{ marginBottom: 'var(--s3)' }}>
-            Focused — the same buttons carrying the focus ring
-          </div>
-          <div className="bg-strip">
-            {focused.slice(0, 6).map((v) => (
-              <Button key={v.name} v={v} reveal={reveal} />
-            ))}
-          </div>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   )
 }
