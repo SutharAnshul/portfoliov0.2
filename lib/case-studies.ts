@@ -48,6 +48,46 @@ export const caseStudies: CaseStudy[] = [
     ],
   },
   {
+    slug: 'superhealth',
+    title: 'Superhealth',
+    description:
+      'A design system for a healthcare product — colour, type, spacing and elevation, and the components built on top of them.',
+    category: 'Design System',
+    deck: 'The system a healthcare product is built from.',
+    status: 'Design system · 2026',
+    client: 'SuperHealth',
+    role: ['Product Designer'],
+    team: ['Product Designer', 'Developer'],
+    surfaces: ['Web', 'Mobile'],
+    opening: [
+      'A product team moving quickly will invent a button every time it needs one. The work here was to make that unnecessary: a set of foundations — colour with documented contrast, a type scale, a nine-step spacing ladder and four elevations — and the components built on top of them, drawn once and specified for every state they can be in.',
+      'The sheets that follow are the system as documented. Each component is drawn across its full matrix rather than in a single resting state, because the states are where a system either holds or falls apart: 49 component sets, 2,799 variants, and 2,370 instances placed from them across the product.',
+    ],
+    featured: true,
+    thumbnail: '/images/superhealth/thumbnail.png',
+    year: 2026,
+    details: {
+      challenge:
+        'Give a fast-moving healthcare product one set of foundations and components, specified across every state, so the interface stops being reinvented screen by screen.',
+      solution:
+        'Built colour ramps with documented contrast, a type scale, a nine-step spacing ladder and an elevation set, then drew each component across its full variant matrix and bound its properties to variables.',
+      results: [],
+    },
+    sections: [
+      { type: 'image', image: '/images/superhealth/sheet-colours.png', imageAlt: 'Superhealth design system — Colour' },
+      { type: 'image', image: '/images/superhealth/sheet-typography.png', imageAlt: 'Superhealth design system — Typography' },
+      { type: 'image', image: '/images/superhealth/sheet-spacing-system.png', imageAlt: 'Superhealth design system — Spacing system' },
+      { type: 'image', image: '/images/superhealth/sheet-shadow.png', imageAlt: 'Superhealth design system — Elevation' },
+      { type: 'image', image: '/images/superhealth/sheet-button.png', imageAlt: 'Superhealth design system — Button' },
+      { type: 'image', image: '/images/superhealth/sheet-text-input.png', imageAlt: 'Superhealth design system — Text input' },
+      { type: 'image', image: '/images/superhealth/sheet-select-field.png', imageAlt: 'Superhealth design system — Select field' },
+      { type: 'image', image: '/images/superhealth/sheet-otp-input-field.png', imageAlt: 'Superhealth design system — OTP input field' },
+      { type: 'image', image: '/images/superhealth/sheet-phone-number-field.png', imageAlt: 'Superhealth design system — Phone number field' },
+      { type: 'image', image: '/images/superhealth/sheet-logotype-and-mark.png', imageAlt: 'Superhealth design system — Logotype and mark' },
+      { type: 'image', image: '/images/superhealth/sheet-website-components.png', imageAlt: 'Superhealth design system — Website components' },
+    ],
+  },
+  {
     slug: 'incentiwise',
     title: 'Incentiwise',
     description:
