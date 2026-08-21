@@ -41,7 +41,6 @@ import { CustomCursor } from '@/components/CustomCursor'
 export const metadata: Metadata = {
   title: 'Anshul Suthar - Product Designer',
   description: 'Product designer based in India. I see design as solving real problems and building systems that scale.',
-  generator: 'v0.app',
   icons: {
     icon: [
       {
