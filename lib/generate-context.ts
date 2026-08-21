@@ -37,7 +37,7 @@ I'm a product designer from India with a passion for solving real problems and b
 - Engineered and iterated multiple prototypes via CNC machining
 - Tested at concerts, earning praise for playability and tone
 
-### Incentiwize - Rewards & Recognition Platform (Jul 2023 - Aug 2024)
+### Incentiwise - Rewards & Recognition Platform (Jul 2023 - Aug 2024)
 - Led UX research and defined user personas for HR Tech space
 - Built MVP of B2B rewards and recognition platform
 - Designed end-to-end flows and UI components

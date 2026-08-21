@@ -2277,3 +2277,99 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 @media (max-width: 560px) {
   .inv-prop { grid-template-columns: 1fr; gap: 4px; }
 }
+
+/* ─── Button gallery ──────────────────────────────────────────────────────
+   The variants as drawn, laid out as the matrix they are: type down, state
+   across. Everything inside a cell comes from the file, so the cells get a
+   light ground — this is a light-mode product and showing its buttons on
+   black would misrepresent every one of them. */
+
+.bg-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  margin-bottom: var(--s4);
+}
+
+.bg-grid {
+  display: grid;
+  grid-template-columns: 92px repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  padding: 1px;
+  background: var(--card-line);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+.bg-corner,
+.bg-colhead,
+.bg-rowhead {
+  display: flex;
+  align-items: center;
+  padding: var(--s3);
+  background: var(--background);
+}
+
+.bg-colhead { justify-content: center; }
+
+.bg-cell,
+.bg-absent {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--s3);
+  min-height: 104px;
+  height: 100%;
+  padding: var(--s4) var(--s3);
+  background: #f4f4f5;
+}
+
+.bg-absent { color: #9a9aa0; }
+
+.bg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  white-space: nowrap;
+  /* The recorded width is a container width; the label decides the real one. */
+  max-width: 100%;
+}
+
+.bg-spec {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  color: #4b4b52;
+  text-align: center;
+}
+
+.bg-spec > span {
+  padding: 1px 5px;
+  border: 1px solid #d8d8dd;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.bg-grad { border-color: #b9c2ff !important; }
+.bg-bind { border-color: #b9d9c2 !important; }
+
+.bg-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1px;
+  padding: 1px;
+  background: var(--card-line);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .bg-grid { grid-template-columns: 1fr; }
+  .bg-corner { display: none; }
+  .bg-colhead { justify-content: flex-start; }
+}

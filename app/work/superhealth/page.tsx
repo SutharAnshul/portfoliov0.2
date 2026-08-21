@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Settle } from '@/components/Settle'
 import { system } from '@/lib/superhealth'
 import { Swatches } from '@/components/system/Swatches'
-import { ButtonLab } from '@/components/system/ButtonLab'
+import { ButtonGallery } from '@/components/system/ButtonGallery'
 import { Inventory } from '@/components/system/Inventory'
 
 /**
@@ -63,7 +63,7 @@ function Stat({ value, label }: { value: string | number; label: string }) {
 }
 
 export default function SuperhealthSystemPage() {
-  const { counts, colours, type, effects, variables, components, foreignLibraries } = system
+  const { counts, colours, type, effects, components, foreignLibraries } = system
 
   const buttons = components.find((c) => c.name === 'Buttons')
 
@@ -75,13 +75,6 @@ export default function SuperhealthSystemPage() {
     typeRoles.get(key)!.push(t)
   }
   for (const list of typeRoles.values()) list.sort((a, b) => (b.size ?? 0) - (a.size ?? 0))
-
-  const varSets = new Map<string, typeof variables>()
-  for (const v of variables) {
-    const key = v.set ?? 'Unassigned'
-    if (!varSets.has(key)) varSets.set(key, [])
-    varSets.get(key)!.push(v)
-  }
 
   const families = [...new Set(type.map((t) => t.family).filter(Boolean))] as string[]
 
@@ -144,9 +137,21 @@ export default function SuperhealthSystemPage() {
           </div>
         </Settle>
 
-        {/* ── 01 At a glance ──────────────────────────────────────────── */}
+        {/* ── 01 Buttons ──────────────────────────────────────────────── */}
         <Settle mass="light" delay={40}>
-          <Section n="01" title="At a glance">
+          <Section n="01" title="Buttons, as drawn" note={`${buttons?.variants ?? 0} variants`}>
+            <p className="case-prose" style={{ marginBottom: 'var(--s5)' }}>
+              Every variant below is rendered from the file&apos;s own geometry — the gradient and
+              its angle, the radius, the auto-layout padding and the label&apos;s type. Reveal what
+              drives them to see the measurements and the variable bound to each label colour.
+            </p>
+            <ButtonGallery />
+          </Section>
+        </Settle>
+
+        {/* ── 02 At a glance ──────────────────────────────────────────── */}
+        <Settle mass="light" delay={40}>
+          <Section n="02" title="At a glance">
             <div className="stats">
               <Stat value={counts.colours} label="Colour styles" />
               <Stat value={counts.type} label="Type styles" />
@@ -165,16 +170,16 @@ export default function SuperhealthSystemPage() {
           </Section>
         </Settle>
 
-        {/* ── 02 Colour ───────────────────────────────────────────────── */}
+        {/* ── 03 Colour ───────────────────────────────────────────────── */}
         <Settle mass="light" delay={40}>
-          <Section n="02" title="Colour" note={`${pad(colours.length)} styles`}>
+          <Section n="03" title="Colour" note={`${pad(colours.length)} styles`}>
             <Swatches colours={colours} />
           </Section>
         </Settle>
 
-        {/* ── 03 Type ─────────────────────────────────────────────────── */}
+        {/* ── 04 Type ─────────────────────────────────────────────────── */}
         <Settle mass="light" delay={40}>
-          <Section n="03" title="Type" note={families.join(' · ')}>
+          <Section n="04" title="Type" note={families.join(' · ')}>
             <div className="stack" style={{ ['--gap' as string]: 'var(--s6)' } as React.CSSProperties}>
               {[...typeRoles.entries()].map(([role, styles]) => (
                 <div key={role}>
@@ -242,9 +247,9 @@ export default function SuperhealthSystemPage() {
           </Section>
         </Settle>
 
-        {/* ── 04 Elevation ────────────────────────────────────────────── */}
+        {/* ── 05 Elevation ────────────────────────────────────────────── */}
         <Settle mass="light" delay={40}>
-          <Section n="04" title="Elevation" note={`${pad(effects.length)} styles`}>
+          <Section n="05" title="Elevation" note={`${pad(effects.length)} styles`}>
             <div className="elevations">
               {effects.map((e) => {
                 const css = e.layers
@@ -269,50 +274,9 @@ export default function SuperhealthSystemPage() {
           </Section>
         </Settle>
 
-        {/* ── 05 Variables ────────────────────────────────────────────── */}
+        {/* ── 06 Inventory ────────────────────────────────────────────── */}
         <Settle mass="light" delay={40}>
-          <Section n="05" title="Variables" note={`${pad(variables.length)} tokens`}>
-            <div className="stack" style={{ ['--gap' as string]: 'var(--s5)' } as React.CSSProperties}>
-              {[...varSets.entries()].map(([setName, tokens]) => (
-                <div key={setName} className="card">
-                  <div className="flex items-baseline justify-between">
-                    <span className="t-title">{setName}</span>
-                    <span className="t-label">{pad(tokens.length)}</span>
-                  </div>
-                  <div className="tokens" style={{ marginTop: 'var(--s4)' }}>
-                    {tokens.map((v) => (
-                      <div key={v.name} className="token">
-                        {typeof v.value === 'string' && v.value.startsWith('#') && (
-                          <span className="token-chip" style={{ background: v.value }} />
-                        )}
-                        <span className="token-name t-meta">{v.name}</span>
-                        <span className="token-val t-meta">{String(v.value ?? '—')}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Section>
-        </Settle>
-
-        {/* ── 06 Buttons ──────────────────────────────────────────────── */}
-        {buttons && (
-          <Settle mass="light" delay={40}>
-            <Section n="06" title="Buttons" note={`${buttons.variants} variants`}>
-              <p className="case-prose" style={{ marginBottom: 'var(--s5)' }}>
-                Four properties multiply out to the set. Rather than list them, this drives a real
-                button from the same matrix — the fill comes from the file&apos;s own orange ramp and
-                the focus ring from its <em>Focused glow</em> effect.
-              </p>
-              <ButtonLab set={buttons} colours={colours} />
-            </Section>
-          </Settle>
-        )}
-
-        {/* ── 07 Inventory ────────────────────────────────────────────── */}
-        <Settle mass="light" delay={40}>
-          <Section n="07" title="Component inventory">
+          <Section n="06" title="Component inventory">
             <Inventory components={components} />
           </Section>
         </Settle>
