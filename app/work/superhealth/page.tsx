@@ -103,12 +103,6 @@ export default function SuperhealthSystemPage() {
       </div>
 
       <div style={{ padding: 'var(--s7) var(--s6) var(--s8)' }}>
-        <Settle boot mass="heavy">
-          <div className="sys-cover">
-            <img src="/images/superhealth/cover.png" alt="Superhealth" fetchPriority="high" />
-          </div>
-        </Settle>
-
         {/* ── Masthead ─────────────────────────────────────────────────── */}
         <Settle boot mass="medium">
           <div className="sys-head">

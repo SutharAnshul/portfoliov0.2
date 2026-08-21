@@ -2405,21 +2405,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .bg-spec { font-size: 9px; }
 .bg-spec > span { padding: 0 4px; }
 
-/* ─── Cover ───────────────────────────────────────────────────────────────
-   The product's own title card, full bleed across the content column. */
-
-.sys-cover {
-  margin: calc(var(--s5) * -1) calc(var(--s6) * -1) var(--s6);
-  overflow: hidden;
-  border-bottom: 1px solid var(--card-line);
-}
-
-.sys-cover img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 /* ─── Source sheets ───────────────────────────────────────────────────────
    A strip of the real documentation pages. They are tall and thin, so the
    thumbnails crop to their top edge — that is where every sheet puts its

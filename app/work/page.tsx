@@ -57,8 +57,15 @@ export default function WorkPage() {
             than being flattened into the same card shape. */}
         <Settle mass="medium" delay={80}>
           <FieldItem maxShift={4} radiusRatio={1.4} mass={1.2}>
-            <Link href="/work/superhealth" data-sfx="tick" className="card-link relative block">
+            <Link href="/work/superhealth" data-sfx="tick" className="card-link group relative block">
               <CornerMarks />
+              <div className="well" style={{ aspectRatio: '4 / 3', marginBottom: 'var(--s4)' }}>
+                <img
+                  src="/images/superhealth/thumbnail.png"
+                  alt="Superhealth"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+              </div>
               <div style={{ marginTop: 0 }}>
                 <div className="flex items-baseline justify-between" style={{ gap: 16 }}>
                   <span className="t-title">Superhealth — Design System</span>

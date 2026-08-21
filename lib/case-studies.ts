@@ -18,7 +18,7 @@ export const caseStudies: CaseStudy[] = [
       'Community research and ergonomic study drove the form: body shape, neck profile, a scalloped fretboard and hand-wound pickups, taken through sketching and prototyping to a finished instrument built on a CNC and by hand.',
     ],
     featured: true,
-    thumbnail: '/images/solic-arc/00-cover.png',
+    thumbnail: '/images/solic-arc/thumbnail.png',
     year: 2025,
     details: {
       challenge:
@@ -28,7 +28,6 @@ export const caseStudies: CaseStudy[] = [
       results: [],
     },
     sections: [
-      { type: 'image', image: '/images/solic-arc/00-cover.png', imageAlt: 'Solic Arc, frame 00-cover' },
       { type: 'image', image: '/images/solic-arc/01.png', imageAlt: 'Solic Arc, frame 01' },
       { type: 'image', image: '/images/solic-arc/02.png', imageAlt: 'Solic Arc, frame 02' },
       { type: 'image', image: '/images/solic-arc/03.png', imageAlt: 'Solic Arc, frame 03' },
