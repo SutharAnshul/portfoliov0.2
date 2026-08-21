@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { caseStudies } from '@/lib/case-studies'
 import { Settle } from '@/components/Settle'
 import { FieldItem } from '@/components/FieldItem'
+import { CornerMarks } from '@/components/CornerMarks'
 
 /**
  * Work index. Each item is a media well plus a tabular caption row — title and
@@ -52,6 +53,25 @@ export default function WorkPage() {
           ))}
         </div>
 
+        {/* Not a case study: a live document, so it gets its own entry rather
+            than being flattened into the same card shape. */}
+        <Settle mass="medium" delay={80}>
+          <FieldItem maxShift={4} radiusRatio={1.4} mass={1.2}>
+            <Link href="/work/superhealth" data-sfx="tick" className="card-link relative block">
+              <CornerMarks />
+              <div style={{ marginTop: 0 }}>
+                <div className="flex items-baseline justify-between" style={{ gap: 16 }}>
+                  <span className="t-title">Superhealth — Design System</span>
+                  <span className="t-meta">2026</span>
+                </div>
+                <p className="t-meta" style={{ marginTop: 6, lineHeight: 1.7 }}>
+                  An interactive document read straight out of the Figma file — 18 colour styles,
+                  30 type styles, 58 variables and 49 component sets, with the button matrix live.
+                </p>
+              </div>
+            </Link>
+          </FieldItem>
+        </Settle>
         <Settle mass="light">
           <div style={{ marginTop: 'var(--s8)' }}>
             <hr className="rule" />
