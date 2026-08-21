@@ -38,6 +38,8 @@ interface Props {
   /** Settle on mount (page boot) rather than on scroll into view */
   boot?: boolean
   className?: string
+  /** Merged after the settle transform, for layout the caller owns. */
+  style?: React.CSSProperties
   as?: 'div' | 'section' | 'li' | 'article' | 'span'
 }
 
@@ -58,6 +60,7 @@ export function Settle({
   delay = 0,
   boot = false,
   className = '',
+  style: outerStyle,
   as = 'div',
 }: Props) {
   const ref = useRef<HTMLElement | null>(null)
@@ -153,11 +156,12 @@ export function Settle({
     '--st-blur': `${BLUR[mass]}px`,
   } as React.CSSProperties
 
-  let style: React.CSSProperties = vars
+  let style: React.CSSProperties = { ...vars, ...outerStyle }
 
   if (state === 'held') {
     style = {
       ...vars,
+      ...outerStyle,
       transform: `translate3d(0, ${TRAVEL[mass] * sign * (arrival ? NAV_TRAVEL : 1)}px, 0)`,
       filter: `blur(${BLUR[mass] * (arrival ? NAV_BLUR : 1)}px)`,
       opacity: 0,
@@ -167,6 +171,7 @@ export function Settle({
   } else if (state === 'settled') {
     style = {
       ...vars,
+      ...outerStyle,
       transform: 'none',
       filter: 'blur(0px)',
       opacity: 1,

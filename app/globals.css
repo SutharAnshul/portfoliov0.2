@@ -2040,244 +2040,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   .ord-outside { order: 6; }
 }
 
-/* ─── Design system document ──────────────────────────────────────────────
-   Specimens are the subject here, so the page's own voice stays quiet: mono
-   for every figure, corner-mark plates around anything being shown, and the
-   product's colour allowed only inside the specimens themselves. */
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s5) var(--s4);
-}
-
-@media (min-width: 720px) {
-  .stats { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-}
-
-.stat-n {
-  font-size: 1.75rem;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  margin-bottom: var(--s2);
-}
-
-/* ── Colour ── */
-.sw-ramp {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
-  gap: 2px;
-}
-
-.sw {
-  display: grid;
-  align-content: space-between;
-  gap: var(--s5);
-  min-height: 92px;
-  padding: var(--s3);
-  border-radius: var(--r);
-  text-align: left;
-  transition: transform var(--dur-light, 300ms) var(--ease-light, ease-out);
-}
-
-.sw:hover { transform: translateY(-2px); }
-
-.sw-token {
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  opacity: 0.85;
-}
-
-.sw-hex {
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ── Type ── */
-.specimens {
-  display: grid;
-  gap: var(--s4);
-}
-
-.specimen {
-  padding: var(--s4);
-  border: 1px solid var(--card-line);
-  border-radius: var(--r);
-  background: var(--card-fill);
-}
-
-.specimen-line {
-  color: var(--foreground);
-  /* A 45px specimen must not push the page sideways on a phone. */
-  overflow-wrap: anywhere;
-}
-
-.specimen-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s3);
-  margin-top: var(--s3);
-  padding-top: var(--s3);
-  border-top: 1px solid var(--card-line);
-}
-
-/* ── Elevation ── */
-.elevations {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--s5);
-}
-
-/* Shadows need a light ground to read; the page is dark. */
-.elev-tile {
-  height: 96px;
-  border-radius: var(--r);
-  background: #f4f4f5;
-}
-
-/* ── Variables ── */
-.tokens { display: grid; gap: 1px; }
-
-.token {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--s3);
-  padding: 5px 0;
-}
-
-.token + .token { border-top: 1px solid var(--card-line); }
-
-.token-chip {
-  width: 13px;
-  height: 13px;
-  border-radius: 3px;
-  border: 1px solid var(--card-line-strong);
-}
-
-.token-name { grid-column: 2; overflow-wrap: anywhere; }
-.token-val { font-variant-numeric: tabular-nums; opacity: 0.7; }
-
-/* ── Button lab ── */
-.lab {
-  display: grid;
-  gap: var(--s5);
-  border: 1px solid var(--card-line);
-  border-radius: var(--r);
-  overflow: hidden;
-}
-
-@media (min-width: 860px) {
-  .lab { grid-template-columns: minmax(0, 1fr) 320px; }
-}
-
-.lab-stage {
-  display: grid;
-  place-items: center;
-  min-height: 200px;
-  padding: var(--s6);
-  /* The product is a light-mode product; showing its buttons on this site's
-     black would misrepresent every one of them. */
-  background: #f4f4f5;
-}
-
-.lab-btn {
-  border-radius: 8px;
-  font-family: system-ui, sans-serif;
-  font-weight: 600;
-  transition: none;
-}
-
-.lab-controls {
-  display: grid;
-  gap: var(--s4);
-  align-content: start;
-  padding: var(--s5);
-  border-left: 1px solid var(--card-line);
-}
-
-.lab-row { display: flex; flex-wrap: wrap; gap: 4px; }
-
-.lab-opt {
-  padding: 5px 9px;
-  border: 1px solid var(--card-line);
-  border-radius: var(--r-sm);
-  color: color-mix(in srgb, var(--foreground) 60%, transparent);
-}
-
-.lab-opt[data-on='true'] {
-  border-color: var(--card-line-strong);
-  background: var(--card-fill-hover);
-  color: var(--foreground);
-}
-
-/* ── Inventory ── */
-.inv { display: grid; }
-
-.inv-row { border-bottom: 1px solid var(--card-line); }
-
-.inv-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--s4);
-  width: 100%;
-  padding: var(--s3) 0;
-  text-align: left;
-  color: color-mix(in srgb, var(--foreground) 78%, transparent);
-  transition: color var(--dur-light, 300ms) var(--ease-light, ease-out);
-}
-
-.inv-head:hover,
-.inv-row[data-open='true'] .inv-head { color: var(--foreground); }
-
-.inv-name { display: inline-flex; align-items: baseline; gap: var(--s3); }
-
-.inv-tag {
-  padding: 1px 5px;
-  border: 1px solid var(--card-line);
-  border-radius: 999px;
-  opacity: 0.6;
-}
-
-.inv-count {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--s4);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.inv-props { opacity: 0.5; }
-
-.inv-body {
-  display: grid;
-  gap: var(--s3);
-  padding: 0 0 var(--s5);
-  animation: say-line 260ms var(--ease-light, ease-out) both;
-}
-
-.inv-prop {
-  display: grid;
-  grid-template-columns: 120px minmax(0, 1fr);
-  gap: var(--s3);
-  align-items: baseline;
-}
-
-.inv-vals { display: flex; flex-wrap: wrap; gap: 4px; }
-
-.inv-val {
-  padding: 2px 7px;
-  border: 1px solid var(--card-line);
-  border-radius: var(--r-sm);
-  background: var(--card-fill);
-}
-
-@media (max-width: 560px) {
-  .inv-prop { grid-template-columns: 1fr; gap: 4px; }
-}
-
 /* ─── Button gallery ──────────────────────────────────────────────────────
    The variants as drawn, laid out as the matrix they are: type down, state
    across. Everything inside a cell comes from the file, so the cells get a
@@ -2372,4 +2134,204 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   .bg-grid { grid-template-columns: 1fr; }
   .bg-corner { display: none; }
   .bg-colhead { justify-content: flex-start; }
+}
+
+/* ─── The board ───────────────────────────────────────────────────────────
+   A design system is not a list, and stacking full-width sections made it one:
+   a three-step ramp got the same width as a thirty-style type scale, and the
+   only way through was to scroll. This is a twelve-column board where each card
+   asks for the span its contents need, so size carries meaning again. */
+
+.bento {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s4);
+  margin-top: var(--s7);
+  align-items: start;
+}
+
+/* Settle owns the element, so the span rides on a custom property it forwards. */
+.bcell {
+  grid-column: span var(--span, 4);
+  min-width: 0;
+}
+
+.bcard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  background: var(--card-fill);
+  overflow: hidden;
+}
+
+.bcard-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: var(--s4) var(--s4) var(--s3);
+  border-bottom: 1px solid var(--card-line);
+}
+
+.bcard-note {
+  opacity: 0.55;
+  white-space: nowrap;
+}
+
+.bcard-body {
+  padding: var(--s4);
+  min-width: 0;
+}
+
+/* Tall content scrolls inside its own card rather than stretching the row and
+   leaving every neighbour with a column of empty space beside it. */
+.bcard-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.bcard-lede {
+  line-height: 1.7;
+  margin-bottom: var(--s4);
+  opacity: 0.8;
+}
+
+/* ── Masthead ── */
+.sys-head {
+  display: grid;
+  gap: var(--s5);
+  align-items: end;
+}
+
+@media (min-width: 900px) {
+  .sys-head { grid-template-columns: minmax(0, 1fr) auto; }
+}
+
+.sys-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s4) var(--s5);
+}
+
+@media (min-width: 640px) {
+  .sys-facts { grid-template-columns: repeat(4, auto); }
+}
+
+/* ── Stats ── */
+.bstats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s4);
+}
+
+.bstat-n {
+  font-size: 1.5rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 4px;
+}
+
+/* ── Ramps ── */
+.ramp {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 2px;
+}
+
+.chip {
+  display: grid;
+  align-content: space-between;
+  gap: var(--s4);
+  min-height: 78px;
+  padding: 9px;
+  border-radius: var(--r);
+  text-align: left;
+  transition: transform var(--dur-light, 300ms) var(--ease-light, ease-out);
+}
+
+.chip:hover { transform: translateY(-2px); }
+
+.chip-token {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.chip-hex {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ramp-notes {
+  margin-top: var(--s3);
+  line-height: 1.65;
+  opacity: 0.7;
+}
+
+/* ── Type specimens ── */
+.specs { display: grid; }
+
+.spec-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding: var(--s3) 0;
+  min-width: 0;
+}
+
+.spec-row + .spec-row { border-top: 1px solid var(--card-line); }
+
+.spec-line {
+  color: var(--foreground);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spec-num {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.spec-unit { opacity: 0.6; margin-left: 1px; }
+
+/* ── Elevation ── */
+.elevs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s4);
+}
+
+/* Shadows need a light ground to read at all; the page is black. */
+.elev-swatch {
+  height: 64px;
+  border-radius: var(--r);
+  background: #f4f4f5;
+}
+
+.elev-name {
+  margin-top: 6px;
+  opacity: 0.7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Board responsiveness ── */
+@media (max-width: 1100px) {
+  .bento { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  /* Anything asking for more than half the board takes the full width here. */
+  .bcell { grid-column: span min(var(--span, 4), 6); }
+}
+
+@media (max-width: 700px) {
+  .bento { grid-template-columns: minmax(0, 1fr); gap: var(--s4); }
+  .bcell { grid-column: 1 / -1; }
+  .bstats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
