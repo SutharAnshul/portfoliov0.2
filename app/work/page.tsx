@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { caseStudies } from '@/lib/case-studies'
+import { neighbours } from '@/lib/flow'
 import { Settle } from '@/components/Settle'
 import { FieldItem } from '@/components/FieldItem'
 
@@ -9,6 +10,11 @@ import { FieldItem } from '@/components/FieldItem'
  * figures so the years form a clean column down the page.
  */
 export default function WorkPage() {
+  // The footer used to promise "↓ Continue" unconditionally. With Garage
+  // unrouted there is nothing below this page, and an invitation to scroll on
+  // to a place that no longer exists is worse than no invitation at all.
+  const { next } = neighbours('/work')
+
   return (
     <div className="bg-background text-foreground min-h-screen">
       <div style={{ padding: 'var(--s6) var(--s6) var(--s8)' }}>
@@ -60,7 +66,7 @@ export default function WorkPage() {
               style={{ paddingTop: 'var(--s3)' }}
             >
               <span className="t-label">End of selected work</span>
-              <span className="t-label">↓ Continue</span>
+              {next && <span className="t-label">↓ Continue</span>}
             </div>
           </div>
         </Settle>

@@ -10,10 +10,17 @@ export interface Page {
   label: string
 }
 
+/**
+ * Garage is not here, and its route folder is `app/_garage` — the App Router
+ * skips a leading underscore, so the page is unrouted rather than merely
+ * unlisted. Hiding it from the nav alone was not enough: overscrolling the
+ * bottom of Work still carried you into it, because this list is what the
+ * gauge advances through. Put the entry back and rename the folder to bring
+ * it back in one move.
+ */
 export const PAGES: Page[] = [
   { path: '/', label: 'About' },
   { path: '/work', label: 'Selected Work' },
-  { path: '/garage', label: 'My Garage' },
 ]
 
 export interface Neighbours {
