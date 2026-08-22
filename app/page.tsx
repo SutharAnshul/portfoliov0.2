@@ -79,17 +79,19 @@ export default function Page() {
               <Card title="About">
                 <div className="t-body stack">
                   <p>
-                    I see design as solving real problems and building systems that scale. I work
-                    across product, UX, systems design, and even industrial design.
+                    I’m interested in how people, products, and systems fit together. I like getting
+                    close to a problem, understanding what’s actually happening, and turning that
+                    into clear, useful experiences.
                   </p>
                   <p>
-                    I&apos;ve worked on B2B HR tech platforms, maternal health apps, and organic
-                    beauty e-commerce brands. Every project taught me something about design,
-                    business, and people.
+                    I’ve worked across B2B platforms, healthcare, e-commerce, and systems design,
+                    with experience spanning research, UX, interaction design, and design systems.
+                    I’ve also explored industrial design, which has shaped how I think about form,
+                    constraints, and how things come together.
                   </p>
                   <p>
-                    In my free time you&apos;ll find me playing guitar, tinkering with new ideas, or
-                    out on a photo walk exploring my neighbourhood.
+                    Outside work, I’m usually playing guitar, taking photographs, tinkering with
+                    something, or following some new curiosity down a rabbit hole.
                   </p>
                 </div>
               </Card>
