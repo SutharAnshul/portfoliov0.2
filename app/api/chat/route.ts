@@ -18,18 +18,39 @@ import { buildProfile } from '@/lib/profile'
  * the Work pages render, so the answers cannot drift from the site.
  */
 
+/**
+ * What Mr. Toast says when he cannot answer.
+ *
+ * A visitor does not need to hear about environment variables — that is our
+ * problem, not theirs, and reading it breaks the one illusion the chat is
+ * built on. A cat that will not do the thing you asked is not a broken cat;
+ * it is a cat. So he declines the way cats decline: completely, without
+ * apology, and without explaining himself. The email still gets handed over,
+ * because the visitor came here to reach someone.
+ *
+ * Several lines, chosen at random, so asking twice does not show the seam.
+ */
+const DECLINED = [
+  "I've considered it and decided no. It's warm here. Anshul is more obliging than I am — s.anshul@iitg.ac.in.",
+  "Ask me again in four hours. I'm in the middle of something, and the something is lying down. Anshul answers sooner: s.anshul@iitg.ac.in.",
+  'I heard you. I am choosing to sit here instead. He is at s.anshul@iitg.ac.in, and he has never once ignored anybody.',
+  "Not today. I don't have to explain myself, that's rather the point of being a cat. Try Anshul at s.anshul@iitg.ac.in — he's the one who does things.",
+  "I've turned my back to you. It isn't personal, it's just what I do with my back. s.anshul@iitg.ac.in reaches Anshul, who faces people.",
+]
+
+/** For the case where something genuinely broke, rather than merely a cat. */
+const KNOCKED_OVER = [
+  'Something fell off a shelf. I was nowhere near it. Ask me again in a moment.',
+  'That went wrong and I would rather not discuss it. Try again shortly.',
+]
+
+const pick = (lines: string[]) => lines[Math.floor(Math.random() * lines.length)]
+
 export async function POST(req: Request) {
   const apiKey = process.env.ANTHROPIC_API_KEY
 
   if (!apiKey) {
-    return Response.json(
-      {
-        error: 'not_configured',
-        message:
-          "I can't reach my brain at the moment — no API key is configured. Ask Anshul directly at s.anshul@iitg.ac.in.",
-      },
-      { status: 503 },
-    )
+    return Response.json({ error: 'not_configured', message: pick(DECLINED) }, { status: 503 })
   }
 
   try {
@@ -73,7 +94,7 @@ ${buildProfile(context)}
       const detail = await res.text()
       console.error('Anthropic API error:', res.status, detail)
       return Response.json(
-        { error: 'upstream', message: 'Something went wrong reaching my brain. Try again shortly.' },
+        { error: 'upstream', message: pick(KNOCKED_OVER) },
         { status: 502 },
       )
     }
@@ -84,7 +105,7 @@ ${buildProfile(context)}
   } catch (error) {
     console.error('Chat API error:', error)
     return Response.json(
-      { error: 'failed', message: 'Something went wrong on my end. Try again shortly.' },
+      { error: 'failed', message: pick(KNOCKED_OVER) },
       { status: 500 },
     )
   }

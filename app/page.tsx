@@ -76,13 +76,11 @@ export default function Page() {
           {/* Right: description, then the record */}
           <div className="about-col stack">
             <Settle boot mass="light" delay={100} className="ord-about">
-              <Card>
+              <Card title="About">
                 <div className="t-body stack">
                   <p>
                     I see design as solving real problems and building systems that scale. I work
-                    across product, UX, systems design, and even industrial design — I&apos;ve
-                    designed and built an electric guitar. The best outcomes come from questioning,
-                    validating, and building with intent.
+                    across product, UX, systems design, and even industrial design.
                   </p>
                   <p>
                     I&apos;ve worked on B2B HR tech platforms, maternal health apps, and organic
@@ -107,31 +105,26 @@ export default function Page() {
                     period="Jul 2023 — Present"
                     detail="Co-Founder & Creative Director at Herbal Mitra"
                   />
+                </div>
+              </Card>
+            </Settle>
 
-                  {/* Education closes the same record rather than repeating the
-                      card structure beside it. */}
-                  <div
-                    style={{
-                      marginTop: 'var(--s3)',
-                      paddingTop: 'var(--s4)',
-                      borderTop: '1px solid var(--card-line)',
-                    }}
-                  >
-                    <div className="t-meta">2021 — 2025</div>
-                    {/* Taller line and a little lead: an 18px mark on a 13px
-                        line overflows its line box and crowds the date above,
-                        which every other entry here does not have to allow for. */}
-                    <div
-                      className="t-body"
-                      style={{ lineHeight: 1.9, marginTop: 3 }}
-                    >
-                      ↳{' '}
-                      <LogoMark
-                        src="/images/iitg.png"
-                        alt="Indian Institute of Technology Guwahati"
-                      />
-                      B.Des. at IIT, Guwahati
-                    </div>
+            {/* Education is its own record. It closed the Experience card
+                before, behind a rule, which read as a fifth job. */}
+            <Settle boot mass="light" delay={220} className="ord-education">
+              <Card title="Education">
+                <div>
+                  <div className="t-meta">2021 — 2025</div>
+                  {/* Taller line and a little lead: an 18px mark on a 13px
+                      line overflows its line box and crowds the date above,
+                      which every other entry here does not have to allow for. */}
+                  <div className="t-body" style={{ lineHeight: 1.9, marginTop: 3 }}>
+                    ↳{' '}
+                    <LogoMark
+                      src="/images/iitg.png"
+                      alt="Indian Institute of Technology Guwahati"
+                    />
+                    B.Des. at IIT, Guwahati
                   </div>
                 </div>
               </Card>

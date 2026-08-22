@@ -17,10 +17,13 @@ export function LogoMark({
   src,
   alt,
   size = 18,
+  className = '',
 }: {
   src: string
   alt: string
   size?: number
+  /** `mark-mono` strips the colour, for pages that hold a monochrome line. */
+  className?: string
 }) {
   const ref = useRef<HTMLImageElement>(null)
   const [ok, setOk] = useState(true)
@@ -41,6 +44,7 @@ export function LogoMark({
       width={size}
       height={size}
       onError={() => setOk(false)}
+      className={className}
       style={{
         width: size,
         height: size,

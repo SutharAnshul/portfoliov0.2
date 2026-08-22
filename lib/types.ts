@@ -27,11 +27,19 @@ export interface CaseStudy {
 }
 
 export interface CaseStudySection {
-  type: 'text' | 'image' | 'two-column' | 'cta' | 'button'
+  type: 'text' | 'image' | 'embed' | 'two-column' | 'cta' | 'button'
   title?: string
   content?: string
   image?: string
   imageAlt?: string
+  /**
+   * A live prototype, shown in the frame sequence where an image would be.
+   * width/height are the prototype's own design size — a phone build is drawn
+   * at phone size rather than stretched across the plate.
+   */
+  embed?: string
+  embedWidth?: number
+  embedHeight?: number
   layout?: 'left' | 'right'
   label?: string
   href?: string

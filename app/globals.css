@@ -491,6 +491,15 @@ html.has-custom-cursor * {
 
 /* Native cursors that carry meaning are preserved; the crosshair fades itself
    out over these so the two never stack. */
+/* Surfaces that are somebody else's software. Inside a live prototype the
+   crosshair is wrong twice over: it is not this site's pointer any more, and
+   the parent document stops receiving pointermove the moment the cursor
+   crosses into a cross-origin frame, so it would freeze at the edge. */
+html.has-custom-cursor .cursor-native,
+html.has-custom-cursor .cursor-native * {
+  cursor: auto;
+}
+
 html.has-custom-cursor .cursor-col-resize { cursor: col-resize; }
 html.has-custom-cursor .cursor-zoom-in { cursor: zoom-in; }
 html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
@@ -1707,6 +1716,78 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   height: auto;
 }
 
+/* A frame whose contents are running rather than photographed.
+   Same plate, same corner marks, same frame number — the only difference the
+   reader is told about is the line at the top saying it is alive. */
+.live {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s4);
+  padding: var(--s5) var(--s4) var(--s6);
+  background:
+    radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--surface) 70%, transparent), transparent 70%),
+    var(--card-fill);
+}
+
+.live-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+}
+
+/* Breathing, not blinking. A hard on/off would read as an error indicator. */
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4fa871;
+  box-shadow: 0 0 0 0 color-mix(in srgb, #4fa871 60%, transparent);
+  animation: live-pulse 2.4s var(--ease-medium, ease-out) infinite;
+}
+
+@keyframes live-pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, #4fa871 55%, transparent); }
+  70%  { box-shadow: 0 0 0 7px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+/* The prototype is a phone build, so it is drawn at phone size rather than
+   stretched across the plate. It only ever gives width away, never takes it. */
+.live-frame {
+  display: block;
+  max-width: 100%;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  background: #fff;
+  color-scheme: light;
+}
+
+/* On a phone the plate has no width to spare, and the thing inside it is a
+   phone build anyway — so it gives up its side padding rather than squeezing
+   the prototype into a column narrower than the device it was drawn for. */
+@media (max-width: 640px) {
+  .live {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .live-bar {
+    padding-left: var(--s4);
+  }
+
+  .live-frame {
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot { animation: none; }
+}
+
 .plate-no {
   position: absolute;
   right: var(--s3);
@@ -2012,7 +2093,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    urgent cards sat directly under the photo and pushed everything a recruiter
    actually opens the page for below the fold.
 
-   display: contents dissolves both column wrappers so all six cards land in
+   display: contents dissolves both column wrappers so all seven cards land in
    one flow and can be ordered on their own merits, without disturbing the
    desktop arrangement at all. */
 
@@ -2035,8 +2116,9 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   .ord-portrait { order: 1; }
   .ord-about { order: 2; }
   .ord-experience { order: 3; }
-  .ord-skills { order: 4; }
-  .ord-philosophy { order: 5; }
-  .ord-outside { order: 6; }
+  .ord-education { order: 4; }
+  .ord-skills { order: 5; }
+  .ord-philosophy { order: 6; }
+  .ord-outside { order: 7; }
 }
 

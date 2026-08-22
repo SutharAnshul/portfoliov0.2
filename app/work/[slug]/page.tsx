@@ -46,11 +46,30 @@ export default async function CaseStudyPage({ params }: Props) {
   const prev = index > 0 ? caseStudies[index - 1] : null
   const next = index < caseStudies.length - 1 ? caseStudies[index + 1] : null
 
-  // The screens, in the order the study defines them. The cover is not
-  // prepended: it is already the first of them.
+  /**
+   * The screens, in the order the study defines them. The cover is not
+   * prepended: it is already the first of them.
+   *
+   * A frame is either a still or a running prototype. Both sit in the same
+   * plate with the same corner marks and the same frame number, because from
+   * the reader's side they are the same thing — the next screen.
+   */
   const screens = caseStudy.sections
-    .filter((s) => s.type === 'image' && s.image)
-    .map((s) => ({ src: s.image!, alt: s.imageAlt ?? caseStudy.title }))
+    .filter((s) => (s.type === 'image' && s.image) || (s.type === 'embed' && s.embed))
+    .map((s) =>
+      s.type === 'embed'
+        ? {
+            key: s.embed!,
+            embed: s.embed!,
+            alt: s.imageAlt ?? `${caseStudy.title}, live prototype`,
+            w: s.embedWidth ?? 390,
+            h: s.embedHeight ?? 844,
+          }
+        : { key: s.image!, src: s.image!, alt: s.imageAlt ?? caseStudy.title },
+    )
+
+  const hasLive = screens.some((s) => 'embed' in s)
+  const allLive = screens.length > 0 && screens.every((s) => 'embed' in s)
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -153,8 +172,14 @@ export default async function CaseStudyPage({ params }: Props) {
             className="flex items-baseline justify-between"
             style={{ paddingBottom: 'var(--s3)' }}
           >
-            <span className="t-label">Screens</span>
-            <span className="t-label">{pad(screens.length)} frames</span>
+            {/* A record made only of a running prototype has no "screens" to
+                count, so it says what it actually is. */}
+            <span className="t-label">
+              {allLive ? 'Prototype' : hasLive ? 'Prototype & system' : 'Screens'}
+            </span>
+            <span className="t-label">
+              {allLive ? 'Interactive' : `${pad(screens.length)} frames`}
+            </span>
           </div>
           <hr className="rule" />
 
@@ -171,11 +196,28 @@ export default async function CaseStudyPage({ params }: Props) {
             style={{ marginTop: 'var(--s6)', ['--gap' as string]: 'var(--s6)' } as React.CSSProperties}
           >
             {screens.map((shot, i) => (
-              <Settle key={shot.src} mass="medium" delay={40}>
+              <Settle key={shot.key} mass="medium" delay={40}>
                 <figure className="shot relative">
                   <CornerMarks />
                   <div className="plate">
-                    <img src={shot.src} alt={shot.alt} loading="lazy" />
+                    {'embed' in shot ? (
+                      <div className="live" style={{ ['--live-h' as string]: `${shot.h}px` }}>
+                        <div className="live-bar t-meta">
+                          <span className="live-dot" aria-hidden="true" />
+                          Live prototype — it works, go on
+                        </div>
+                        <iframe
+                          src={shot.embed}
+                          title={shot.alt}
+                          loading="lazy"
+                          className="live-frame cursor-native"
+                          style={{ width: shot.w, height: shot.h }}
+                          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                        />
+                      </div>
+                    ) : (
+                      <img src={shot.src} alt={shot.alt} loading="lazy" />
+                    )}
                     <span className="plate-no t-meta">
                       {pad(index + 1)}-{pad(i + 1)}
                     </span>

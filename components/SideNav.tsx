@@ -31,10 +31,16 @@ interface SideNavProps {
   width?: number
 }
 
+/**
+ * `hidden` keeps a destination in the source without offering it. The Garage
+ * route still exists and still renders — it is only withheld from the nav
+ * until there is something in it worth walking to. Flip the flag to bring it
+ * back; nothing else has to change.
+ */
 const NAV = [
   { href: '/', title: 'About', note: "Let's get to know each other", icon: 'about' },
   { href: '/work', title: 'Work', note: 'A selection of recent work', icon: 'work' },
-  { href: '/garage', title: 'My Garage', note: 'Things I tinker with', icon: 'garage' },
+  { href: '/garage', title: 'My Garage', note: 'Things I tinker with', icon: 'garage', hidden: true },
 ] as const
 
 /** Contact lives with the CV: both are ways to reach him, not page content. */
@@ -69,8 +75,8 @@ export function SideNav({ width }: SideNavProps) {
           <ThemeToggle />
         </div>
         <p className="t-body" style={{ marginTop: 'var(--s3)' }}>
-          Product designer based in India. Design as solving real problems, and building systems
-          that scale.
+          Product designer based in India. I like figuring out how things work, then making them
+          better.
         </p>
 
         {/* CV — a quiet aside in the same voice as the card headings, not a
@@ -106,7 +112,7 @@ export function SideNav({ width }: SideNavProps) {
 
         {/* Sections */}
         <nav className="stack" style={{ marginTop: 'var(--s6)' }} aria-label="Sections">
-          {NAV.map((item) => {
+          {NAV.filter((item) => !('hidden' in item && item.hidden)).map((item) => {
             const I = ICONS[item.icon]
             const active = isActive(item.href)
             return (

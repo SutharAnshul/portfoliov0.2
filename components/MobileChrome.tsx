@@ -36,10 +36,11 @@ import {
  * thumb cannot comfortably hit, which is why that is what this replaces.
  */
 
+/** Withheld from the rail, same as on desktop — see the note in SideNav. */
 const NAV = [
   { href: '/', title: 'About', Icon: IconAperture },
   { href: '/work', title: 'Work', Icon: IconSheet },
-  { href: '/garage', title: 'Garage', Icon: IconBolt },
+  { href: '/garage', title: 'Garage', Icon: IconBolt, hidden: true },
 ] as const
 
 const CONTACT = [
@@ -118,8 +119,8 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
       <div id="studio-card" className="m-studio" data-open={open}>
         <div className="m-studio-inner">
           <p className="t-body" style={{ opacity: 0.8 }}>
-            Product designer based in India. Design as solving real problems, and building systems
-            that scale.
+            Product designer based in India. I like figuring out how things work, then making them
+            better.
           </p>
 
           <a
@@ -163,7 +164,7 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
 
       {/* ── Where ───────────────────────────────────────────────────── */}
       <nav ref={railRef} className="m-rail" aria-label="Sections">
-        {NAV.map(({ href, title, Icon }) => {
+        {NAV.filter((n) => !('hidden' in n && n.hidden)).map(({ href, title, Icon }) => {
           const active = isActive(href)
           return (
             <Link

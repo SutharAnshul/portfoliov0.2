@@ -27,7 +27,8 @@ const HOVER_SCALE = 1.55
 const HOVER_ANGLE = 45
 const PRESS_SCALE = 0.7
 
-const NATIVE_CURSOR = '.cursor-col-resize, .cursor-zoom-in, .cursor-zoom-out'
+/** Where the crosshair stands down and the machine's own pointer takes over. */
+const NATIVE_CURSOR = '.cursor-native, .cursor-col-resize, .cursor-zoom-in, .cursor-zoom-out'
 const INTERACTIVE = 'a, button, [role="button"], input, textarea, select, [data-cursor="interactive"]'
 
 export function CustomCursor() {
@@ -82,6 +83,23 @@ export function CustomCursor() {
       }
     }
 
+    /**
+     * A cross-origin iframe swallows pointermove — the parent document stops
+     * hearing anything the moment the cursor crosses the frame's edge, so the
+     * crosshair would freeze there rather than hand over.
+     *
+     * mouseover/mouseout still fire on the iframe *element*, which lives in
+     * this document even though its contents do not. They are the only signal
+     * that survives the boundary, and unlike sampling coordinates on move they
+     * cannot be skipped over by a fast flick of the wrist.
+     */
+    const onOver = (e: MouseEvent) => {
+      if ((e.target as Element | null)?.closest?.(NATIVE_CURSOR)) root.style.opacity = '0'
+    }
+    const onOut = (e: MouseEvent) => {
+      if ((e.target as Element | null)?.closest?.(NATIVE_CURSOR)) root.style.opacity = '1'
+    }
+
     const spawnBurst = (x: number, y: number) => {
       const burst = document.createElement('div')
       burst.className = 'cursor-burst'
@@ -134,6 +152,8 @@ export function CustomCursor() {
     frame = requestAnimationFrame(loop)
 
     window.addEventListener('pointermove', onMove, { passive: true })
+    document.addEventListener('mouseover', onOver, { passive: true })
+    document.addEventListener('mouseout', onOut, { passive: true })
     window.addEventListener('pointerdown', onDown, { passive: true })
     window.addEventListener('pointerup', onUp, { passive: true })
     document.addEventListener('pointerleave', onLeave)
@@ -142,6 +162,8 @@ export function CustomCursor() {
     return () => {
       cancelAnimationFrame(frame)
       window.removeEventListener('pointermove', onMove)
+      document.removeEventListener('mouseover', onOver)
+      document.removeEventListener('mouseout', onOut)
       window.removeEventListener('pointerdown', onDown)
       window.removeEventListener('pointerup', onUp)
       document.removeEventListener('pointerleave', onLeave)
