@@ -43,20 +43,6 @@ const display = EB_Garamond({
 import { LayoutShell } from '@/components/LayoutShell'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { CustomCursor } from '@/components/CustomCursor'
-import dynamic from 'next/dynamic'
-
-/**
- * The type tuner, loaded only in development.
- *
- * A plain `import` plus a NODE_ENV guard in the JSX is not enough: the guard
- * removes the *render*, but the import is still a client reference and the
- * whole component ships anyway — measured, it did. Putting the import inside
- * a branch that is statically false in production lets the bundler drop it.
- */
-const TypeTuner =
-  process.env.NODE_ENV === 'development'
-    ? dynamic(() => import('@/components/TypeTuner').then((m) => m.TypeTuner))
-    : null
 
 export const metadata: Metadata = {
   title: 'Anshul Suthar - Product Designer',
@@ -126,7 +112,6 @@ try{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.
           {children}
         </LayoutShell>
         {process.env.NODE_ENV === 'production' && <Analytics />}
-        {TypeTuner && <TypeTuner />}
       </body>
     </html>
   )

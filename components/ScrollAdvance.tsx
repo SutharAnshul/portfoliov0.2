@@ -35,8 +35,6 @@ import { sfx } from '@/lib/audio'
 const THRESHOLD_PX = 1240
 /** No single event may contribute more than this share of the gauge. */
 const MAX_EVENT_SHARE = 0.06
-/** Time against the edge before input starts counting. */
-const DWELL_MS = 140
 /** Gauge units drained per second once input stops. */
 const DRAIN_PER_S = 1.35
 /** Input is considered stopped after this long without an event. */
@@ -133,7 +131,6 @@ export function ScrollAdvance() {
     let restingDir: Dir = null
     /** Last published height, so the custom property is only written on change. */
     let lastHeight = 0
-    let edgeSince = 0
     let lastInput = 0
     let armed = true
     let releaseAt = 0
@@ -160,25 +157,19 @@ export function ScrollAdvance() {
       const pushing: Dir =
         at === 'down' && deltaY > 0 ? 'down' : at === 'up' && deltaY < 0 ? 'up' : null
 
-      if (!pushing || !target(pushing)) {
-        edgeSince = 0
-        return
-      }
+      if (!pushing || !target(pushing)) return
 
       const now = performance.now()
       if (activeDir !== pushing) {
         activeDir = pushing
         charge = 0
-        edgeSince = now
         setDir(pushing)
         docEl.style.setProperty('--page-exit-dir', pushing === 'down' ? '-1' : '1')
-        return
+        // Falls through rather than returning. The event that establishes the
+        // direction is also the first push, and swallowing it — along with the
+        // 140ms dwell that used to follow — was why the gauge sat still
+        // through the first stretch of a scroll against the edge.
       }
-      if (!edgeSince) {
-        edgeSince = now
-        return
-      }
-      if (now - edgeSince < DWELL_MS) return
 
       lastInput = now
       charge = clamp(charge + Math.min(Math.abs(deltaY) / THRESHOLD_PX, MAX_EVENT_SHARE), 0, 1)
@@ -218,7 +209,6 @@ export function ScrollAdvance() {
           if (dest) router.push(dest.path)
         }
       } else {
-        if (!edge()) edgeSince = 0
         if (now - lastInput > IDLE_MS && charge > 0) {
           charge = clamp(charge - DRAIN_PER_S * dt, 0, 1)
         }
