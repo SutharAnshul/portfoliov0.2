@@ -316,6 +316,21 @@
   --fw-label: 700;
   --fw-title: 700;
 
+  /* ── The content floor ───────────────────────────────────────────────
+     The sidebar's scale is settled and stays exactly as it is. Page content
+     is a different problem: it is read rather than scanned, at arm's length
+     from a chair rather than glanced at, and Space Mono is a wide,
+     low-contrast face that loses legibility faster than most as it shrinks.
+
+     So the same roles are set larger inside the content column. Nothing
+     there falls below 12px — WCAG sets no absolute minimum, but 12px is the
+     usual floor for body-adjacent text and small mono needs it more than
+     most. Applied by re-pointing the tokens under [data-page-content], so
+     one rule covers every page and the nav is untouched. */
+  --fs-meta-content: 12px;
+  --fs-label-content: 12px;
+  --fs-pill-content: 12px;
+
   /* The two families, overridable at runtime by the tuner. They resolve to
      the next/font variables by default, so production is unchanged. */
   --family-ui: var(--font-ui), ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -1067,7 +1082,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .player-track {
   flex: none;
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--foreground) 70%, transparent);
@@ -2186,7 +2201,11 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   /* A serif fits far more into the same measure than a monospace does, so the
      line length has to come down to stay readable. */
   max-width: 34ch;
-  text-wrap: pretty;
+  /* balance, not pretty. `pretty` only refuses to strand the last word; it
+     left this block running 43 characters on one line and 19 on another, a
+     rag of 24 that read as carelessness at this size. `balance` equalises the
+     lines instead, which is what a six-line statement wants. */
+  text-wrap: balance;
 }
 
 /* ── One band ──────────────────────────────────────────────────────────
@@ -2417,4 +2436,42 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .record-line[data-mark='true'] {
   line-height: calc(var(--lh-record) * 1.27);
   margin-top: 3px;
+}
+
+/* ─── The content floor, applied ──────────────────────────────────────────
+   Page content only. The sidebar sits outside [data-page-content], so its
+   scale is untouched by anything here.
+
+   The breadcrumb and the advance strip are fixed rather than in the flow, so
+   they miss the selector — but they span the content column, are read at the
+   same distance, and were the last two things under the floor. */
+[data-page-content],
+[data-breadcrumb],
+.scroll-advance {
+  --fs-meta: var(--fs-meta-content);
+  --fs-label: var(--fs-label-content);
+}
+
+[data-breadcrumb],
+[data-breadcrumb] * {
+  font-size: var(--fs-meta-content);
+}
+
+.scroll-advance-action,
+.scroll-advance-target {
+  font-size: var(--fs-label-content);
+}
+
+/* The two content sizes that were literals rather than tokens. */
+[data-page-content] .pill,
+[data-page-content] .plate-no,
+[data-page-content] .record-no,
+[data-page-content] .record-btn {
+  font-size: var(--fs-pill-content);
+}
+
+/* Tracking at 0.18em on 12px uppercase is a lot of air. Content labels are
+   read as words, not scanned as markers, so they close up slightly. */
+[data-page-content] .t-label {
+  letter-spacing: 0.12em;
 }

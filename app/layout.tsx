@@ -1,15 +1,22 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { IBM_Plex_Mono, EB_Garamond } from 'next/font/google'
+import { Space_Mono, EB_Garamond } from 'next/font/google'
 import './globals.css'
 
 /**
  * The working face. Everything in the system reads from --font-ui, so this
  * import is the only place the family is named.
+ *
+ * Space Mono ships 400 and 700 only — there is no 500 or 600 to ask for, and
+ * asking would make the browser synthesise one. The three weight tokens in
+ * globals.css are set to weights it actually has.
+ *
+ * It is also a wide, low-contrast face that loses legibility faster than most
+ * as it shrinks, which is the reason for the 12px floor on page content.
  */
-const ui = IBM_Plex_Mono({
+const ui = Space_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '700'],
   // Italic carries Mr. Toast's untranslated speech. It has to be the same
   // monospace family as the translation so a meow and the English word it
   // becomes occupy identical width — the swap then happens with no reflow.

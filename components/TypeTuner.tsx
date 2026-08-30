@@ -55,9 +55,9 @@ interface Family {
 }
 
 const MONO: Family[] = [
-  { label: 'IBM Plex Mono ·', stack: 'var(--font-ui), ui-monospace, SFMono-Regular, Menlo, monospace' },
+  { label: 'Space Mono ·', stack: 'var(--font-ui), ui-monospace, SFMono-Regular, Menlo, monospace' },
+  { label: 'IBM Plex Mono', google: 'IBM+Plex+Mono:wght@400;500;600;700', stack: "'IBM Plex Mono', ui-monospace, monospace" },
   { label: 'JetBrains Mono', google: 'JetBrains+Mono:wght@400;500;700', stack: "'JetBrains Mono', ui-monospace, monospace" },
-  { label: 'Space Mono', google: 'Space+Mono:wght@400;700', stack: "'Space Mono', ui-monospace, monospace" },
   { label: 'Roboto Mono', google: 'Roboto+Mono:wght@400;500;700', stack: "'Roboto Mono', ui-monospace, monospace" },
   { label: 'DM Mono', google: 'DM+Mono:wght@400;500', stack: "'DM Mono', ui-monospace, monospace" },
   { label: 'Fira Code', google: 'Fira+Code:wght@400;500;700', stack: "'Fira Code', ui-monospace, monospace" },
