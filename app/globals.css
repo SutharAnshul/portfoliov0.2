@@ -2198,13 +2198,15 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      further, so tracking opens slightly instead of closing. */
   letter-spacing: 0.002em;
   color: var(--foreground);
-  /* A serif fits far more into the same measure than a monospace does, so the
-     line length has to come down to stay readable. */
-  max-width: 34ch;
-  /* balance, not pretty. `pretty` only refuses to strand the last word; it
-     left this block running 43 characters on one line and 19 on another, a
-     rag of 24 that read as carelessness at this size. `balance` equalises the
-     lines instead, which is what a six-line statement wants. */
+  /* 46ch is the narrowest measure that sets this statement in four lines, and
+     the breaks do not move at 48 or 50 — balance has already chosen them, so
+     anything wider is box with nothing in it.
+
+     balance, not pretty. Measured across both modes at four widths, in pixels
+     rather than characters because the face is proportional: balance holds
+     the rag to 17% of the longest line, while pretty and normal wrapping run
+     41–52% by filling greedily and dumping the remainder on the last line. */
+  max-width: 46ch;
   text-wrap: balance;
 }
 
