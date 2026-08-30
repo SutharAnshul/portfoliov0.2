@@ -53,6 +53,133 @@ const TOKENS: Token[] = [
   { key: 'fs-case-deck', label: 'Case deck', where: 'Case study one-liner', unit: 'rem', min: 0.9, max: 2.6, step: 0.02, clamped: true },
 ]
 
+const CSS = `
+/* ─── Type tuner ──────────────────────────────────────────────────────────
+   Development only — mounted behind a NODE_ENV check, so none of this reaches
+   a build. Deliberately plain: it is an instrument for looking at the site,
+   and it should not be interesting enough to look at itself. */
+
+.tuner {
+  position: fixed;
+  right: var(--s4);
+  bottom: var(--s4);
+  z-index: 200;
+  width: 310px;
+  max-height: calc(100vh - var(--s6) * 2);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--card-line-strong);
+  border-radius: var(--r);
+  background: color-mix(in srgb, var(--background) 94%, var(--foreground));
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  /* Its own type must not move when the sliders do, or reading the panel
+     becomes part of the experiment. */
+  font-size: 11px;
+}
+
+.tuner-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px var(--s3);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--card-line);
+  color: var(--foreground);
+  cursor: pointer;
+  text-align: left;
+}
+
+.tuner[data-open='false'] .tuner-tab {
+  border-bottom: 0;
+}
+
+.tuner-count {
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--foreground) 18%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+.tuner-body {
+  overflow-y: auto;
+  padding: var(--s3);
+}
+
+.tuner-row {
+  display: grid;
+  grid-template-columns: 74px 1fr 46px 22px;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 0;
+}
+
+.tuner-row[data-dirty='true'] .tuner-name {
+  color: var(--foreground);
+}
+
+.tuner-name {
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tuner-row input[type='range'] {
+  width: 100%;
+  accent-color: color-mix(in srgb, var(--foreground) 70%, transparent);
+}
+
+.tuner-num {
+  width: 100%;
+  padding: 2px 4px;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r-sm, 2px);
+  background: transparent;
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tuner-unit em {
+  font-style: normal;
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+}
+
+.tuner-foot {
+  display: flex;
+  gap: 6px;
+  margin-top: var(--s3);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--card-line);
+}
+
+.tuner-btn {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.tuner-btn:hover {
+  border-color: var(--card-line-strong);
+  background: color-mix(in srgb, var(--foreground) 7%, transparent);
+}
+
+.tuner-note {
+  margin-top: 8px;
+  font-size: 10px;
+  line-height: 1.45;
+}
+`
+
 const STORE = 'type-tuner'
 
 const parse = (raw: string) => Number.parseFloat(raw.trim())
@@ -128,6 +255,7 @@ export function TypeTuner() {
 
   return (
     <div className="tuner" data-open={open}>
+      <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <button className="tuner-tab t-label" onClick={() => setOpen((v) => !v)}>
         Type {open ? '▾' : '▴'}
         {changed.length > 0 && <span className="tuner-count">{changed.length}</span>}
