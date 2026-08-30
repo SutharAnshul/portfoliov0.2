@@ -2186,26 +2186,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     min-height: 200px;
   }
 
-  /* The record below stacks in reading order: the two most-asked-for cards
-     first, then the rest. */
-  .about-grid {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .about-col {
-    display: contents;
-  }
-
-  .about-grid > .about-col > * + * {
-    margin-top: 0;
-  }
-
-  .ord-experience { order: 1; }
-  .ord-education { order: 2; }
-  .ord-skills { order: 3; }
-  .ord-philosophy { order: 4; }
-  .ord-outside { order: 5; }
 }
 
 @media (max-width: 560px) {
@@ -2215,5 +2195,45 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
   .fact-row > .fact-card:first-child {
     grid-column: auto;
+  }
+}
+
+/* ── The record ────────────────────────────────────────────────────────
+   Work and study in one list. Period left, what happened right — the two
+   columns are what let the degree sit among the roles without reading as a
+   fifth job, and they give the card something to do with its width now that
+   it is the only one on the page rather than one of six. */
+.record {
+  display: grid;
+  gap: var(--s4);
+  margin-top: var(--s5);
+}
+
+.record-row {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: var(--s4);
+  align-items: baseline;
+}
+
+/* An 18px institution mark on a 13px line overflows its line box, so the row
+   carrying one is given the lead to absorb it. */
+.record-detail {
+  line-height: 1.75;
+  color: var(--foreground);
+}
+
+.record-period {
+  padding-top: 4px;
+}
+
+@media (max-width: 767px) {
+  .record-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .record-period {
+    padding-top: 0;
   }
 }

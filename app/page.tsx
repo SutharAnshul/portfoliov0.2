@@ -14,38 +14,25 @@ import { LocalTime } from '@/components/LocalTime'
  * statement is the monospace body face simply spoken louder, and the three
  * panels are the same `.card` every other surface here uses.
  *
- * The record — experience, education, the rest — follows underneath. The
- * reference has no equivalent for it, and it is the part a recruiter opens
- * the page for.
+ * One record follows underneath, holding the work and the degree together.
+ * The reference has no equivalent for it, and it is the part a recruiter
+ * opens the page for.
  */
 
-function Card({
-  title,
-  children,
-  className = '',
-}: {
-  title?: string
-  children: React.ReactNode
-  className?: string
-}) {
-  return (
-    <section className={`card ${className}`}>
-      {title && <h2 className="t-head">{title}</h2>}
-      <div style={{ marginTop: title ? 'var(--s5)' : 0 }}>{children}</div>
-    </section>
-  )
-}
-
-function Entry({ period, detail }: { period: string; detail: React.ReactNode }) {
-  return (
-    <div>
-      <div className="t-meta">{period}</div>
-      <div className="t-body" style={{ lineHeight: 1.5 }}>
-        ↳ {detail}
-      </div>
-    </div>
-  )
-}
+/**
+ * Work and study in one list, newest first by start date.
+ *
+ * Kept as data rather than markup because the merge only works if the order
+ * is derived from the dates — the degree sits last because it started first,
+ * not because education conventionally goes at the bottom.
+ */
+const RECORD = [
+  { period: 'May 2026 — Jul 2026', detail: 'Product Designer at SuperHealth' },
+  { period: 'Sept 2024 — Feb 2026', detail: 'Product Designer at CNVRT Labs' },
+  { period: 'Apr 2024 — Jul 2025', detail: 'Growth Operator at Impact Acquisition' },
+  { period: 'Jul 2023 — Present', detail: 'Co-Founder & Creative Director at Herbal Mitra' },
+  { period: '2021 — 2025', detail: 'B.Des. at IIT, Guwahati', mark: true },
+]
 
 /** One labelled fact inside the panel row. */
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
@@ -124,102 +111,32 @@ export default function Page() {
           </div>
         </Settle>
 
-        {/* ── The record ────────────────────────────────────────────── */}
-        <div
-          className="about-grid grid grid-cols-1 lg:grid-cols-2"
-          style={{ gap: 'var(--s5)', marginTop: 'var(--s7)' }}
-        >
-          <div className="about-col stack">
-            <Settle mass="light" delay={40} className="ord-experience">
-              <Card title="Experience">
-                <div className="stack">
-                  <Entry period="May 2026 — Jul 2026" detail="Product Designer at SuperHealth" />
-                  <Entry period="Sept 2024 — Feb 2026" detail="Product Designer at CNVRT Labs" />
-                  <Entry period="Apr 2024 — Jul 2025" detail="Growth Operator at Impact Acquisition" />
-                  <Entry
-                    period="Jul 2023 — Present"
-                    detail="Co-Founder & Creative Director at Herbal Mitra"
-                  />
-                </div>
-              </Card>
-            </Settle>
-
-            <Settle mass="light" delay={60} className="ord-education">
-              <Card title="Education">
-                <div>
-                  <div className="t-meta">2021 — 2025</div>
-                  {/* Taller line and a little lead: an 18px mark on a 13px line
-                      overflows its line box and crowds the date above. */}
-                  <div className="t-body" style={{ lineHeight: 1.9, marginTop: 3 }}>
-                    ↳{' '}
-                    <LogoMark
-                      src="/images/iitg.png"
-                      alt="Indian Institute of Technology Guwahati"
-                    />
-                    B.Des. at IIT, Guwahati
+        {/* ── The record ──────────────────────────────────────────────
+            One list, not two. The degree ran alongside the first two roles,
+            which two separate cards hid and a single reverse-chronological
+            record shows: he was co-founding and working while finishing it.
+            Ordered by start date, the degree lands last on its own. */}
+        <Settle mass="light" delay={40}>
+          <section className="card" style={{ marginTop: 'var(--s7)' }}>
+            <h2 className="t-head">Experience &amp; Education</h2>
+            <div className="record">
+              {RECORD.map((row) => (
+                <div key={row.detail} className="record-row">
+                  <div className="t-meta record-period">{row.period}</div>
+                  <div className="t-body record-detail">
+                    {row.mark && (
+                      <LogoMark
+                        src="/images/iitg.png"
+                        alt="Indian Institute of Technology Guwahati"
+                      />
+                    )}
+                    {row.detail}
                   </div>
                 </div>
-              </Card>
-            </Settle>
-          </div>
-
-          <div className="about-col stack">
-            <Settle mass="light" delay={80} className="ord-skills">
-              <Card title="Skills & Tools">
-                <div className="grid grid-cols-2" style={{ gap: 'var(--s5)' }}>
-                  <div>
-                    <div className="t-label" style={{ marginBottom: 'var(--s2)' }}>
-                      Skills
-                    </div>
-                    <div className="t-body" style={{ lineHeight: 1.85 }}>
-                      {[
-                        'User Research',
-                        'Usability Testing',
-                        'Journey Mapping',
-                        'Design Systems',
-                        'Visual Design',
-                        'Industrial Design',
-                      ].map((s) => (
-                        <div key={s}>+ {s}</div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="t-label" style={{ marginBottom: 'var(--s2)' }}>
-                      Tools
-                    </div>
-                    <div className="t-body" style={{ lineHeight: 1.85 }}>
-                      {['Figma', 'Adobe Suite', 'HTML/CSS', 'React.js', 'v0.app', 'Framer'].map(
-                        (s) => (
-                          <div key={s}>+ {s}</div>
-                        ),
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </Settle>
-
-            <Settle mass="light" delay={100} className="ord-philosophy">
-              <Card title="Philosophy">
-                <p className="t-body">
-                  Kaizen — continuous improvement. There&apos;s always room to make something
-                  better, one improvement at a time.
-                </p>
-              </Card>
-            </Settle>
-
-            <Settle mass="light" delay={120} className="ord-outside">
-              <Card title="Outside Work">
-                <div className="t-body" style={{ lineHeight: 1.9 }}>
-                  <div>↳ Lead guitar &amp; vocals, Octaves — IITG Music Society</div>
-                  <div>↳ Inter-IIT Cultural Meet 7.0, second overall</div>
-                  <div>↳ Photo walks, Bengaluru &amp; Guwahati</div>
-                </div>
-              </Card>
-            </Settle>
-          </div>
-        </div>
+              ))}
+            </div>
+          </section>
+        </Settle>
       </div>
     </div>
   )
