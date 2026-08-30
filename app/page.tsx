@@ -155,9 +155,12 @@ export default function Page() {
               </Fact>
               <Fact label="Location">
                 India, <LocalTime />
-                <div className="t-meta" style={{ marginTop: 2 }}>
-                  Open to product design roles
-                </div>
+              </Fact>
+              {/* Its own fact, not a footnote to the clock. Sitting two pixels
+                  under the time it read as part of it — as though the hour
+                  were somehow the reason he was available. */}
+              <Fact label="Work status">
+                <span className="status-pill">Open to work</span>
               </Fact>
             </div>
           </div>

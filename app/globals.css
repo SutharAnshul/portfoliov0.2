@@ -2579,3 +2579,25 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 [data-page-content] .t-label {
   letter-spacing: 0.12em;
 }
+
+/* ─── Availability ────────────────────────────────────────────────────────
+   The one filled, coloured thing on the page, and it earns that by being the
+   single fact a visitor might have come to check. Green because the site
+   already uses this green for the phone tile, so the palette does not grow to
+   carry it — and dark text on the fill rather than light, which is what makes
+   it read as a lit chip instead of a tinted outline.
+
+   2px corner, matching every other corner on the site: --r is the radius the
+   cards, plates and wells all use. */
+.status-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--r);
+  background: #4fa871;
+  color: #08120c;
+  font-size: var(--fs-meta-content, 12px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
