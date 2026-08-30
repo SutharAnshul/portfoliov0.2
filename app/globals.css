@@ -298,7 +298,7 @@
   --lh-name: 1.15;
   --lh-body: 1.5;
   --lh-meta: 1.5;
-  --lh-lede: 1.4;
+  --lh-lede: 1.5;
   --lh-prose: 1.75;
   --lh-case-title: 0.95;
   --lh-record: 1.5;
@@ -2192,6 +2192,11 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      in the sidebar already follows: the serif stands up when it is being a
      voice rather than a heading. */
   font-family: var(--family-display);
+  /* 500, not 400. Light type on a dark ground thins optically — the strokes
+     get eaten by the surround — and Garamond is a delicate face to begin
+     with. One step up restores the weight the eye expects without making it
+     look bold. */
+  font-weight: 500;
   font-size: clamp(22px, 2.3vw, var(--fs-lede));
   line-height: var(--lh-lede);
   /* Garamond sets loose and small; the mono's -0.012em would only thin it
@@ -2225,7 +2230,10 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      characters and past that it only stretches a short list — and the print
      is fixed because its crop is fixed, so the third panel is the only one
      with any business absorbing width. */
-  grid-template-columns: minmax(0, 460px) 200px minmax(215px, 1fr);
+  /* The print is 280 rather than 200. At the smaller size it was the least
+     of the three — shorter than the record beside it — which is the wrong
+     way round for the only photograph on the page. */
+  grid-template-columns: minmax(0, 460px) 280px minmax(215px, 1fr);
   gap: var(--s4);
   align-items: stretch;
   margin-top: var(--s6);
@@ -2290,6 +2298,31 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   container: about / inline-size;
 }
 
+/* ── Filling the first screen ──────────────────────────────────────────
+   The page is four short things, and with the chat panel closed they used
+   to finish a third of the way up the viewport, leaving a dead band under
+   everything. Anchoring the row to the bottom turns that leftover into air
+   between two placed blocks — the statement at the top, the record at the
+   foot — which is space doing something rather than space left over.
+
+   Desktop only: the phone scrolls inside its own container, where 100vh is
+   both wrong and famously unstable as the address bar moves. */
+@media (min-width: 1024px) {
+  .about-page {
+    display: flex;
+    flex-direction: column;
+    /* 5rem is the main column's top padding. */
+    min-height: calc(100vh - 5rem);
+  }
+
+  /* The last child, not `.about-band` — the band is wrapped in a Settle, so
+     the band is not the flex item and an auto margin on it distributes
+     nothing. Targeting the child also survives the wrapper changing. */
+  .about-page > *:last-child {
+    margin-top: auto;
+  }
+}
+
 @media (max-width: 1023px) {
   .hero-statement {
     max-width: none;
@@ -2299,27 +2332,47 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 /* Three across needs about 900px of column. Below that the record takes the
    full measure — its longest line is 46 characters and it is the panel that
    suffers first — and the print and the address share the line beneath it. */
+/* Not enough width for three across. The record and the print stay on the top
+   row and the address drops under the record — the print is the thing that
+   holds the composition together, and sending it down with the address left
+   the top row as a lone strip of text.
+
+   The print then spans both rows, which is what makes this an improvement
+   rather than a rearrangement: it is drawn wider so that its 2:3 crop stands
+   as tall as the two stacked cards beside it, and the space that used to sit
+   empty under the address is a photograph instead. */
 @container about (max-width: 900px) {
   .about-band {
-    grid-template-columns: 200px minmax(215px, 1fr);
+    grid-template-columns: minmax(0, 1fr) 340px;
   }
 
-  .about-band > .record-card {
-    grid-column: 1 / -1;
-    max-width: 460px;
+  .about-band > .fact-photo {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+
+  .about-band > .fact-card {
+    grid-column: 1;
+    grid-row: 2;
   }
 }
 
-@container about (max-width: 470px) {
+/* One column. The explicit placement above has to be undone as well as the
+   template — left set, the print stays pinned to a column 2 that no longer
+   exists, and the grid invents an implicit one to hold it. */
+@container about (max-width: 560px) {
   .about-band {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .about-band > .record-card {
-    grid-column: auto;
+  .about-band > .record-card,
+  .about-band > .fact-photo,
+  .about-band > .fact-card {
+    grid-column: 1;
+    grid-row: auto;
   }
 
-  /* One column: the print takes the measure, still at 2:3. */
+  /* The print takes the measure, still at 2:3. */
   .fact-photo {
     max-width: 260px;
   }
