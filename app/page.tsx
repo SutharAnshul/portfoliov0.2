@@ -14,9 +14,12 @@ import { LocalTime } from '@/components/LocalTime'
  * statement is the monospace body face simply spoken louder, and the three
  * panels are the same `.card` every other surface here uses.
  *
- * One record follows underneath, holding the work and the degree together.
- * The reference has no equivalent for it, and it is the part a recruiter
- * opens the page for.
+ * Between the statement and the panels sits the record, unlabelled — the
+ * reference has no equivalent for it, and it is the part a recruiter opens
+ * the page for.
+ *
+ * Four things on the page, and no more. Every paragraph that only restated
+ * what the record already proves has been cut.
  */
 
 /**
@@ -61,19 +64,34 @@ export default function Page() {
           </p>
         </Settle>
 
+        {/* ── The record ──────────────────────────────────────────────
+            No heading. Directly under the statement, dates against roles is
+            already unmistakably a working history — a label would only name
+            what the reader has finished understanding.
+
+            One list, not two, ordered newest first by start date. That puts
+            the degree last because it began first, and it shows what two
+            separate cards hid: 2021 — 2025 overlaps Jul 2023 and Apr 2024,
+            so he was co-founding and working while finishing it. */}
         <Settle boot mass="light" delay={140}>
-          <div className="t-body stack hero-sub">
-            <p>
-              I’ve worked across B2B platforms, healthcare, e-commerce, and systems design, with
-              experience spanning research, UX, interaction design, and design systems. I’ve also
-              explored industrial design, which has shaped how I think about form, constraints, and
-              how things come together.
-            </p>
-            <p>
-              Outside work, I’m usually playing guitar, taking photographs, tinkering with
-              something, or following some new curiosity down a rabbit hole.
-            </p>
-          </div>
+          <section className="card record-card">
+            <div className="record">
+              {RECORD.map((row) => (
+                <div key={row.detail} className="record-row">
+                  <div className="t-meta record-period">{row.period}</div>
+                  <div className="t-body record-detail">
+                    {row.mark && (
+                      <LogoMark
+                        src="/images/iitg.png"
+                        alt="Indian Institute of Technology Guwahati"
+                      />
+                    )}
+                    {row.detail}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         </Settle>
 
         {/* ── The three panels ──────────────────────────────────────── */}
@@ -111,32 +129,6 @@ export default function Page() {
           </div>
         </Settle>
 
-        {/* ── The record ──────────────────────────────────────────────
-            One list, not two. The degree ran alongside the first two roles,
-            which two separate cards hid and a single reverse-chronological
-            record shows: he was co-founding and working while finishing it.
-            Ordered by start date, the degree lands last on its own. */}
-        <Settle mass="light" delay={40}>
-          <section className="card" style={{ marginTop: 'var(--s7)' }}>
-            <h2 className="t-head">Experience &amp; Education</h2>
-            <div className="record">
-              {RECORD.map((row) => (
-                <div key={row.detail} className="record-row">
-                  <div className="t-meta record-period">{row.period}</div>
-                  <div className="t-body record-detail">
-                    {row.mark && (
-                      <LogoMark
-                        src="/images/iitg.png"
-                        alt="Indian Institute of Technology Guwahati"
-                      />
-                    )}
-                    {row.detail}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        </Settle>
       </div>
     </div>
   )

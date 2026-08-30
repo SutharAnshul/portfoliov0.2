@@ -2096,9 +2096,8 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   text-wrap: pretty;
 }
 
-.hero-sub {
-  margin-top: var(--s5);
-  max-width: 62ch;
+.record-card {
+  margin-top: var(--s6);
 }
 
 /* ── The three panels ──────────────────────────────────────────────────
