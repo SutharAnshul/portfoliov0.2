@@ -37,6 +37,7 @@ const display = Instrument_Serif({
 import { LayoutShell } from '@/components/LayoutShell'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { CustomCursor } from '@/components/CustomCursor'
+import { TypeTuner } from '@/components/TypeTuner'
 
 export const metadata: Metadata = {
   title: 'Anshul Suthar - Product Designer',
@@ -106,6 +107,9 @@ try{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.
           {children}
         </LayoutShell>
         {process.env.NODE_ENV === 'production' && <Analytics />}
+        {/* Development only: the check is evaluated at build time, so the
+            component and its styles are dropped from a production bundle. */}
+        {process.env.NODE_ENV === 'development' && <TypeTuner />}
       </body>
     </html>
   )
