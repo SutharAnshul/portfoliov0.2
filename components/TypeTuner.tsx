@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react'
  * of nudging is not lost to a stray refresh.
  */
 
-type Unit = 'px' | 'rem'
+type Unit = 'px' | 'rem' | 'em' | ''
 
 interface Token {
   /** Custom property name, without the leading dashes. */
@@ -33,25 +33,95 @@ interface Token {
   max: number
   step: number
   clamped?: boolean
+  group: 'Size' | 'Leading' | 'Tracking' | 'Weight'
 }
 
-const TOKENS: Token[] = [
-  { key: 'fs-lede', label: 'Lede', where: 'About opening statement', unit: 'px', min: 14, max: 48, step: 0.5, clamped: true },
-  { key: 'fs-body', label: 'Body', where: 'Paragraphs, list entries', unit: 'px', min: 10, max: 20, step: 0.5 },
-  { key: 'fs-meta', label: 'Meta', where: 'Dates, captions, counts', unit: 'px', min: 8, max: 16, step: 0.5 },
-  { key: 'fs-label', label: 'Label', where: 'Small uppercase headers', unit: 'px', min: 7, max: 14, step: 0.5 },
-  { key: 'fs-title', label: 'Title', where: 'Nav and card titles', unit: 'px', min: 9, max: 18, step: 0.5 },
-  { key: 'fs-value', label: 'Value', where: 'Email, location', unit: 'px', min: 10, max: 20, step: 0.5 },
-  { key: 'fs-cv', label: 'CV link', where: 'Sidebar, italic serif', unit: 'px', min: 11, max: 24, step: 0.5 },
-  { key: 'fs-studyno', label: 'Study no.', where: 'Sidebar index plates', unit: 'px', min: 10, max: 22, step: 0.5 },
-  { key: 'fs-prose', label: 'Case prose', where: 'Case study body', unit: 'px', min: 11, max: 22, step: 0.5 },
-  { key: 'fs-name', label: 'Name', where: 'Sidebar identity, serif', unit: 'rem', min: 0.9, max: 2.6, step: 0.02 },
-  { key: 'fs-head', label: 'Heading', where: 'Section headings, serif', unit: 'rem', min: 0.9, max: 3, step: 0.02 },
-  { key: 'fs-num', label: 'Numeral', where: 'Large figures', unit: 'rem', min: 1, max: 4, step: 0.05 },
-  { key: 'fs-display', label: 'Display', where: 'Largest serif', unit: 'rem', min: 1.4, max: 4.5, step: 0.05, clamped: true },
-  { key: 'fs-case-title', label: 'Case title', where: 'Case study name', unit: 'rem', min: 2, max: 8, step: 0.05, clamped: true },
-  { key: 'fs-case-deck', label: 'Case deck', where: 'Case study one-liner', unit: 'rem', min: 0.9, max: 2.6, step: 0.02, clamped: true },
+/**
+ * Families offered as alternatives, fetched from Google only when picked.
+ *
+ * Nothing here is bundled: the default entry resolves to the next/font
+ * variable the site already ships, and choosing any other appends a
+ * stylesheet link at that moment. So the experiment costs a request in
+ * development and nothing at all in production.
+ *
+ * `stack` is what gets written into the family token, fallbacks included, so
+ * the page stays readable in the moment before the webfont lands.
+ */
+interface Family {
+  label: string
+  /** Google Fonts family name; empty for the site's own default. */
+  google?: string
+  stack: string
+}
+
+const MONO: Family[] = [
+  { label: 'JetBrains Mono ·', stack: 'var(--font-ui), ui-monospace, SFMono-Regular, Menlo, monospace' },
+  { label: 'IBM Plex Mono', google: 'IBM+Plex+Mono:wght@400;500;600;700', stack: "'IBM Plex Mono', ui-monospace, monospace" },
+  { label: 'Space Mono', google: 'Space+Mono:wght@400;700', stack: "'Space Mono', ui-monospace, monospace" },
+  { label: 'Roboto Mono', google: 'Roboto+Mono:wght@400;500;700', stack: "'Roboto Mono', ui-monospace, monospace" },
+  { label: 'DM Mono', google: 'DM+Mono:wght@400;500', stack: "'DM Mono', ui-monospace, monospace" },
+  { label: 'Fira Code', google: 'Fira+Code:wght@400;500;700', stack: "'Fira Code', ui-monospace, monospace" },
+  { label: 'Courier Prime', google: 'Courier+Prime:wght@400;700', stack: "'Courier Prime', ui-monospace, monospace" },
+  { label: 'Inter (sans)', google: 'Inter:wght@400;500;600;700', stack: "'Inter', system-ui, sans-serif" },
+  { label: 'Geist (sans)', google: 'Geist:wght@400;500;600;700', stack: "'Geist', system-ui, sans-serif" },
 ]
+
+const SERIF: Family[] = [
+  { label: 'Instrument Serif ·', stack: 'var(--font-display), Georgia, serif' },
+  { label: 'Playfair Display', google: 'Playfair+Display:ital,wght@0,400;0,600;1,400', stack: "'Playfair Display', Georgia, serif" },
+  { label: 'EB Garamond', google: 'EB+Garamond:ital,wght@0,400;0,600;1,400', stack: "'EB Garamond', Georgia, serif" },
+  { label: 'Cormorant', google: 'Cormorant+Garamond:ital,wght@0,400;0,600;1,400', stack: "'Cormorant Garamond', Georgia, serif" },
+  { label: 'Libre Baskerville', google: 'Libre+Baskerville:ital,wght@0,400;0,700;1,400', stack: "'Libre Baskerville', Georgia, serif" },
+  { label: 'Lora', google: 'Lora:ital,wght@0,400;0,600;1,400', stack: "'Lora', Georgia, serif" },
+  { label: 'Spectral', google: 'Spectral:ital,wght@0,400;0,600;1,400', stack: "'Spectral', Georgia, serif" },
+  { label: 'DM Serif Display', google: 'DM+Serif+Display:ital@0;1', stack: "'DM Serif Display', Georgia, serif" },
+  { label: 'Newsreader', google: 'Newsreader:ital,wght@0,400;0,600;1,400', stack: "'Newsreader', Georgia, serif" },
+]
+
+const TOKENS: Token[] = [
+  { key: 'fs-lede', label: 'Lede', where: 'About opening statement', unit: 'px', min: 14, max: 48, step: 0.5, clamped: true, group: 'Size' },
+  { key: 'fs-body', label: 'Body', where: 'Paragraphs, list entries', unit: 'px', min: 10, max: 20, step: 0.5, group: 'Size' },
+  { key: 'fs-meta', label: 'Meta', where: 'Dates, captions, counts', unit: 'px', min: 8, max: 16, step: 0.5, group: 'Size' },
+  { key: 'fs-label', label: 'Label', where: 'Small uppercase headers', unit: 'px', min: 7, max: 14, step: 0.5, group: 'Size' },
+  { key: 'fs-title', label: 'Title', where: 'Nav and card titles', unit: 'px', min: 9, max: 18, step: 0.5, group: 'Size' },
+  { key: 'fs-value', label: 'Value', where: 'Email, location', unit: 'px', min: 10, max: 20, step: 0.5, group: 'Size' },
+  { key: 'fs-cv', label: 'CV link', where: 'Sidebar, italic serif', unit: 'px', min: 11, max: 24, step: 0.5, group: 'Size' },
+  { key: 'fs-studyno', label: 'Study no.', where: 'Sidebar index plates', unit: 'px', min: 10, max: 22, step: 0.5, group: 'Size' },
+  { key: 'fs-prose', label: 'Case prose', where: 'Case study body', unit: 'px', min: 11, max: 22, step: 0.5, group: 'Size' },
+  { key: 'fs-name', label: 'Name', where: 'Sidebar identity, serif', unit: 'rem', min: 0.9, max: 2.6, step: 0.02, group: 'Size' },
+  { key: 'fs-head', label: 'Heading', where: 'Section headings, serif', unit: 'rem', min: 0.9, max: 3, step: 0.02, group: 'Size' },
+  { key: 'fs-num', label: 'Numeral', where: 'Large figures', unit: 'rem', min: 1, max: 4, step: 0.05, group: 'Size' },
+  { key: 'fs-display', label: 'Display', where: 'Largest serif', unit: 'rem', min: 1.4, max: 4.5, step: 0.05, clamped: true, group: 'Size' },
+  { key: 'fs-case-title', label: 'Case title', where: 'Case study name', unit: 'rem', min: 2, max: 8, step: 0.05, clamped: true, group: 'Size' },
+  { key: 'fs-case-deck', label: 'Case deck', where: 'Case study one-liner', unit: 'rem', min: 0.9, max: 2.6, step: 0.02, clamped: true, group: 'Size' },
+
+  // Unitless, so leading follows whatever size the row above is set to.
+  { key: 'lh-lede', label: 'Lede', where: 'About opening statement', unit: '', min: 1, max: 2.2, step: 0.01, group: 'Leading' },
+  { key: 'lh-record', label: 'Record', where: 'About experience list', unit: '', min: 1.1, max: 2.4, step: 0.01, group: 'Leading' },
+  { key: 'lh-body', label: 'Body', where: 'Paragraphs, list entries', unit: '', min: 1.1, max: 2.4, step: 0.01, group: 'Leading' },
+  { key: 'lh-meta', label: 'Meta', where: 'Dates, captions', unit: '', min: 1, max: 2.2, step: 0.01, group: 'Leading' },
+  { key: 'lh-prose', label: 'Case prose', where: 'Case study body', unit: '', min: 1.2, max: 2.4, step: 0.01, group: 'Leading' },
+  { key: 'lh-head', label: 'Heading', where: 'Section headings', unit: '', min: 0.85, max: 1.8, step: 0.01, group: 'Leading' },
+  { key: 'lh-name', label: 'Name', where: 'Sidebar identity', unit: '', min: 0.85, max: 1.8, step: 0.01, group: 'Leading' },
+  { key: 'lh-display', label: 'Display', where: 'Largest serif', unit: '', min: 0.8, max: 1.6, step: 0.01, group: 'Leading' },
+  { key: 'lh-case-title', label: 'Case title', where: 'Case study name', unit: '', min: 0.8, max: 1.6, step: 0.01, group: 'Leading' },
+
+  // em rather than px, so tracking scales with the type instead of fighting it.
+  { key: 'ls-lede', label: 'Lede', where: 'About opening statement', unit: 'em', min: -0.05, max: 0.1, step: 0.001, group: 'Tracking' },
+  { key: 'ls-label', label: 'Label', where: 'Small uppercase headers', unit: 'em', min: 0, max: 0.4, step: 0.005, group: 'Tracking' },
+  { key: 'ls-title', label: 'Title', where: 'Nav and card titles', unit: 'em', min: 0, max: 0.3, step: 0.005, group: 'Tracking' },
+  { key: 'ls-head', label: 'Heading', where: 'Section headings', unit: 'em', min: -0.06, max: 0.06, step: 0.001, group: 'Tracking' },
+  { key: 'ls-name', label: 'Name', where: 'Sidebar identity', unit: 'em', min: -0.06, max: 0.06, step: 0.001, group: 'Tracking' },
+  { key: 'ls-display', label: 'Display', where: 'Largest serif', unit: 'em', min: -0.06, max: 0.06, step: 0.001, group: 'Tracking' },
+  { key: 'ls-case-title', label: 'Case title', where: 'Case study name', unit: 'em', min: -0.06, max: 0.06, step: 0.001, group: 'Tracking' },
+
+  // JetBrains Mono ships 100–800; the steps below are the ones it actually has.
+  { key: 'fw-body', label: 'Body', where: 'Paragraphs, list entries', unit: '', min: 300, max: 700, step: 100, group: 'Weight' },
+  { key: 'fw-label', label: 'Label', where: 'Small uppercase headers', unit: '', min: 300, max: 800, step: 100, group: 'Weight' },
+  { key: 'fw-title', label: 'Title', where: 'Nav and card titles', unit: '', min: 300, max: 800, step: 100, group: 'Weight' },
+]
+
+const GROUPS = ['Size', 'Leading', 'Tracking', 'Weight'] as const
 
 const CSS = `
 /* ─── Type tuner ──────────────────────────────────────────────────────────
@@ -178,17 +248,75 @@ const CSS = `
   font-size: 10px;
   line-height: 1.45;
 }
+
+.tuner-group {
+  margin: 10px 0 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--card-line);
+  font-size: 9px;
+}
+
+.tuner-body > .tuner-group:first-child,
+.tuner-body > div:first-of-type > .tuner-group {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.tuner-font {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 0;
+}
+
+.tuner-font[data-dirty='true'] .tuner-name {
+  color: var(--foreground);
+}
+
+.tuner-font select {
+  width: 100%;
+  padding: 3px 4px;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r-sm, 2px);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 11px;
+}
 `
 
 const STORE = 'type-tuner'
+const FONT_STORE = 'type-tuner-fonts'
 
 const parse = (raw: string) => Number.parseFloat(raw.trim())
+
+/**
+ * Pull a family from Google, once.
+ *
+ * Keyed by the family string so flipping back and forth between two choices
+ * does not stack up duplicate <link>s, and left in place afterwards — a font
+ * already fetched should not be fetched again when you return to it.
+ */
+const loaded = new Set<string>()
+function ensureFont(google?: string) {
+  if (!google || loaded.has(google)) return
+  loaded.add(google)
+  const link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.href = `https://fonts.googleapis.com/css2?family=${google}&display=swap`
+  link.dataset.tuner = 'font'
+  document.head.appendChild(link)
+}
 
 export function TypeTuner() {
   const [values, setValues] = useState<Record<string, number> | null>(null)
   const [defaults, setDefaults] = useState<Record<string, number>>({})
   const [open, setOpen] = useState(true)
   const [copied, setCopied] = useState(false)
+  /** Index into MONO / SERIF; 0 is the site's own. */
+  const [fonts, setFonts] = useState({ ui: 0, display: 0 })
 
   /** Read the stylesheet's own values once, so the panel starts truthful. */
   useEffect(() => {
@@ -210,7 +338,34 @@ export function TypeTuner() {
         document.documentElement.style.setProperty(`--${t.key}`, `${saved[t.key]}${t.unit}`)
       }
     }
+
+    try {
+      const f = JSON.parse(localStorage.getItem(FONT_STORE) ?? 'null')
+      if (f && (f.ui || f.display)) {
+        setFonts(f)
+        if (f.ui) applyFamily('ui', MONO[f.ui])
+        if (f.display) applyFamily('display', SERIF[f.display])
+      }
+    } catch {
+      // Same as above: a bad entry just means starting from the site's own.
+    }
   }, [])
+
+  const applyFamily = (slot: 'ui' | 'display', family: Family) => {
+    ensureFont(family.google)
+    document.documentElement.style.setProperty(`--family-${slot}`, family.stack)
+  }
+
+  const pickFont = (slot: 'ui' | 'display', index: number) => {
+    const family = (slot === 'ui' ? MONO : SERIF)[index]
+    applyFamily(slot, family)
+    const next = { ...fonts, [slot]: index }
+    setFonts(next)
+    try {
+      localStorage.setItem(FONT_STORE, JSON.stringify(next))
+    } catch {}
+    setCopied(false)
+  }
 
   const set = (t: Token, v: number) => {
     document.documentElement.style.setProperty(`--${t.key}`, `${v}${t.unit}`)
@@ -233,10 +388,15 @@ export function TypeTuner() {
 
   const reset = () => {
     for (const t of TOKENS) document.documentElement.style.removeProperty(`--${t.key}`)
+    for (const slot of ['ui', 'display'] as const) {
+      document.documentElement.style.removeProperty(`--family-${slot}`)
+    }
     try {
       localStorage.removeItem(STORE)
+      localStorage.removeItem(FONT_STORE)
     } catch {}
     setValues({ ...defaults })
+    setFonts({ ui: 0, display: 0 })
     setCopied(false)
   }
 
@@ -245,8 +405,17 @@ export function TypeTuner() {
     : []
 
   const copy = () => {
-    const css = changed.map((t) => `  --${t.key}: ${values![t.key]}${t.unit};`).join('\n')
-    navigator.clipboard?.writeText(css || '/* nothing changed yet */')
+    const lines = changed.map((t) => `  --${t.key}: ${values![t.key]}${t.unit};`)
+
+    // Families come back as a note, not as CSS: swapping one properly means
+    // changing the next/font import in layout.tsx, and pasting a Google stack
+    // into globals.css would quietly give up self-hosting and preloading.
+    const notes: string[] = []
+    if (fonts.ui) notes.push(`/* body/UI: ${MONO[fonts.ui].label} — change the next/font import in app/layout.tsx */`)
+    if (fonts.display) notes.push(`/* display: ${SERIF[fonts.display].label} — same */`)
+
+    const out = [...notes, ...lines].join('\n')
+    navigator.clipboard?.writeText(out || '/* nothing changed yet */')
     setCopied(true)
     window.setTimeout(() => setCopied(false), 1600)
   }
@@ -263,39 +432,69 @@ export function TypeTuner() {
 
       {open && (
         <div className="tuner-body">
-          {TOKENS.map((t) => {
-            const v = values[t.key]
-            const dirty = v !== defaults[t.key]
-            return (
-              <label key={t.key} className="tuner-row" data-dirty={dirty} title={t.where}>
-                <span className="tuner-name t-meta">{t.label}</span>
-                <input
-                  type="range"
-                  min={t.min}
-                  max={t.max}
-                  step={t.step}
-                  value={v}
-                  onChange={(e) => set(t, Number(e.target.value))}
-                />
-                <input
-                  type="number"
-                  className="tuner-num t-meta"
-                  min={t.min}
-                  max={t.max}
-                  step={t.step}
-                  value={v}
-                  onChange={(e) => {
-                    const n = Number(e.target.value)
-                    if (Number.isFinite(n)) set(t, n)
-                  }}
-                />
-                <span className="tuner-unit t-meta">
-                  {t.unit}
-                  {t.clamped && <em title="tunes the clamp maximum">*</em>}
-                </span>
-              </label>
-            )
-          })}
+          <div className="tuner-group t-label">Family</div>
+          <label className="tuner-font" data-dirty={fonts.ui > 0}>
+            <span className="tuner-name t-meta">Body / UI</span>
+            <select value={fonts.ui} onChange={(e) => pickFont('ui', Number(e.target.value))}>
+              {MONO.map((f, i) => (
+                <option key={f.label} value={i}>
+                  {f.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="tuner-font" data-dirty={fonts.display > 0}>
+            <span className="tuner-name t-meta">Display</span>
+            <select
+              value={fonts.display}
+              onChange={(e) => pickFont('display', Number(e.target.value))}
+            >
+              {SERIF.map((f, i) => (
+                <option key={f.label} value={i}>
+                  {f.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {GROUPS.map((g) => (
+            <div key={g}>
+              <div className="tuner-group t-label">{g}</div>
+              {TOKENS.filter((t) => t.group === g).map((t) => {
+                const v = values[t.key]
+                const dirty = v !== defaults[t.key]
+                return (
+                  <label key={t.key} className="tuner-row" data-dirty={dirty} title={t.where}>
+                    <span className="tuner-name t-meta">{t.label}</span>
+                    <input
+                      type="range"
+                      min={t.min}
+                      max={t.max}
+                      step={t.step}
+                      value={v}
+                      onChange={(e) => set(t, Number(e.target.value))}
+                    />
+                    <input
+                      type="number"
+                      className="tuner-num t-meta"
+                      min={t.min}
+                      max={t.max}
+                      step={t.step}
+                      value={v}
+                      onChange={(e) => {
+                        const n = Number(e.target.value)
+                        if (Number.isFinite(n)) set(t, n)
+                      }}
+                    />
+                    <span className="tuner-unit t-meta">
+                      {t.unit || '—'}
+                      {t.clamped && <em title="tunes the clamp maximum">*</em>}
+                    </span>
+                  </label>
+                )
+              })}
+            </div>
+          ))}
 
           <div className="tuner-foot">
             <button className="tuner-btn t-label" onClick={copy}>

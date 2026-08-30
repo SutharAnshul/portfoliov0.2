@@ -61,7 +61,10 @@ function Entry({
   return (
     <div className={apart ? 'record-apart' : undefined}>
       <div className="t-meta">{period}</div>
-      <div className="t-body" style={{ lineHeight: mark ? 1.9 : 1.5, marginTop: mark ? 3 : 0 }}>
+      {/* Class, not an inline style: an inline line-height outranks the token
+          the tuner drives, so this list was the one place on the page where
+          the leading slider appeared to do nothing. */}
+      <div className="t-body record-line" data-mark={mark ? 'true' : undefined}>
         ↳{' '}
         {mark && (
           <LogoMark src="/images/iitg.png" alt="Indian Institute of Technology Guwahati" />
