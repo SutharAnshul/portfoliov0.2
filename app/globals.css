@@ -2075,29 +2075,119 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .m-rail-item .mech-slot {
   transform: rotate(90deg);
 }
+/* ─── About ───────────────────────────────────────────────────────────────
+   The opening, after the Gimaev reference: a small label, one large spoken
+   statement, and a row of three panels answering the questions a visitor
+   would otherwise have to read a CV to answer.
 
-/* A square crop, so the print keeps its shape at any column width. */
-.portrait-photo {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+   Set in this site's own material rather than the reference's. The statement
+   is the monospace body face spoken louder — not a display serif — because
+   the whole voice of this site is that the ordinary text is the voice. */
+
+.hero-statement {
+  margin-top: var(--s4);
+  /* Mono gains weight fast as it grows, so this tops out well below the
+     reference's 40px sans and pulls the leading in to compensate. */
+  font-size: clamp(19px, 1.9vw, 27px);
+  line-height: 1.42;
+  letter-spacing: -0.012em;
+  color: var(--foreground);
+  max-width: 42ch;
+  text-wrap: pretty;
 }
 
-/* ─── About, on one column ────────────────────────────────────────────────
-   The two-column layout puts the print, Philosophy and Outside Work on the
-   left and the description, Experience and Skills on the right. Below the
-   breakpoint that grid collapses to source order, which meant a phone read
-   photo → Philosophy → Outside Work → description → Experience: the two least
-   urgent cards sat directly under the photo and pushed everything a recruiter
-   actually opens the page for below the fold.
+.hero-sub {
+  margin-top: var(--s5);
+  max-width: 62ch;
+}
 
-   display: contents dissolves both column wrappers so all seven cards land in
-   one flow and can be ordered on their own merits, without disturbing the
-   desktop arrangement at all. */
+/* ── The three panels ──────────────────────────────────────────────────
+   Facts, face, contact. Widths are uneven on purpose: the facts panel holds
+   four values and the contact panel two, so equal columns would leave one
+   half empty and force the other to wrap. */
+.fact-row {
+  display: grid;
+  grid-template-columns: 1.75fr 0.8fr 1.15fr;
+  gap: var(--s4);
+  align-items: stretch;
+  margin-top: var(--s6);
+}
+
+.fact-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  padding: var(--s4);
+}
+
+.fact-pair {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s4);
+}
+
+/* Labels stay in the quiet register; the values are the page's own colour,
+   because they are the answer and the label is only the question. */
+.fact-value {
+  margin-top: 3px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--foreground);
+}
+
+.fact-mail {
+  color: #d9603c;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms ease;
+}
+
+.fact-mail:hover {
+  border-bottom-color: currentColor;
+}
+
+/* The portrait, reduced to one of three. It was the whole left column before;
+   at this size it is a face attached to the facts rather than a poster. */
+.fact-photo {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.fact-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 168px;
+  object-fit: cover;
+  object-position: center 22%;
+}
+
+/* ── Narrower ──────────────────────────────────────────────────────────
+   The row breaks in two before it breaks in three: the facts panel is the
+   one that needs the width, so it takes the full measure and the face and
+   the contact card share the line under it. */
+@media (max-width: 1279px) {
+  .fact-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .fact-row > .fact-card:first-child {
+    grid-column: 1 / -1;
+  }
+}
 
 @media (max-width: 1023px) {
+  .hero-statement {
+    max-width: none;
+  }
+
+  .fact-photo img {
+    min-height: 200px;
+  }
+
+  /* The record below stacks in reading order: the two most-asked-for cards
+     first, then the rest. */
   .about-grid {
     display: flex;
     flex-direction: column;
@@ -2107,18 +2197,23 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     display: contents;
   }
 
-  /* .stack spaces its children with margins; the flex gap above now does it,
-     and leaving both on would double every gap. */
   .about-grid > .about-col > * + * {
     margin-top: 0;
   }
 
-  .ord-portrait { order: 1; }
-  .ord-about { order: 2; }
-  .ord-experience { order: 3; }
-  .ord-education { order: 4; }
-  .ord-skills { order: 5; }
-  .ord-philosophy { order: 6; }
-  .ord-outside { order: 7; }
+  .ord-experience { order: 1; }
+  .ord-education { order: 2; }
+  .ord-skills { order: 3; }
+  .ord-philosophy { order: 4; }
+  .ord-outside { order: 5; }
 }
 
+@media (max-width: 560px) {
+  .fact-row {
+    grid-template-columns: 1fr;
+  }
+
+  .fact-row > .fact-card:first-child {
+    grid-column: auto;
+  }
+}
