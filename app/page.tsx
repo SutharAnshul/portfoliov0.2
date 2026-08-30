@@ -92,18 +92,34 @@ export default function Page() {
           the width of this column rather than of the window. The sidebar and
           the chat panel both take space the viewport knows nothing about, so
           at 1500px of window there can be as little as 778px of column. */}
-      <div className="about-page" style={{ padding: 'var(--s6) var(--s6) var(--s8)' }}>
-        {/* ── The opening ───────────────────────────────────────────── */}
+      <div className="about-page">
+        {/* ── The opening ─────────────────────────────────────────────
+            Set as a quotation: the marks open and close it, the greeting
+            stands on its own line, and the statement follows underneath.
+            The "About me" label is gone — a quotation that begins "Hey
+            there! I am Anshul" does not need to be told what it is. */}
         <Settle boot mass="light">
-          <div className="t-label">About me</div>
+          <div className="hero-quote" aria-hidden="true">
+            &ldquo;
+          </div>
         </Settle>
 
         <Settle boot mass="medium" delay={80}>
+          <h1 className="hero-greeting">Hey there! I am Anshul</h1>
+        </Settle>
+
+        <Settle boot mass="light" delay={130}>
           <p className="hero-statement">
-            Hi, I am Anshul. I’m interested in how people, products, and systems fit together. I
-            like getting close to a problem, understanding what’s actually happening, and turning
-            that into clear, useful experiences.
+            I’m interested in how people, products, and systems fit together. I like getting close
+            to a problem, understanding what’s actually happening, and turning that into clear,
+            useful experiences.
           </p>
+        </Settle>
+
+        <Settle boot mass="light" delay={180}>
+          <div className="hero-quote hero-quote-close" aria-hidden="true">
+            &rdquo;
+          </div>
         </Settle>
         {/* ── One band: the record, the face, the address ────────────
             Three panels on one line, in the order they are wanted: what he

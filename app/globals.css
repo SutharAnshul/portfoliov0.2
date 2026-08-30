@@ -702,44 +702,48 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   top: 0;
 }
 
+/* Always present, in three states rather than two.
+
+   It used to be invisible until you were already overscrolling, so the only
+   way to learn there was a next page was to overshoot into it by accident.
+   Now it stands in its inactive form the whole time — destination named,
+   gauge empty — brightens on reaching the edge that leads there, and comes
+   fully up as the gauge charges. Quiet enough to ignore, present enough to
+   answer the question before it is asked. */
 .scroll-advance[data-active='false'] {
-  opacity: 0;
+  opacity: 0.3;
 }
 
 .scroll-advance[data-active='false'] .scroll-advance-hit {
-  pointer-events: none;
-}
-
-/* At rest against an edge that leads somewhere: named, dimmed, and clickable.
-   Without this the panel was invisible until you were already overscrolling,
-   so the only way to learn there was a next page was to overshoot into it by
-   accident. Quiet enough to ignore, present enough to answer the question. */
-.scroll-advance[data-active='false'][data-resting='true'] {
-  opacity: 0.5;
-  transition: opacity 420ms ease 140ms;
-}
-
-.scroll-advance[data-active='false'][data-resting='true'] .scroll-advance-hit {
   pointer-events: auto;
 }
 
-.scroll-advance[data-active='false'][data-resting='true']:hover {
+.scroll-advance[data-active='false'][data-resting='true'] {
+  opacity: 0.58;
+  transition: opacity 420ms ease 140ms;
+}
+
+.scroll-advance[data-active='false']:hover {
   opacity: 0.85;
 }
 
-/* One slow travel of the head along an empty track, then still. It says which
-   way the gesture goes without becoming a thing that blinks at you forever. */
+/* The head travels the empty track and repeats, which is what says the strip
+   is a gesture rather than a caption. Slow and dim enough not to nag: a long
+   pause sits between passes, and the pass itself is most of a second. */
 @media (prefers-reduced-motion: no-preference) {
-  .scroll-advance[data-active='false'][data-resting='true'] .scroll-advance-head {
-    animation: sa-hint 2.6s var(--ease-medium, ease-out) 3;
+  .scroll-advance[data-active='false'] .scroll-advance-head {
+    animation: sa-hint 4.2s var(--ease-medium, ease-out) infinite;
   }
 }
 
+/* One pass, then a long rest. The head fades in at the start mark, travels,
+   and fades out — it never sits static at the far end, which would read as a
+   gauge that had already been filled. */
 @keyframes sa-hint {
-  0%, 12% { opacity: 0; transform: translate(0, -50%); }
-  30% { opacity: 1; }
-  70% { opacity: 1; transform: translate(14px, -50%); }
-  88%, 100% { opacity: 0; transform: translate(14px, -50%); }
+  0%, 8% { opacity: 0; transform: translate(0, -50%); }
+  20% { opacity: 1; }
+  46% { opacity: 1; transform: translate(16px, -50%); }
+  58%, 100% { opacity: 0; transform: translate(16px, -50%); }
 }
 
 .scroll-advance:has(.scroll-advance-hit:focus-visible) {
@@ -2183,6 +2187,39 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    is the monospace body face spoken louder — not a display serif — because
    the whole voice of this site is that the ordinary text is the voice. */
 
+/* The quotation marks. Set large and dim in the display face, sitting on the
+   left margin above and below the block — they frame the statement as
+   something said rather than something written about him. Zero line-height
+   so a 3rem glyph does not open a 3rem gap in the flow. */
+.hero-quote {
+  font-family: var(--family-display);
+  font-size: 3rem;
+  /* 0.62, not 0. At zero the box collapses and the glyph paints outside it,
+     which makes the space above unpredictable and can run the mark into the
+     breadcrumb. This keeps the ink inside a box short enough not to open a
+     48px hole in the flow. */
+  line-height: 0.62;
+  color: color-mix(in srgb, var(--foreground) 34%, transparent);
+  user-select: none;
+}
+
+.hero-quote-close {
+  margin-top: var(--s4);
+}
+
+/* The greeting, on its own line above the statement and set in the same face
+   and size — it is the first sentence of the quotation, not a heading over
+   it, so it should not out-shout what follows. */
+.hero-greeting {
+  margin-top: var(--s3);
+  font-family: var(--family-display);
+  font-weight: 500;
+  font-size: clamp(22px, 2.3vw, var(--fs-lede));
+  line-height: var(--lh-lede);
+  letter-spacing: 0.002em;
+  color: var(--foreground);
+}
+
 .hero-statement {
   margin-top: var(--s4);
   /* The serif, upright. It is the one paragraph on the site set in the display
@@ -2294,8 +2331,18 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   object-position: center 22%;
 }
 
+/* The advance strip is fixed to the foot of the content column and visible at
+   all times now, so every page has to stand clear of it or its last line sits
+   behind it. Reserved once here rather than page by page. */
+[data-page-content] {
+  padding-bottom: var(--advance-h, 0px);
+}
+
 .about-page {
   container: about / inline-size;
+  /* Even on all four sides — the row stands off the strip below it by exactly
+     what it stands off the left edge. */
+  padding: var(--s6);
 }
 
 /* ── Filling the first screen ──────────────────────────────────────────
@@ -2311,8 +2358,8 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   .about-page {
     display: flex;
     flex-direction: column;
-    /* 5rem is the main column's top padding. */
-    min-height: calc(100vh - 5rem);
+    /* 5rem is the main column's top padding; the strip is reserved below. */
+    min-height: calc(100vh - 5rem - var(--advance-h, 0px));
   }
 
   /* The last child, not `.about-band` — the band is wrapped in a Settle, so
@@ -2372,9 +2419,11 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     grid-row: auto;
   }
 
-  /* The print takes the measure, still at 2:3. */
+  /* The print takes the full measure, like the cards it now sits between.
+     Capped at 260 it was the one narrow thing in a column of full-width
+     blocks, which read as a mistake rather than as a choice. Still 2:3. */
   .fact-photo {
-    max-width: 260px;
+    max-width: none;
   }
 }
 

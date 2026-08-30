@@ -6,17 +6,18 @@ import Lenis from 'lenis'
 /**
  * Damped window scrolling — weighted, but not sluggish.
  *
- * Tuning knobs: DURATION is how long the glide takes to settle, WHEEL is
- * distance per notch. These were 1.35s and 0.85, which put roughly a third of
- * a second of visible drift between the wheel stopping and the page stopping —
- * enough that the page felt like it was catching up rather than responding.
+ * DURATION is how long the glide takes to settle, WHEEL is distance per notch.
+ * This has come down twice: 1.35s, then 0.85s, now 0.55s. What makes the lag
+ * feel long is not the number on its own but how much of it lands in the tail,
+ * and both earlier easings were tail-heavy — expo-out worst, quint-out still
+ * spending a third of its run inside the last tenth of the distance.
  *
- * 0.85s with a full-strength wheel keeps the damping legible while letting the
- * page arrive close to when the hand does. The easing matters as much as the
- * number: expo-out spends most of its time in a long tail, so the last 10% of
- * the distance took a disproportionate share of the old duration.
+ * Cubic-out at 0.55s reaches 90% of the move in about 0.27s and is done at
+ * 0.55s, against quint-out at 0.85s taking 0.31s and 0.85s for the same two
+ * marks. The hand is answered roughly when it stops moving, and what remains
+ * reads as weight rather than as the page catching up.
  */
-const DURATION = 0.85
+const DURATION = 0.55
 const WHEEL = 1
 
 export function SmoothScroll() {
@@ -26,10 +27,9 @@ export function SmoothScroll() {
 
     const lenis = new Lenis({
       duration: DURATION,
-      // quint-out rather than expo-out. Both pick up fast, but expo's tail is
-      // so long that the page keeps creeping after the gesture has clearly
-      // ended; quint settles decisively while still reading as damped.
-      easing: (t: number) => 1 - Math.pow(1 - t, 5),
+      // cubic-out. Still eased, still decelerating — just without the long
+      // crawl at the end that quint and expo both carry.
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
       wheelMultiplier: WHEEL,
       // Leave touch alone: iOS/Android momentum is already good, and mobile
       // scrolls its own container in LayoutShell rather than the window.

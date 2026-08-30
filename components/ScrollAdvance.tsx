@@ -131,6 +131,8 @@ export function ScrollAdvance() {
      * state so the label is only re-rendered when it actually changes.
      */
     let restingDir: Dir = null
+    /** Last published height, so the custom property is only written on change. */
+    let lastHeight = 0
     let edgeSince = 0
     let lastInput = 0
     let armed = true
@@ -247,6 +249,20 @@ export function ScrollAdvance() {
       if (r) {
         root.style.left = `${Math.round(r.left)}px`
         root.style.width = `${Math.round(r.width)}px`
+      }
+
+      /**
+       * Publish the strip's height so the page can stand clear of it.
+       *
+       * It is fixed to the bottom of the content column and now visible at
+       * all times, so anything anchored to the foot of the page sits under
+       * it — on About, the record row landed straight behind this. Measured
+       * rather than assumed, because the height moves with the type scale.
+       */
+      const h = Math.ceil(root.getBoundingClientRect().height)
+      if (h && h !== lastHeight) {
+        lastHeight = h
+        docEl.style.setProperty('--advance-h', `${h}px`)
       }
 
       // Docking upward, sit *below* the breadcrumb rather than over it — the
