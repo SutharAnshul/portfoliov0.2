@@ -91,7 +91,20 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
     }
   }, [isResizing])
 
-  const transition = isResizing ? 'none' : 'margin 300ms ease'
+  /**
+   * Closing Mr. Toast hands his column back to the page, and the page should
+   * be seen taking it rather than being found already wider.
+   *
+   * On the site's own spring, so the column arrives the way everything else
+   * here does. Off entirely while a divider is being dragged: an easing curve
+   * between the pointer and the edge it is holding reads as lag, not weight.
+   */
+  const transition = isResizing
+    ? 'none'
+    : 'margin var(--dur-light, 380ms) var(--ease-light, cubic-bezier(0.22, 1, 0.36, 1))'
+  const edgeTransition = isResizing
+    ? 'none'
+    : 'left var(--dur-light, 380ms) var(--ease-light, cubic-bezier(0.22, 1, 0.36, 1)), right var(--dur-light, 380ms) var(--ease-light, cubic-bezier(0.22, 1, 0.36, 1))'
   const rightEdge = chatOpen ? chatWidth : 0
 
   if (bare) return <>{children}</>
@@ -104,9 +117,13 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
       <div className="hidden md:block">
         <SideNav width={navWidth} />
 
+      {/* The breadcrumb spans the same column and has to travel with it —
+          left to its own timing it snapped to the new width while the page
+          beneath it was still moving. */}
       <BreadcrumbNav
         left={navWidth}
         right={rightEdge}
+        transition={edgeTransition}
         chatOpen={chatOpen}
         onOpenChat={() => setChatOpen(true)}
       />

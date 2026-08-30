@@ -12,11 +12,19 @@ interface BreadcrumbItem {
 interface BreadcrumbNavProps {
   left?: number
   right?: number
+  /** Matched to the main column's, so the two edges move as one. */
+  transition?: string
   chatOpen?: boolean
   onOpenChat?: () => void
 }
 
-export function BreadcrumbNav({ left = 0, right = 0, chatOpen = true, onOpenChat }: BreadcrumbNavProps) {
+export function BreadcrumbNav({
+  left = 0,
+  right = 0,
+  transition,
+  chatOpen = true,
+  onOpenChat,
+}: BreadcrumbNavProps) {
   const pathname = usePathname()
 
   const breadcrumbs: BreadcrumbItem[] = []
@@ -40,7 +48,7 @@ export function BreadcrumbNav({ left = 0, right = 0, chatOpen = true, onOpenChat
   return (
     <div
       data-breadcrumb
-      style={{ left, right, padding: 'var(--s4) var(--s6)' }}
+      style={{ left, right, transition, padding: 'var(--s4) var(--s6)' }}
       className="fixed top-0 z-[70] bg-background"
     >
       <div className="flex items-center justify-between gap-4">

@@ -2138,12 +2138,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    height, so the three read as one band rather than three leftovers. */
 .about-band {
   display: grid;
-  /* Capped rather than 1fr. The record's longest line is 46 characters; past
-     about 460px the card stops gaining anything and just stretches a short
-     list across the whole page. The band packs left and leaves the surplus
-     as margin, which is what a maximum is for. */
-  grid-template-columns: minmax(0, 460px) 200px minmax(215px, 250px);
-  justify-content: start;
+  /* The band spans the column edge to edge; the surplus goes to the address
+     card. The record is still capped at 460 — its longest line is 46
+     characters and past that it only stretches a short list — and the print
+     is fixed because its crop is fixed, so the third panel is the only one
+     with any business absorbing width. */
+  grid-template-columns: minmax(0, 460px) 200px minmax(215px, 1fr);
   gap: var(--s4);
   align-items: stretch;
   margin-top: var(--s6);
@@ -2218,10 +2218,8 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    full measure — its longest line is 46 characters and it is the panel that
    suffers first — and the print and the address share the line beneath it. */
 @container about (max-width: 900px) {
-  /* Still capped on the second row — the address card gains nothing from the
-     width the record just gave up. */
   .about-band {
-    grid-template-columns: 200px minmax(215px, 250px);
+    grid-template-columns: 200px minmax(215px, 1fr);
   }
 
   .about-band > .record-card {
