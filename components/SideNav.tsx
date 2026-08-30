@@ -45,10 +45,10 @@ const NAV = [
 
 /** Contact lives with the CV: both are ways to reach him, not page content. */
 const CONTACT = [
-  { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', Icon: IconMail, tint: '#D9603C' },
-  { href: 'tel:+916376542708', label: 'Phone', Icon: IconPhone, tint: '#4FA871' },
-  { href: 'https://linkedin.com/in/sutharanshul', label: 'LinkedIn', Icon: IconLinkedIn, tint: '#3B8BD8' },
-  { href: 'https://behance.net/anshulsuthar', label: 'Behance', Icon: IconBehance, tint: '#6C7BFF' },
+  { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', Icon: IconMail },
+  { href: 'tel:+916376542708', label: 'Phone', Icon: IconPhone },
+  { href: 'https://linkedin.com/in/sutharanshul', label: 'LinkedIn', Icon: IconLinkedIn },
+  { href: 'https://behance.net/anshulsuthar', label: 'Behance', Icon: IconBehance },
 ] as const
 
 const ICONS = {
@@ -96,7 +96,7 @@ export function SideNav({ width }: SideNavProps) {
         </a>
 
         <div className="contact-row">
-          {CONTACT.map(({ href, label, Icon, tint }) => (
+          {CONTACT.map(({ href, label, Icon }) => (
             <a
               key={label}
               href={href}
@@ -104,11 +104,10 @@ export function SideNav({ width }: SideNavProps) {
               rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
               data-sfx="tick"
               className="contact-chip"
-              style={{ color: tint }}
               aria-label={label}
               title={label}
             >
-              <Icon size={18} />
+              <Icon size={21} />
             </a>
           ))}
         </div>
@@ -153,11 +152,14 @@ export function SideNav({ width }: SideNavProps) {
                   href={`/work/${study.slug}`}
                   data-sfx="tick"
                   data-active={active}
-                  className="card-link relative flex items-start gap-3"
+                  className="card-link study-link relative"
                   aria-current={active ? 'page' : undefined}
                 >
                   <CornerMarks />
-                  <span className="t-meta flex-shrink-0" style={{ paddingTop: 1 }}>
+                  {/* The index, given the same slot the nav items give their
+                      mechanism. At 11px beside the title it read as a stray
+                      piece of metadata; at plate size it is the item's mark. */}
+                  <span className="study-no" aria-hidden="true">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <span className="min-w-0" style={{ display: 'grid', gap: 2 }}>

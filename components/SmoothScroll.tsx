@@ -4,14 +4,20 @@ import { useEffect } from 'react'
 import Lenis from 'lenis'
 
 /**
- * Damped, weighted window scrolling.
+ * Damped window scrolling — weighted, but not sluggish.
  *
- * Tuning knobs — raise DURATION for heavier/slower glide, lower WHEEL for less
- * distance per notch. LERP is intentionally unused; DURATION + EASING gives a
- * more consistent "weight" across trackpads and mouse wheels.
+ * Tuning knobs: DURATION is how long the glide takes to settle, WHEEL is
+ * distance per notch. These were 1.35s and 0.85, which put roughly a third of
+ * a second of visible drift between the wheel stopping and the page stopping —
+ * enough that the page felt like it was catching up rather than responding.
+ *
+ * 0.85s with a full-strength wheel keeps the damping legible while letting the
+ * page arrive close to when the hand does. The easing matters as much as the
+ * number: expo-out spends most of its time in a long tail, so the last 10% of
+ * the distance took a disproportionate share of the old duration.
  */
-const DURATION = 1.35
-const WHEEL = 0.85
+const DURATION = 0.85
+const WHEEL = 1
 
 export function SmoothScroll() {
   useEffect(() => {
@@ -20,8 +26,10 @@ export function SmoothScroll() {
 
     const lenis = new Lenis({
       duration: DURATION,
-      // expo-out: fast pickup, long soft settle — reads as mass
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      // quint-out rather than expo-out. Both pick up fast, but expo's tail is
+      // so long that the page keeps creeping after the gesture has clearly
+      // ended; quint settles decisively while still reading as damped.
+      easing: (t: number) => 1 - Math.pow(1 - t, 5),
       wheelMultiplier: WHEEL,
       // Leave touch alone: iOS/Android momentum is already good, and mobile
       // scrolls its own container in LayoutShell rather than the window.

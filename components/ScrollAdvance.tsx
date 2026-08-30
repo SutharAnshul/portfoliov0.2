@@ -120,6 +120,17 @@ export function ScrollAdvance() {
     let shown = 0
     let shownVel = 0
     let activeDir: Dir = null
+    /**
+     * Which direction the resting hint is currently advertising.
+     *
+     * The panel used to be invisible until you were already overscrolling,
+     * which meant the only way to discover the next page was to push past the
+     * bottom by accident. Reaching the edge now shows the strip quietly — the
+     * destination named, the gauge empty — so the gesture is offered before it
+     * has to be guessed. Tracked in a local rather than read back from React
+     * state so the label is only re-rendered when it actually changes.
+     */
+    let restingDir: Dir = null
     let edgeSince = 0
     let lastInput = 0
     let armed = true
@@ -221,6 +232,15 @@ export function ScrollAdvance() {
       root.dataset.active = p > 0.004 || releaseAt ? 'true' : 'false'
       docEl.style.setProperty('--page-exit', exit.toFixed(4))
 
+      // Sitting at an edge that has somewhere to go, and not yet charging.
+      const at = releaseAt || p > 0.004 ? null : edge()
+      const rest = at && target(at) ? at : null
+      root.dataset.resting = rest ? 'true' : 'false'
+      if (rest !== restingDir) {
+        restingDir = rest
+        if (rest) setDir(rest)
+      }
+
       // Span the content column, so the panel is chrome for the content rather
       // than an overlay floating across it.
       const r = contentRect()
@@ -273,6 +293,7 @@ export function ScrollAdvance() {
       ref={rootRef}
       className="scroll-advance"
       data-active="false"
+      data-resting="false"
       data-state="idle"
       data-dir={dir ?? 'down'}
     >

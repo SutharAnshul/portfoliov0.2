@@ -643,6 +643,38 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   pointer-events: none;
 }
 
+/* At rest against an edge that leads somewhere: named, dimmed, and clickable.
+   Without this the panel was invisible until you were already overscrolling,
+   so the only way to learn there was a next page was to overshoot into it by
+   accident. Quiet enough to ignore, present enough to answer the question. */
+.scroll-advance[data-active='false'][data-resting='true'] {
+  opacity: 0.5;
+  transition: opacity 420ms ease 140ms;
+}
+
+.scroll-advance[data-active='false'][data-resting='true'] .scroll-advance-hit {
+  pointer-events: auto;
+}
+
+.scroll-advance[data-active='false'][data-resting='true']:hover {
+  opacity: 0.85;
+}
+
+/* One slow travel of the head along an empty track, then still. It says which
+   way the gesture goes without becoming a thing that blinks at you forever. */
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-advance[data-active='false'][data-resting='true'] .scroll-advance-head {
+    animation: sa-hint 2.6s var(--ease-medium, ease-out) 3;
+  }
+}
+
+@keyframes sa-hint {
+  0%, 12% { opacity: 0; transform: translate(0, -50%); }
+  30% { opacity: 1; }
+  70% { opacity: 1; transform: translate(14px, -50%); }
+  88%, 100% { opacity: 0; transform: translate(14px, -50%); }
+}
+
 .scroll-advance:has(.scroll-advance-hit:focus-visible) {
   opacity: 1;
 }
@@ -1186,7 +1218,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   display: inline-block;
   font-family: var(--font-display), Georgia, serif;
   font-style: italic;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.3;
   color: color-mix(in srgb, var(--foreground) 58%, transparent);
   text-decoration: underline;
@@ -1204,16 +1236,16 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 /* Contact sits with the CV: both are ways to reach him, not page content. */
 .contact-row {
   display: flex;
-  gap: var(--s3);
+  gap: var(--s4);
   margin-top: var(--s4);
 }
 
 .contact-chip {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
-  opacity: 0.82;
+  width: 26px;
+  height: 26px;
+  opacity: 0.92;
   transition: opacity 200ms ease, transform 200ms ease;
 }
 
@@ -2096,21 +2128,24 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   text-wrap: pretty;
 }
 
-.record-card {
-  margin-top: var(--s6);
-}
+/* ── One band ──────────────────────────────────────────────────────────
+   Record, face, address, on one line and in that order.
 
-/* ── The face, and how to reach it ─────────────────────────────────────
-   Two panels, sized to their contents and left-aligned rather than stretched
-   across the measure. A card holding an address and a timezone does not
-   improve for being 800px wide; it only gets emptier. */
-.fact-row {
+   The record takes the free space because it holds the longest line on the
+   page; the photograph is a fixed column because a portrait has a shape it
+   should keep; the address is capped because a card holding an email and a
+   timezone gets emptier, not better, with width. Stretched to a common
+   height, so the three read as one band rather than three leftovers. */
+.about-band {
   display: grid;
-  grid-template-columns: 172px minmax(250px, 330px);
-  justify-content: start;
+  grid-template-columns: minmax(0, 1fr) 140px minmax(215px, 250px);
   gap: var(--s4);
   align-items: stretch;
   margin-top: var(--s6);
+}
+
+.record-card {
+  min-width: 0;
 }
 
 .fact-card {
@@ -2166,52 +2201,41 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     min-height: 200px;
   }
 
+  /* The record needs the whole measure before the other two do: its longest
+     line is 46 characters and the band cannot hold that under about 1000px. */
+  .about-band {
+    grid-template-columns: 140px minmax(215px, 1fr);
+  }
+
+  .about-band > .record-card {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 560px) {
-  .fact-row {
+  .about-band {
     grid-template-columns: 1fr;
+  }
+
+  .about-band > .record-card {
+    grid-column: auto;
   }
 }
 
 /* ── The record ────────────────────────────────────────────────────────
-   Work and study in one list. Period left, what happened right — the two
-   columns are what let the degree sit among the roles without reading as a
-   fifth job, and they give the card something to do with its width now that
-   it is the only one on the page rather than one of six. */
+   Work and study in one list, each entry the period with what happened
+   under it. The two-column version this replaces spread the same content
+   across 190px of date column and left the rows looking stranded. */
 .record {
   display: grid;
   gap: var(--s4);
-  margin-top: var(--s5);
 }
 
-.record-row {
-  display: grid;
-  grid-template-columns: 190px 1fr;
-  gap: var(--s4);
-  align-items: baseline;
-}
-
-/* An 18px institution mark on a 13px line overflows its line box, so the row
-   carrying one is given the lead to absorb it. */
-.record-detail {
-  line-height: 1.75;
-  color: var(--foreground);
-}
-
-.record-period {
-  padding-top: 4px;
-}
-
-@media (max-width: 767px) {
-  .record-row {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
-
-  .record-period {
-    padding-top: 0;
-  }
+/* Study, set apart from work by space alone. A rule would draw a section
+   boundary the list does not need, and a heading would name a distinction
+   the dates have already made. */
+.record-apart {
+  margin-top: var(--s3);
 }
 
 /* The bio line, wherever it appears. `pretty` costs the browser a little
@@ -2220,4 +2244,82 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    together would otherwise have caused in a column this narrow. */
 .bio {
   text-wrap: pretty;
+}
+
+/* ─── Scrollbars ──────────────────────────────────────────────────────────
+   The native bar is a wide light-grey slab that reads as a piece of the
+   operating system dropped onto the page — most visible in the sidebar, which
+   scrolls independently and so shows one whenever the window is short.
+
+   Thin, transparent-tracked, and drawn in the page's own foreground colour at
+   low opacity, so it belongs to the surface it sits on and darkens only while
+   the pointer is over that surface. Both syntaxes: the standard properties
+   for Firefox, the pseudo-elements for Chromium and Safari. */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--foreground) 18%, transparent) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--foreground) 16%, transparent);
+  /* Inset by a transparent border rather than by width, so the track keeps its
+     full hit area while the visible thumb stays slim. */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 200ms ease;
+}
+
+:hover > ::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--foreground) 34%, transparent);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ─── Case study list ─────────────────────────────────────────────────────
+   The same shape as a nav item: a mark in a plate on the left, title and
+   type stacked beside it. The index used to sit at 11px above the title
+   where it read as a stray piece of metadata; at plate size it becomes the
+   item's mark, and the two lines beside it become the item's content. */
+.study-link {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: var(--s3);
+  align-items: center;
+}
+
+.study-no {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  font-size: 15px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--foreground) 52%, transparent);
+  transition: color 260ms ease, border-color 260ms ease, background-color 260ms ease;
+}
+
+.study-link:hover .study-no,
+.study-link[data-active='true'] .study-no {
+  color: var(--foreground);
+  border-color: var(--card-line-strong);
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
 }

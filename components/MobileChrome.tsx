@@ -44,10 +44,10 @@ const NAV = [
 ] as const
 
 const CONTACT = [
-  { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', Icon: IconMail, tint: '#D9603C' },
-  { href: 'tel:+916376542708', label: 'Phone', Icon: IconPhone, tint: '#4FA871' },
-  { href: 'https://linkedin.com/in/sutharanshul', label: 'LinkedIn', Icon: IconLinkedIn, tint: '#3B8BD8' },
-  { href: 'https://behance.net/anshulsuthar', label: 'Behance', Icon: IconBehance, tint: '#6C7BFF' },
+  { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', Icon: IconMail },
+  { href: 'tel:+916376542708', label: 'Phone', Icon: IconPhone },
+  { href: 'https://linkedin.com/in/sutharanshul', label: 'LinkedIn', Icon: IconLinkedIn },
+  { href: 'https://behance.net/anshulsuthar', label: 'Behance', Icon: IconBehance },
 ] as const
 
 export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
@@ -135,7 +135,7 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
           </a>
 
           <div className="contact-row">
-            {CONTACT.map(({ href, label, Icon, tint }) => (
+            {CONTACT.map(({ href, label, Icon }) => (
               <a
                 key={label}
                 href={href}
@@ -143,7 +143,6 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
                 rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 data-sfx="tick"
                 className="contact-chip"
-                style={{ color: tint }}
                 aria-label={label}
               >
                 <Icon size={20} />

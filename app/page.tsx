@@ -34,8 +34,43 @@ const RECORD = [
   { period: 'Sept 2024 — Feb 2026', detail: 'Product Designer at CNVRT Labs' },
   { period: 'Apr 2024 — Jul 2025', detail: 'Growth Operator at Impact Acquisition' },
   { period: 'Jul 2023 — Present', detail: 'Co-Founder & Creative Director at Herbal Mitra' },
-  { period: '2021 — 2025', detail: 'B.Des. at IIT, Guwahati', mark: true },
+  // `apart` opens the gap that separates study from work. No rule and no
+  // heading: at this point in the list the shift from roles to a degree is
+  // already legible, and space is enough to mark it.
+  { period: '2021 — 2025', detail: 'B.Des. at IIT, Guwahati', mark: true, apart: true },
 ]
+
+/**
+ * One line of the record: the period, then what happened under it.
+ *
+ * An 18px institution mark on a 13px line overflows its line box and crowds
+ * the date above, which the rows without one do not have to allow for — hence
+ * the extra lead on that row only.
+ */
+function Entry({
+  period,
+  detail,
+  mark,
+  apart,
+}: {
+  period: string
+  detail: string
+  mark?: boolean
+  apart?: boolean
+}) {
+  return (
+    <div className={apart ? 'record-apart' : undefined}>
+      <div className="t-meta">{period}</div>
+      <div className="t-body" style={{ lineHeight: mark ? 1.9 : 1.5, marginTop: mark ? 3 : 0 }}>
+        ↳{' '}
+        {mark && (
+          <LogoMark src="/images/iitg.png" alt="Indian Institute of Technology Guwahati" />
+        )}
+        {detail}
+      </div>
+    </div>
+  )
+}
 
 /** One labelled fact inside the panel row. */
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
@@ -63,44 +98,28 @@ export default function Page() {
             that into clear, useful experiences.
           </p>
         </Settle>
+        {/* ── One band: the record, the face, the address ────────────
+            Three panels on one line, in the order they are wanted: what he
+            has done, who he is, how to reach him.
 
-        {/* ── The record ──────────────────────────────────────────────
-            No heading. Directly under the statement, dates against roles is
-            already unmistakably a working history — a label would only name
-            what the reader has finished understanding.
+            No heading on the record. Directly under the statement, dates
+            against roles is already unmistakably a working history, and a
+            label would only name what the reader has finished understanding.
 
             One list, not two, ordered newest first by start date. That puts
             the degree last because it began first, and it shows what two
             separate cards hid: 2021 — 2025 overlaps Jul 2023 and Apr 2024,
             so he was co-founding and working while finishing it. */}
         <Settle boot mass="light" delay={140}>
-          <section className="card record-card">
-            <div className="record">
-              {RECORD.map((row) => (
-                <div key={row.detail} className="record-row">
-                  <div className="t-meta record-period">{row.period}</div>
-                  <div className="t-body record-detail">
-                    {row.mark && (
-                      <LogoMark
-                        src="/images/iitg.png"
-                        alt="Indian Institute of Technology Guwahati"
-                      />
-                    )}
-                    {row.detail}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        </Settle>
+          <div className="about-band">
+            <section className="card record-card">
+              <div className="record">
+                {RECORD.map((row) => (
+                  <Entry key={row.detail} {...row} />
+                ))}
+              </div>
+            </section>
 
-        {/* ── The face, and how to reach it ─────────────────────────
-            The facts panel that stood here said Position, Currently and
-            Degree — all three of which the record above now states with
-            dates attached. What is left is the pair the record cannot
-            carry. */}
-        <Settle boot mass="light" delay={200}>
-          <div className="fact-row">
             <figure className="card fact-photo">
               <img src="/images/anshul-portrait.jpeg" alt="Anshul Suthar, product designer" />
             </figure>
@@ -120,7 +139,6 @@ export default function Page() {
             </div>
           </div>
         </Settle>
-
       </div>
     </div>
   )
