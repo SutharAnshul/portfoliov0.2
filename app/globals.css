@@ -2296,8 +2296,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   color: var(--foreground);
 }
 
+/* The page's own colour, not the mail tint. With the availability chip beside
+   it there is one coloured thing on this card, and an address is not it —
+   two accents in one small panel and neither reads as the accent.
+   The link still says it is one: a rule appears under it on hover. */
 .fact-mail {
-  color: #d9603c;
+  color: var(--foreground);
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color 200ms ease;
