@@ -74,9 +74,12 @@ export function SideNav({ width }: SideNavProps) {
           <h1 className="t-name">Anshul Suthar</h1>
           <ThemeToggle />
         </div>
-        <p className="t-body" style={{ marginTop: 'var(--s3)' }}>
-          Product designer based in India. I like figuring out how things work, then making them
-          better.
+        <p className="t-body bio" style={{ marginTop: 'var(--s3)' }}>
+          {/* Non-breaking: the column is narrow enough that "how things" and
+              "work" land on different lines, and the gap between them reads as
+              a stray space rather than as a wrap. */}
+          Product designer based in India. I like figuring out how things&nbsp;work, then making
+          them better.
         </p>
 
         {/* CV — a quiet aside in the same voice as the card headings, not a

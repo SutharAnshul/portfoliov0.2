@@ -58,9 +58,9 @@ export default function Page() {
 
         <Settle boot mass="medium" delay={80}>
           <p className="hero-statement">
-            I’m interested in how people, products, and systems fit together. I like getting close
-            to a problem, understanding what’s actually happening, and turning that into clear,
-            useful experiences.
+            Hi, I am Anshul. I’m interested in how people, products, and systems fit together. I
+            like getting close to a problem, understanding what’s actually happening, and turning
+            that into clear, useful experiences.
           </p>
         </Settle>
 
@@ -94,21 +94,13 @@ export default function Page() {
           </section>
         </Settle>
 
-        {/* ── The three panels ──────────────────────────────────────── */}
+        {/* ── The face, and how to reach it ─────────────────────────
+            The facts panel that stood here said Position, Currently and
+            Degree — all three of which the record above now states with
+            dates attached. What is left is the pair the record cannot
+            carry. */}
         <Settle boot mass="light" delay={200}>
           <div className="fact-row">
-            <div className="card fact-card">
-              <div className="fact-pair">
-                <Fact label="Position">Product Designer</Fact>
-                <Fact label="Experience">3+ years</Fact>
-              </div>
-              <Fact label="Currently">Herbal Mitra — Co-Founder &amp; Creative Director</Fact>
-              <Fact label="Degree">
-                <LogoMark src="/images/iitg.png" alt="Indian Institute of Technology Guwahati" />
-                B.Des., IIT Guwahati
-              </Fact>
-            </div>
-
             <figure className="card fact-photo">
               <img src="/images/anshul-portrait.jpeg" alt="Anshul Suthar, product designer" />
             </figure>

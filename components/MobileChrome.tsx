@@ -118,9 +118,9 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
 
       <div id="studio-card" className="m-studio" data-open={open}>
         <div className="m-studio-inner">
-          <p className="t-body" style={{ opacity: 0.8 }}>
-            Product designer based in India. I like figuring out how things work, then making them
-            better.
+          <p className="t-body bio" style={{ opacity: 0.8 }}>
+            Product designer based in India. I like figuring out how things&nbsp;work, then making
+            them better.
           </p>
 
           <a

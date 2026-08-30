@@ -2100,13 +2100,14 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   margin-top: var(--s6);
 }
 
-/* ── The three panels ──────────────────────────────────────────────────
-   Facts, face, contact. Widths are uneven on purpose: the facts panel holds
-   four values and the contact panel two, so equal columns would leave one
-   half empty and force the other to wrap. */
+/* ── The face, and how to reach it ─────────────────────────────────────
+   Two panels, sized to their contents and left-aligned rather than stretched
+   across the measure. A card holding an address and a timezone does not
+   improve for being 800px wide; it only gets emptier. */
 .fact-row {
   display: grid;
-  grid-template-columns: 1.75fr 0.8fr 1.15fr;
+  grid-template-columns: 172px minmax(250px, 330px);
+  justify-content: start;
   gap: var(--s4);
   align-items: stretch;
   margin-top: var(--s6);
@@ -2117,12 +2118,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   flex-direction: column;
   gap: var(--s4);
   padding: var(--s4);
-}
-
-.fact-pair {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--s4);
 }
 
 /* Labels stay in the quiet register; the values are the page's own colour,
@@ -2145,8 +2140,8 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   border-bottom-color: currentColor;
 }
 
-/* The portrait, reduced to one of three. It was the whole left column before;
-   at this size it is a face attached to the facts rather than a poster. */
+/* The portrait, reduced to one of two. It was the whole left column before;
+   at this size it is a face beside an address rather than a poster. */
 .fact-photo {
   margin: 0;
   padding: 0;
@@ -2160,20 +2155,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   min-height: 168px;
   object-fit: cover;
   object-position: center 22%;
-}
-
-/* ── Narrower ──────────────────────────────────────────────────────────
-   The row breaks in two before it breaks in three: the facts panel is the
-   one that needs the width, so it takes the full measure and the face and
-   the contact card share the line under it. */
-@media (max-width: 1279px) {
-  .fact-row {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .fact-row > .fact-card:first-child {
-    grid-column: 1 / -1;
-  }
 }
 
 @media (max-width: 1023px) {
@@ -2190,10 +2171,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 @media (max-width: 560px) {
   .fact-row {
     grid-template-columns: 1fr;
-  }
-
-  .fact-row > .fact-card:first-child {
-    grid-column: auto;
   }
 }
 
@@ -2235,4 +2212,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   .record-period {
     padding-top: 0;
   }
+}
+
+/* The bio line, wherever it appears. `pretty` costs the browser a little
+   extra line-breaking work in exchange for not stranding the last word of a
+   short paragraph on its own line — which is what binding "things work"
+   together would otherwise have caused in a column this narrow. */
+.bio {
+  text-wrap: pretty;
 }
