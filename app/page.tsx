@@ -85,7 +85,11 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
 export default function Page() {
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <div style={{ padding: 'var(--s6) var(--s6) var(--s8)' }}>
+      {/* A container, not just a wrapper: the band below has to respond to
+          the width of this column rather than of the window. The sidebar and
+          the chat panel both take space the viewport knows nothing about, so
+          at 1500px of window there can be as little as 778px of column. */}
+      <div className="about-page" style={{ padding: 'var(--s6) var(--s6) var(--s8)' }}>
         {/* ── The opening ───────────────────────────────────────────── */}
         <Settle boot mass="light">
           <div className="t-label">About me</div>

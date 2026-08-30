@@ -2138,7 +2138,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    height, so the three read as one band rather than three leftovers. */
 .about-band {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 140px minmax(215px, 250px);
+  /* Capped rather than 1fr. The record's longest line is 46 characters; past
+     about 460px the card stops gaining anything and just stretches a short
+     list across the whole page. The band packs left and leaves the surplus
+     as margin, which is what a maximum is for. */
+  grid-template-columns: minmax(0, 460px) 200px minmax(215px, 250px);
+  justify-content: start;
   gap: var(--s4);
   align-items: stretch;
   margin-top: var(--s6);
@@ -2183,42 +2188,60 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   overflow: hidden;
 }
 
+/* A fixed 2:3 crop, so the print keeps one shape at every width. It has to
+   hug its own height rather than stretch to the band's — stretching a figure
+   whose image is locked to a ratio just letterboxes the difference. */
+.fact-photo {
+  align-self: start;
+}
+
 .fact-photo img {
   display: block;
   width: 100%;
-  height: 100%;
-  min-height: 168px;
+  height: auto;
+  aspect-ratio: 2 / 3;
   object-fit: cover;
   object-position: center 22%;
+}
+
+.about-page {
+  container: about / inline-size;
 }
 
 @media (max-width: 1023px) {
   .hero-statement {
     max-width: none;
   }
+}
 
-  .fact-photo img {
-    min-height: 200px;
-  }
-
-  /* The record needs the whole measure before the other two do: its longest
-     line is 46 characters and the band cannot hold that under about 1000px. */
+/* Three across needs about 900px of column. Below that the record takes the
+   full measure — its longest line is 46 characters and it is the panel that
+   suffers first — and the print and the address share the line beneath it. */
+@container about (max-width: 900px) {
+  /* Still capped on the second row — the address card gains nothing from the
+     width the record just gave up. */
   .about-band {
-    grid-template-columns: 140px minmax(215px, 1fr);
+    grid-template-columns: 200px minmax(215px, 250px);
   }
 
   .about-band > .record-card {
     grid-column: 1 / -1;
+    max-width: 460px;
   }
 }
 
-@media (max-width: 560px) {
+@container about (max-width: 470px) {
   .about-band {
     grid-template-columns: 1fr;
   }
 
   .about-band > .record-card {
     grid-column: auto;
+  }
+
+  /* One column: the print takes the measure, still at 2:3. */
+  .fact-photo {
+    max-width: 260px;
   }
 }
 
