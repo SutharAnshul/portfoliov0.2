@@ -276,29 +276,29 @@
      The four that were clamped still are: the token is the clamp's *maximum*,
      so tuning changes the size the type grows to without flattening the
      responsive floor underneath it. */
-  --fs-display: 2.6rem;
-  --fs-head: 1.75rem;
+  --fs-display: 2.5rem;
+  --fs-head: 1.6rem;
   --fs-name: 1.5rem;
   --fs-title: 12px;
-  --fs-body: 13px;
+  --fs-body: 14px;
   --fs-meta: 11px;
-  --fs-label: 10px;
+  --fs-label: 10.5px;
   --fs-num: 2.25rem;
-  --fs-lede: 27px;
-  --fs-cv: 16px;
-  --fs-studyno: 15px;
-  --fs-value: 13px;
-  --fs-case-title: 5.25rem;
-  --fs-case-deck: 1.375rem;
-  --fs-prose: 15px;
+  --fs-lede: 32px;
+  --fs-cv: 18px;
+  --fs-studyno: 14px;
+  --fs-value: 14px;
+  --fs-case-title: 5.2rem;
+  --fs-case-deck: 1.4rem;
+  --fs-prose: 16px;
 
   /* Leading. Unitless, so it scales with whatever size the token above sets. */
   --lh-display: 1.02;
   --lh-head: 1.16;
   --lh-name: 1.15;
-  --lh-body: 1.7;
+  --lh-body: 1.5;
   --lh-meta: 1.5;
-  --lh-lede: 1.42;
+  --lh-lede: 1.4;
   --lh-prose: 1.75;
   --lh-case-title: 0.95;
   --lh-record: 1.5;
@@ -308,7 +308,6 @@
   --ls-display: -0.015em;
   --ls-head: -0.005em;
   --ls-name: -0.005em;
-  --ls-lede: -0.012em;
   --ls-label: 0.18em;
   --ls-title: 0.1em;
   --ls-case-title: -0.015em;
@@ -2171,13 +2170,22 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 .hero-statement {
   margin-top: var(--s4);
-  /* Mono gains weight fast as it grows, so this tops out well below the
-     reference's 40px sans and pulls the leading in to compensate. */
-  font-size: clamp(19px, 1.9vw, var(--fs-lede));
+  /* The serif, upright. It is the one paragraph on the site set in the display
+     face, which is what makes it read as spoken rather than as more interface
+     — and the mono it replaces was gaining weight fast enough at this size to
+     look like a wall. Upright rather than italic, following the rule the name
+     in the sidebar already follows: the serif stands up when it is being a
+     voice rather than a heading. */
+  font-family: var(--family-display);
+  font-size: clamp(22px, 2.3vw, var(--fs-lede));
   line-height: var(--lh-lede);
-  letter-spacing: var(--ls-lede);
+  /* Garamond sets loose and small; the mono's -0.012em would only thin it
+     further, so tracking opens slightly instead of closing. */
+  letter-spacing: 0.002em;
   color: var(--foreground);
-  max-width: 42ch;
+  /* A serif fits far more into the same measure than a monospace does, so the
+     line length has to come down to stay readable. */
+  max-width: 34ch;
   text-wrap: pretty;
 }
 

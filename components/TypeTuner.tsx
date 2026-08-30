@@ -55,8 +55,8 @@ interface Family {
 }
 
 const MONO: Family[] = [
-  { label: 'JetBrains Mono ·', stack: 'var(--font-ui), ui-monospace, SFMono-Regular, Menlo, monospace' },
-  { label: 'IBM Plex Mono', google: 'IBM+Plex+Mono:wght@400;500;600;700', stack: "'IBM Plex Mono', ui-monospace, monospace" },
+  { label: 'IBM Plex Mono ·', stack: 'var(--font-ui), ui-monospace, SFMono-Regular, Menlo, monospace' },
+  { label: 'JetBrains Mono', google: 'JetBrains+Mono:wght@400;500;700', stack: "'JetBrains Mono', ui-monospace, monospace" },
   { label: 'Space Mono', google: 'Space+Mono:wght@400;700', stack: "'Space Mono', ui-monospace, monospace" },
   { label: 'Roboto Mono', google: 'Roboto+Mono:wght@400;500;700', stack: "'Roboto Mono', ui-monospace, monospace" },
   { label: 'DM Mono', google: 'DM+Mono:wght@400;500', stack: "'DM Mono', ui-monospace, monospace" },
@@ -67,9 +67,9 @@ const MONO: Family[] = [
 ]
 
 const SERIF: Family[] = [
-  { label: 'Instrument Serif ·', stack: 'var(--font-display), Georgia, serif' },
+  { label: 'EB Garamond ·', stack: 'var(--font-display), Georgia, serif' },
+  { label: 'Instrument Serif', google: 'Instrument+Serif:ital@0;1', stack: "'Instrument Serif', Georgia, serif" },
   { label: 'Playfair Display', google: 'Playfair+Display:ital,wght@0,400;0,600;1,400', stack: "'Playfair Display', Georgia, serif" },
-  { label: 'EB Garamond', google: 'EB+Garamond:ital,wght@0,400;0,600;1,400', stack: "'EB Garamond', Georgia, serif" },
   { label: 'Cormorant', google: 'Cormorant+Garamond:ital,wght@0,400;0,600;1,400', stack: "'Cormorant Garamond', Georgia, serif" },
   { label: 'Libre Baskerville', google: 'Libre+Baskerville:ital,wght@0,400;0,700;1,400', stack: "'Libre Baskerville', Georgia, serif" },
   { label: 'Lora', google: 'Lora:ital,wght@0,400;0,600;1,400', stack: "'Lora', Georgia, serif" },
@@ -107,7 +107,6 @@ const TOKENS: Token[] = [
   { key: 'lh-case-title', label: 'Case title', where: 'Case study name', unit: '', min: 0.8, max: 1.6, step: 0.01, group: 'Leading' },
 
   // em rather than px, so tracking scales with the type instead of fighting it.
-  { key: 'ls-lede', label: 'Lede', where: 'About opening statement', unit: 'em', min: -0.05, max: 0.1, step: 0.001, group: 'Tracking' },
   { key: 'ls-label', label: 'Label', where: 'Small uppercase headers', unit: 'em', min: 0, max: 0.4, step: 0.005, group: 'Tracking' },
   { key: 'ls-title', label: 'Title', where: 'Nav and card titles', unit: 'em', min: 0, max: 0.3, step: 0.005, group: 'Tracking' },
   { key: 'ls-head', label: 'Heading', where: 'Section headings', unit: 'em', min: -0.06, max: 0.06, step: 0.001, group: 'Tracking' },
@@ -285,6 +284,19 @@ const CSS = `
   font-family: inherit;
   font-size: 11px;
 }
+
+/* On a phone it sits above the nav rail rather than on top of it — a tool
+   that blocks the thing you are testing is not a tool. --rail-h is measured
+   and published by MobileChrome. */
+@media (max-width: 899px) {
+  .tuner {
+    right: var(--s3);
+    left: var(--s3);
+    bottom: calc(var(--rail-h, 64px) + var(--s3));
+    width: auto;
+    max-height: 70vh;
+  }
+}
 `
 
 const STORE = 'type-tuner'
@@ -313,13 +325,19 @@ function ensureFont(google?: string) {
 export function TypeTuner() {
   const [values, setValues] = useState<Record<string, number> | null>(null)
   const [defaults, setDefaults] = useState<Record<string, number>>({})
-  const [open, setOpen] = useState(true)
+  /**
+   * Open on a desktop, shut on a phone. At 310px wide the panel covers most
+   * of a 375px viewport, which makes it impossible to check the thing it is
+   * supposed to be measuring.
+   */
+  const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   /** Index into MONO / SERIF; 0 is the site's own. */
   const [fonts, setFonts] = useState({ ui: 0, display: 0 })
 
   /** Read the stylesheet's own values once, so the panel starts truthful. */
   useEffect(() => {
+    setOpen(window.matchMedia('(min-width: 900px)').matches)
     const cs = getComputedStyle(document.documentElement)
     const base: Record<string, number> = {}
     for (const t of TOKENS) base[t.key] = parse(cs.getPropertyValue(`--${t.key}`))

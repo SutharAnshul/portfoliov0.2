@@ -1,20 +1,16 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { JetBrains_Mono, Instrument_Serif } from 'next/font/google'
+import { IBM_Plex_Mono, EB_Garamond } from 'next/font/google'
 import './globals.css'
 
 /**
- * Working default while the typeface is still open. The whole system reads
- * from --font-ui, so swapping families is a one-line change here.
+ * The working face. Everything in the system reads from --font-ui, so this
+ * import is the only place the family is named.
  */
-/**
- * Working default while the typeface is still open. The whole system reads
- * from --font-ui, so swapping families is a one-line change here.
- */
-const ui = JetBrains_Mono({
+const ui = IBM_Plex_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  // Italic carries Orion's untranslated speech. It has to be the same
+  weight: ['400', '500', '600', '700'],
+  // Italic carries Mr. Toast's untranslated speech. It has to be the same
   // monospace family as the translation so a meow and the English word it
   // becomes occupy identical width — the swap then happens with no reflow.
   style: ['normal', 'italic'],
@@ -23,13 +19,16 @@ const ui = JetBrains_Mono({
 })
 
 /**
- * The display face. Pairing a dramatic serif against the mono is what creates
- * hierarchy — four mono sizes between 10px and 13px read as one size no matter
- * how the weights are set.
+ * The display face, and now the voice of the About statement too. Pairing a
+ * serif against the mono is what creates hierarchy — four mono sizes between
+ * 10px and 14px read as one size no matter how the weights are set.
+ *
+ * EB Garamond is a variable font, so the weight range costs one file rather
+ * than one per step.
  */
-const display = Instrument_Serif({
+const display = EB_Garamond({
   subsets: ['latin'],
-  weight: ['400'],
+  weight: ['400', '500', '600'],
   style: ['normal', 'italic'],
   variable: '--font-display',
   display: 'swap',
