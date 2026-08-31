@@ -2611,3 +2611,24 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   text-transform: uppercase;
   white-space: nowrap;
 }
+
+/* ─── Work page type ──────────────────────────────────────────────────────
+   --work-family is unset by default, so this resolves to the site's own face
+   and the page is unchanged. The dev-only switch on /work sets it, and
+   because it is set on this wrapper the change cannot reach the sidebar, the
+   chat, or any other route.
+
+   Applied to the page and its descendants rather than to `html`, which is
+   the whole point of scoping it here. */
+.work-page,
+.work-page * {
+  font-family: var(--work-family, var(--family-ui));
+}
+
+/* The serif headings on this page keep the display face unless a face has
+   been chosen, in which case they follow it too — comparing a page means
+   comparing all of its type, not most of it. */
+.work-page .t-head,
+.work-page .t-name {
+  font-family: var(--work-family, var(--family-display));
+}

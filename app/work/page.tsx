@@ -1,7 +1,21 @@
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { caseStudies } from '@/lib/case-studies'
 import { neighbours } from '@/lib/flow'
 import { Settle } from '@/components/Settle'
+
+/**
+ * Four faces to try on this page, in development only.
+ *
+ * The import sits inside a branch that is statically false in production, not
+ * behind a guard in the JSX: a `use client` component referenced from a server
+ * component ships whether or not it renders, so the guard has to be where the
+ * bundler can see it.
+ */
+const WorkFontSwitch =
+  process.env.NODE_ENV === 'development'
+    ? dynamic(() => import('@/components/WorkFontSwitch').then((m) => m.WorkFontSwitch))
+    : null
 
 /**
  * Work index. Each item is a media well plus a tabular caption row — title and
@@ -16,7 +30,9 @@ export default function WorkPage() {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <div style={{ padding: 'var(--s6) var(--s6) var(--s8)' }}>
+      {/* data-work-root is what the font switch writes to, so the choice is
+          confined to this page's own type. */}
+      <div className="work-page" data-work-root style={{ padding: 'var(--s6) var(--s6) var(--s8)' }}>
         <Settle boot mass="light">
           <div className="flex items-baseline justify-between" style={{ paddingBottom: 'var(--s3)' }}>
             <span className="t-label">Selected work</span>
@@ -68,6 +84,8 @@ export default function WorkPage() {
           </div>
         </Settle>
       </div>
+
+      {WorkFontSwitch && <WorkFontSwitch />}
     </div>
   )
 }
