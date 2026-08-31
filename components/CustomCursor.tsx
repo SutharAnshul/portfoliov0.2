@@ -8,11 +8,15 @@ import { sfx } from '@/lib/audio'
  * Crosshair cursor: full-viewport guide rules, a precise "+" at the pointer,
  * and a damped square ring that springs on hover and click.
  *
- * Motion model — position, scale and rotation animate separately so the cursor
- * reads as a physical object rather than a snapping div:
+ * Motion model — position and scale animate separately so the cursor reads as
+ * a physical object rather than a snapping div:
  *   position  -> damped lerp (heavier the further back the layer sits)
  *   scale     -> spring with slight overshoot, so hover "pops"
- *   rotation  -> spring, same feel, same trigger
+ *
+ * The ring used to turn 45° on hover as well. It does not any more: the square
+ * becoming a diamond changed what the mark *was* every time it crossed a link,
+ * which is a lot of movement to spend on saying "this is clickable" when the
+ * size change already says it.
  *
  * Layering — guides and the "+" live in a `difference` blend layer so they stay
  * legible on any backdrop in either theme. The ring sits in a normal-blend
@@ -24,7 +28,6 @@ const POS_EASE = 0.13
 const GUIDE_EASE = 0.22
 
 const HOVER_SCALE = 1.55
-const HOVER_ANGLE = 45
 const PRESS_SCALE = 0.7
 
 /** Where the crosshair stands down and the machine's own pointer takes over. */
@@ -63,8 +66,6 @@ export function CustomCursor() {
 
     let scale = 1
     let scaleVel = 0
-    let angle = 0
-    let angleVel = 0
 
     let hovering = false
     let pressed = false
@@ -137,13 +138,11 @@ export function CustomCursor() {
 
       const speed = Math.min(Math.hypot(targetX - ringX, targetY - ringY) / 90, 1)
       const scaleTarget = (pressed ? PRESS_SCALE : hovering ? HOVER_SCALE : 1) + speed * 0.3
-      const angleTarget = hovering ? HOVER_ANGLE : 0
 
       ;[scale, scaleVel] = springStep(scale, scaleVel, scaleTarget, MASS.light)
-      ;[angle, angleVel] = springStep(angle, angleVel, angleTarget, MASS.light)
 
       core.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) translate(-50%, -50%)`
-      ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) rotate(${angle}deg) scale(${scale})`
+      ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) scale(${scale})`
       hLine.style.transform = `translate3d(0, ${guideY}px, 0)`
       vLine.style.transform = `translate3d(${guideX}px, 0, 0)`
 
