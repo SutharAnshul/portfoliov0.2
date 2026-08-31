@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { caseStudies } from '@/lib/case-studies'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { FieldItem } from '@/components/FieldItem'
 import { SoundControl } from '@/components/SoundControl'
 import { CornerMarks } from '@/components/CornerMarks'
 import {
@@ -118,24 +117,23 @@ export function SideNav({ width }: SideNavProps) {
             const I = ICONS[item.icon]
             const active = isActive(item.href)
             return (
-              <FieldItem key={item.href} maxShift={3} radiusRatio={1.8} mass={0.7}>
-                <Link
-                  href={item.href}
-                  data-sfx="tick"
-                  data-active={active}
-                  className="nav-item"
-                  aria-current={active ? 'page' : undefined}
-                >
-                  <CornerMarks />
-                  <span className="nav-plate">
-                    <I size={17} />
-                  </span>
-                  <span className="min-w-0" style={{ display: 'grid', gap: 2 }}>
-                    <span className="t-title">{item.title}</span>
-                    <span className="t-meta truncate">{item.note}</span>
-                  </span>
-                </Link>
-              </FieldItem>
+              <Link
+                key={item.href}
+                href={item.href}
+                data-sfx="tick"
+                data-active={active}
+                className="nav-item"
+                aria-current={active ? 'page' : undefined}
+              >
+                <CornerMarks />
+                <span className="nav-plate">
+                  <I size={17} />
+                </span>
+                <span className="min-w-0" style={{ display: 'grid', gap: 2 }}>
+                  <span className="t-title">{item.title}</span>
+                  <span className="t-meta truncate">{item.note}</span>
+                </span>
+              </Link>
             )
           })}
         </nav>

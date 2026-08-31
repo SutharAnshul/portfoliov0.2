@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { caseStudies } from '@/lib/case-studies'
 import { neighbours } from '@/lib/flow'
 import { Settle } from '@/components/Settle'
-import { FieldItem } from '@/components/FieldItem'
 
 /**
  * Work index. Each item is a media well plus a tabular caption row — title and
@@ -32,28 +31,26 @@ export default function WorkPage() {
         >
           {caseStudies.map((study, index) => (
             <Settle key={study.slug} boot mass="medium" delay={120 + index * 90}>
-              <FieldItem maxShift={5} radiusRatio={1.35} mass={1.4}>
-                <Link href={`/work/${study.slug}`} data-sfx="tick" className="group block">
-                  {study.thumbnail && (
-                    <div className="well" style={{ aspectRatio: '4 / 3' }}>
-                      <img
-                        src={study.thumbnail}
-                        alt={study.title}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                      />
-                    </div>
-                  )}
-
-                  <div className="caption-row">
-                    <div className="min-w-0">
-                      <div className="t-title truncate">{study.title}</div>
-                      <div className="t-meta truncate">{study.category}</div>
-                    </div>
-                    <p className="t-meta">{study.description}</p>
-                    <span className="t-meta">{study.year}</span>
+              <Link href={`/work/${study.slug}`} data-sfx="tick" className="group block">
+                {study.thumbnail && (
+                  <div className="well" style={{ aspectRatio: '4 / 3' }}>
+                    <img
+                      src={study.thumbnail}
+                      alt={study.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    />
                   </div>
-                </Link>
-              </FieldItem>
+                )}
+
+                <div className="caption-row">
+                  <div className="min-w-0">
+                    <div className="t-title truncate">{study.title}</div>
+                    <div className="t-meta truncate">{study.category}</div>
+                  </div>
+                  <p className="t-meta">{study.description}</p>
+                  <span className="t-meta">{study.year}</span>
+                </div>
+              </Link>
             </Settle>
           ))}
         </div>
