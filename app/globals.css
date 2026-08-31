@@ -2299,16 +2299,22 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 /* The page's own colour, not the mail tint. With the availability chip beside
    it there is one coloured thing on this card, and an address is not it —
    two accents in one small panel and neither reads as the accent.
-   The link still says it is one: a rule appears under it on hover. */
+   Which leaves the underline to say it is a link, so it is drawn always
+   rather than on hover, and darkens under the pointer.
+
+   A real underline rather than a bottom border: it hugs the text instead of
+   the box, and skip-ink lifts it around the descender in "iitg". */
 .fact-mail {
   color: var(--foreground);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-color 200ms ease;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--foreground) 45%, transparent);
+  transition: text-decoration-color 200ms ease;
 }
 
 .fact-mail:hover {
-  border-bottom-color: currentColor;
+  text-decoration-color: currentColor;
 }
 
 /* The portrait, reduced to one of two. It was the whole left column before;
