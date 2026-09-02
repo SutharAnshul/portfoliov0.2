@@ -8,7 +8,7 @@ export const caseStudies: CaseStudy[] = [
       'A rewards and recognition platform designed to make employee recognition more meaningful, measurable, and relevant to different workplace cultures.',
     category: 'Product Design',
     deck: 'A rewards and recognition platform, built to fit how each organisation actually recognises work.',
-    status: 'Product design · 14 weeks',
+    status: 'Product design · 6 months',
     client: 'CNVRT Labs',
     role: ['Product Designer'],
     team: ['Founder', 'Product Manager', 'Product Designer', 'Developer'],
