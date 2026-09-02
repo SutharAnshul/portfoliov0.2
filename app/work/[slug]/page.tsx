@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Settle } from '@/components/Settle'
 import { CornerMarks } from '@/components/CornerMarks'
+import { IncentiwiseStory } from '@/components/case/IncentiwiseStory'
 
 /**
  * A case study as a catalogue record.
@@ -67,6 +68,13 @@ export default async function CaseStudyPage({ params }: Props) {
           }
         : { key: s.image!, src: s.image!, alt: s.imageAlt ?? caseStudy.title },
     )
+
+  /**
+   * A written story, where one exists, replaces the prose-then-frames body.
+   * Registered by slug rather than carried in the data, because a story is a
+   * component with its own structure, not a field.
+   */
+  const story = slug === 'incentiwise' ? <IncentiwiseStory /> : null
 
   const hasLive = screens.some((s) => 'embed' in s)
   const allLive = screens.length > 0 && screens.every((s) => 'embed' in s)
@@ -158,16 +166,24 @@ export default async function CaseStudyPage({ params }: Props) {
           </div>
         </Settle>
 
-        <Settle mass="light" delay={60}>
-          <div className="case-prose" style={{ marginTop: 'var(--s7)' }}>
-            {(caseStudy.opening ?? [caseStudy.description]).map((para, i) => (
-              <p key={i}>{para}</p>
-            ))}
-          </div>
-        </Settle>
+        {/* ── The body ──────────────────────────────────────────────
+            Most records are prose then frames, which asks the reader to
+            reconstruct the reasoning from the artefacts. A study with a
+            written story tells it instead, and brings its own evidence. */}
+        {story ? (
+          story
+        ) : (
+          <>
+            <Settle mass="light" delay={60}>
+              <div className="case-prose" style={{ marginTop: 'var(--s7)' }}>
+                {(caseStudy.opening ?? [caseStudy.description]).map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
+              </div>
+            </Settle>
 
-        {/* ── The screens ───────────────────────────────────────────── */}
-        <div style={{ marginTop: 'var(--s8)' }}>
+            {/* ── The screens ─────────────────────────────────────── */}
+            <div style={{ marginTop: 'var(--s8)' }}>
           <div
             className="flex items-baseline justify-between"
             style={{ paddingBottom: 'var(--s3)' }}
@@ -225,8 +241,10 @@ export default async function CaseStudyPage({ params }: Props) {
                 </figure>
               </Settle>
             ))}
-          </div>
-        </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Where the record ends, and what follows it. */}
         <Settle mass="light">

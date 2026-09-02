@@ -2708,3 +2708,277 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   opacity: 0.3;
   cursor: default;
 }
+
+/* ─── Case study: the written kind ────────────────────────────────────────
+   An editorial document inside the site's existing material — same near-black
+   ground, same serif for statements, same monospace for body, same hairlines
+   and 2px corners. What is new is the reading structure.
+
+   One grid, two measures. Text sits in a column narrow enough to read; the
+   evidence breaks out wider, because an artefact is only worth showing at a
+   size where it can be examined. Sections are numbered and ruled so the page
+   can be skimmed by heading alone. */
+
+.cs {
+  --cs-text: 68ch;
+  margin-top: var(--s7);
+}
+
+.cs-summary {
+  max-width: 56ch;
+  font-family: var(--family-display);
+  font-size: clamp(18px, 1.5vw, 22px);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--foreground) 88%, transparent);
+}
+
+.cs-section {
+  margin-top: var(--s8);
+}
+
+.cs-head {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--s3);
+  margin-top: var(--s5);
+}
+
+.cs-n {
+  font-variant-numeric: tabular-nums;
+}
+
+.cs-title {
+  font-family: var(--family-display);
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
+/* The sentence a section exists to deliver. Serif, larger than the body, and
+   the thing a skimming reader is meant to stop on. */
+.cs-statement {
+  margin-top: var(--s6);
+  margin-left: calc(44px + var(--s3));
+  max-width: 34ch;
+  font-family: var(--family-display);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  line-height: 1.3;
+  color: var(--foreground);
+  text-wrap: balance;
+}
+
+.cs-body {
+  margin-top: var(--s5);
+  margin-left: calc(44px + var(--s3));
+  max-width: var(--cs-text);
+}
+
+.cs-body p + p {
+  margin-top: var(--s4);
+}
+
+/* ── Questions ─────────────────────────────────────────────────────── */
+.cs-questions {
+  margin-top: var(--s5);
+  margin-left: calc(44px + var(--s3));
+  display: grid;
+  gap: 0;
+  max-width: var(--cs-text);
+  border-top: 1px solid var(--card-line);
+}
+
+.cs-q {
+  padding: var(--s4) 0;
+  border-bottom: 1px solid var(--card-line);
+  font-family: var(--family-display);
+  font-size: clamp(1.0625rem, 1.5vw, 1.3rem);
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--foreground) 82%, transparent);
+}
+
+/* ── Cards ─────────────────────────────────────────────────────────
+   Used for the things that genuinely come in sets — findings, roles,
+   problems, learnings — and nowhere else. */
+.cs-cards {
+  margin-top: var(--s5);
+  margin-left: calc(44px + var(--s3));
+  display: grid;
+  gap: var(--s4);
+}
+
+.cs-cards-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cs-card {
+  padding: var(--s4);
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  background: var(--card-fill);
+}
+
+.cs-card-n {
+  display: block;
+  margin-bottom: var(--s2);
+  font-variant-numeric: tabular-nums;
+}
+
+.cs-card-title {
+  font-family: var(--family-display);
+  font-size: 1.1875rem;
+  line-height: 1.25;
+  color: var(--foreground);
+}
+
+.cs-card-body {
+  margin-top: var(--s3);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--foreground) 72%, transparent);
+}
+
+.cs-card-body em {
+  font-family: var(--family-display);
+  font-style: italic;
+  font-size: 1.05em;
+  color: color-mix(in srgb, var(--foreground) 92%, transparent);
+}
+
+/* ── Two lists side by side ────────────────────────────────────────── */
+.cs-split {
+  margin-top: var(--s6);
+  margin-left: calc(44px + var(--s3));
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s5);
+}
+
+.cs-list ol {
+  margin-top: var(--s3);
+  counter-reset: cs;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--foreground) 72%, transparent);
+}
+
+.cs-list li {
+  counter-increment: cs;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  padding: var(--s3) 0;
+  border-top: 1px solid var(--card-line);
+}
+
+.cs-list li::before {
+  content: counter(cs, decimal-leading-zero);
+  color: color-mix(in srgb, var(--foreground) 40%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Evidence ──────────────────────────────────────────────────────
+   Breaks the text measure, because an artefact you cannot read is
+   decoration. */
+.cs-figure {
+  margin: var(--s6) 0 0;
+}
+
+.cs-figure-wide {
+  margin-left: 0;
+}
+
+.cs-figure .plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.cs-caption {
+  margin-top: var(--s3);
+  margin-left: calc(44px + var(--s3));
+  max-width: 62ch;
+  line-height: 1.55;
+}
+
+/* ── Decisions ─────────────────────────────────────────────────────── */
+.cs-decisions,
+.cs-iterations {
+  margin-top: var(--s5);
+  display: grid;
+  gap: var(--s8);
+}
+
+.cs-decision > .t-label,
+.cs-iteration > .t-label {
+  margin-left: calc(44px + var(--s3));
+}
+
+.cs-decision-title,
+.cs-iteration-title {
+  margin-top: var(--s2);
+  margin-left: calc(44px + var(--s3));
+  max-width: 30ch;
+  font-family: var(--family-display);
+  font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+  line-height: 1.25;
+  color: var(--foreground);
+}
+
+.cs-decision-grid {
+  margin-top: var(--s4);
+  margin-left: calc(44px + var(--s3));
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s5);
+  max-width: var(--cs-text);
+}
+
+.cs-iteration > .cs-card-body {
+  margin-left: calc(44px + var(--s3));
+  margin-top: var(--s3);
+  max-width: var(--cs-text);
+}
+
+/* ── Final screens ─────────────────────────────────────────────────── */
+.cs-screens {
+  margin-top: var(--s6);
+  display: grid;
+  gap: var(--s7);
+}
+
+/* ── Narrower ──────────────────────────────────────────────────────
+   The indent that aligns text under the section number is a luxury of a wide
+   column. Below this it costs more than it buys, and the cards stack. */
+@media (max-width: 1023px) {
+  .cs-statement,
+  .cs-body,
+  .cs-questions,
+  .cs-cards,
+  .cs-split,
+  .cs-caption,
+  .cs-decision > .t-label,
+  .cs-iteration > .t-label,
+  .cs-decision-title,
+  .cs-iteration-title,
+  .cs-decision-grid,
+  .cs-iteration > .cs-card-body {
+    margin-left: 0;
+  }
+
+  .cs-head {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: var(--s2);
+  }
+
+  .cs-cards-3,
+  .cs-split,
+  .cs-decision-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cs-decisions,
+  .cs-iterations {
+    gap: var(--s7);
+  }
+}
