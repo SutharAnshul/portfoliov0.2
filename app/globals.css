@@ -2603,11 +2603,108 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   display: inline-block;
   padding: 4px 10px;
   border-radius: var(--r);
-  background: #4fa871;
-  color: #08120c;
+  /* #4FA871 was a desaturated forest green — a colour that reads as muted
+     even at full opacity, because most of what it is is grey. This one keeps
+     the same hue and takes the grey out: saturation up from roughly 36% to
+     85%, lightness up a little, which is what makes it read as lit against
+     near-black rather than merely present. */
+  background: #21e07a;
+  color: #04150b;
   font-size: var(--fs-meta-content, 12px);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+/* ─── Chat, on the nav's terms ────────────────────────────────────────────
+   The panel sits opposite the sidebar and should be built from the same
+   parts. The tokens already matched; what did not was which token each thing
+   used — most of the chat sat at body size, so against a nav whose repeated
+   items are 12px it read as a larger, looser column.
+
+   The split the nav makes is between prose and controls: its bio is 14px, its
+   items are 12px. The chat now makes the same one. The intro and the messages
+   are prose and stay at 14px; the suggestions and the field are controls and
+   come down to 12px. */
+.chat-suggestion {
+  font-size: var(--fs-title);
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--foreground) 74%, transparent);
+}
+
+.chat-suggestion:hover {
+  color: var(--foreground);
+}
+
+/* ── The composer ──────────────────────────────────────────────────────
+   One object: the field holds the border and the send control sits inside
+   it, so there is no second box floating beside the first. */
+.chat-composer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  background: var(--card-fill);
+  transition: border-color 220ms ease, background-color 220ms ease;
+}
+
+.chat-composer:hover {
+  border-color: var(--card-line-strong);
+}
+
+/* The ring goes on the wrapper rather than the input, since the wrapper is
+   what now looks like the field. */
+.chat-composer:focus-within {
+  border-color: var(--card-line-strong);
+  background: var(--card-fill-hover);
+}
+
+.chat-input {
+  flex: 1;
+  min-width: 0;
+  /* Right padding clears the send control. */
+  padding: 9px 40px 9px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: var(--fs-title);
+  line-height: 1.5;
+}
+
+.chat-input::placeholder {
+  color: color-mix(in srgb, var(--foreground) 38%, transparent);
+}
+
+.chat-input:focus {
+  outline: none;
+}
+
+/* White, and inside. No border or fill of its own — a second bordered box
+   inside a bordered box is what made the old one read as bolted on. */
+.chat-send {
+  position: absolute;
+  right: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background-color 180ms ease, opacity 180ms ease;
+}
+
+.chat-send:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+
+.chat-send:disabled {
+  opacity: 0.3;
+  cursor: default;
 }

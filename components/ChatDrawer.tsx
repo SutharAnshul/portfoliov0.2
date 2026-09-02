@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { OrionCat } from '@/components/OrionCat'
+import { CornerMarks } from '@/components/CornerMarks'
 import { tokenise, intoLines, type Token } from '@/lib/meow'
 
 /**
@@ -209,7 +210,11 @@ export function ChatDrawer({ context, width, onClose }: ChatDrawerProps) {
 
         <div className="flex items-center gap-3" style={{ paddingRight: 'var(--s5)' }}>
           <span ref={bedRef} className="orion-mark" data-thinking={isLoading} />
-          <h2 className="t-head" style={{ fontSize: '1.375rem' }}>
+          {/* t-name, not t-head with an inline size. "Mr. Toast" is a name,
+              the same kind of thing as "Anshul Suthar" in the nav opposite,
+              and it should be set with the same token rather than at a
+              one-off 1.375rem that belongs to no scale. */}
+          <h2 className="t-name">
             Mr. Toast
           </h2>
         </div>
@@ -303,9 +308,9 @@ export function ChatDrawer({ context, width, onClose }: ChatDrawerProps) {
                 key={suggestion}
                 onClick={() => setInput(suggestion)}
                 data-sfx="tick"
-                className="card-link t-body text-left"
+                className="card-link chat-suggestion relative text-left"
               >
-                ↳ {suggestion}
+                <CornerMarks />↳ {suggestion}
               </button>
             ))}
           </div>
@@ -315,20 +320,23 @@ export function ChatDrawer({ context, width, onClose }: ChatDrawerProps) {
       {/* Input */}
       <div style={{ padding: 'var(--s4) var(--s5) var(--s5)' }}>
         <hr className="rule" style={{ marginBottom: 'var(--s4)' }} />
-        <form ref={inputPerchRef} onSubmit={handleSubmit} className="flex gap-2">
+        {/* The send control sits inside the field rather than beside it, so
+            the composer reads as one object. The field carries the border and
+            the hover, the way a nav item does. */}
+        <form ref={inputPerchRef} onSubmit={handleSubmit} className="chat-composer">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask anything…"
-            className="t-body flex-1 rounded-[var(--r-sm)] border border-[var(--card-line)] bg-[var(--card-fill)] px-3 py-2 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-1 focus:ring-[var(--card-line-strong)]"
+            className="chat-input"
             disabled={isLoading}
           />
           <button
             type="submit"
             data-sfx="tick"
             disabled={isLoading || !input.trim()}
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[var(--r-sm)] border border-[var(--card-line-strong)]/40 bg-[var(--card-fill)] text-foreground transition-all hover:bg-[var(--card-fill-hover)] disabled:opacity-40"
+            className="chat-send"
             aria-label="Send message"
           >
             <svg
