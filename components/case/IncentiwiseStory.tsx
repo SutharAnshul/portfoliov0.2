@@ -1,537 +1,429 @@
 import { Settle } from '@/components/Settle'
 
 /**
- * Incentiwise, told as a case study rather than shown as a screen dump.
+ * Incentiwise, told in spreads.
  *
- * Two rules govern what is on this page.
+ * One idea to a screen. Each spread holds a single claim, set large enough to
+ * land before anything else on it, with whatever evidence that claim needs in
+ * small type underneath. Nothing is numbered and nothing is ruled off — a
+ * spread ends because the next one begins a screen later, which the eye reads
+ * as a break without being told.
  *
- * Nothing is borrowed. The source deck has a visual language of its own —
- * cobalt panels, its own serif, its own diagrams — and none of it appears
- * here; every table, matrix and list below is drawn in this site's material
- * from the underlying facts. The writing is the same: the deck's sentences
- * are not reused or reworded, only its findings.
+ * Two things carry the hierarchy, because the only images here are the product:
+ * the distance between a 56px serif claim and a 15px monospace note, and a
+ * five-colour pill system that says what kind of thing you are looking at
+ * before you read a word of it. Lime is what shipped, amber is what was held
+ * back, rose is what hurt, cyan is a question, violet is a decision. The colour
+ * is never the only signal — the pill's word always says the same thing.
  *
- * Nothing is inflated. There are no adoption figures, no engagement lifts and
- * no test scores, because the project recorded none. Where something was
- * explored rather than proven, it says so.
- *
- * The only imagery is the product itself, shown plainly — no plate, no border,
- * no corner marks. The screens are the one thing that is genuinely his.
+ * Nothing from the source deck: not its artwork, not its sentences. Only what
+ * happened, and only what was recorded — no adoption numbers, no engagement
+ * lift, no test scores, because the project produced none.
  */
 
-function Section({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
+type Tone = 'lime' | 'amber' | 'rose' | 'cyan' | 'violet' | 'plain'
+
+/** One screen, one idea. Vertically centred so the claim sits at eye level. */
+function Spread({ children, tall }: { children: React.ReactNode; tall?: boolean }) {
   return (
     <Settle mass="light">
-      <section className="cs-section">
-        <hr className="rule" />
-        <header className="cs-head">
-          <span className="t-label cs-n">{n}</span>
-          <h2 className="cs-title">{title}</h2>
-        </header>
-        {children}
-      </section>
+      <section className={`spread${tall ? ' spread-tall' : ''}`}>{children}</section>
     </Settle>
   )
 }
 
-/** The one line a section exists to deliver. */
-function Statement({ children }: { children: React.ReactNode }) {
-  return <p className="cs-statement">{children}</p>
+/** The claim. Sized to be read first, and to work without a heading above it. */
+function Say({ children }: { children: React.ReactNode }) {
+  return <p className="say">{children}</p>
 }
 
-function Body({ children }: { children: React.ReactNode }) {
-  return <div className="cs-body t-body">{children}</div>
+/** A quieter claim, for spreads whose evidence needs the room. */
+function Mid({ children }: { children: React.ReactNode }) {
+  return <p className="say say-mid">{children}</p>
 }
 
-function Card({ n, title, children }: { n?: string; title: string; children: React.ReactNode }) {
+function Note({ children }: { children: React.ReactNode }) {
+  return <p className="note">{children}</p>
+}
+
+function Pill({
+  tone = 'plain',
+  solid,
+  children,
+}: {
+  tone?: Tone
+  solid?: boolean
+  children: React.ReactNode
+}) {
+  return <span className={`pil pil-${tone}${solid ? ' pil-solid' : ''}`}>{children}</span>
+}
+
+/** A row of pills, used where a spread needs a heading it does not deserve. */
+function Pills({ children }: { children: React.ReactNode }) {
+  return <div className="pils">{children}</div>
+}
+
+function Card({
+  tag,
+  tone = 'plain',
+  title,
+  children,
+}: {
+  tag?: string
+  tone?: Tone
+  title: string
+  children: React.ReactNode
+}) {
   return (
-    <div className="cs-card">
-      {n && <span className="t-label cs-card-n">{n}</span>}
-      <h3 className="cs-card-title">{title}</h3>
-      <p className="cs-card-body">{children}</p>
+    <div className={`c c-${tone}`}>
+      {tag && <Pill tone={tone}>{tag}</Pill>}
+      <h3 className="c-t">{title}</h3>
+      <p className="c-b">{children}</p>
     </div>
   )
 }
 
-/** A product screen, unframed. */
 function Screen({ src, alt, title, note }: { src: string; alt: string; title: string; note: string }) {
   return (
-    <figure className="cs-screen">
+    <figure className="shot-plain">
       <img src={src} alt={alt} loading="lazy" />
       <figcaption>
-        <h3 className="cs-screen-title">{title}</h3>
-        <p className="t-meta cs-caption">{note}</p>
+        <h3 className="c-t">{title}</h3>
+        <p className="note">{note}</p>
       </figcaption>
     </figure>
-  )
-}
-
-/** Rows of a plain comparison, set in the site's own type. */
-function Row({ label, a, b }: { label: string; a: string; b: string }) {
-  return (
-    <div className="cs-row">
-      <span className="t-label">{label}</span>
-      <span className="cs-row-v">{a}</span>
-      <span className="cs-row-v">{b}</span>
-    </div>
   )
 }
 
 export function IncentiwiseStory() {
   return (
     <div className="cs">
-      {/* ── 01 Intro ─────────────────────────────────────────────── */}
-      <Settle mass="light">
-        <p className="cs-summary">
-          Asked for a recognition app. Delivered the machinery underneath one — who may recognise
-          whom, out of whose budget, under which rules, and what leadership sees for the money.
-        </p>
-      </Settle>
+      {/* 1 — what it is */}
+      <Spread>
+        <Pills>
+          <Pill tone="lime" solid>
+            Rewards &amp; recognition
+          </Pill>
+          <Pill tone="plain">Indian SMEs</Pill>
+          <Pill tone="plain">Ten weeks</Pill>
+        </Pills>
+        <Say>
+          Asked for a way to say thank you. Built the machinery that decides whether thank you ever
+          gets said.
+        </Say>
+      </Spread>
 
-      {/* ── 02 The problem ───────────────────────────────────────── */}
-      <Section n="02" title="The problem">
-        <Statement>Tools that thrived elsewhere were going flat in Indian SMEs.</Statement>
-        <Body>
-          <p>
-            A client came to the studio wanting an MVP: an employee rewards and recognition product
-            aimed at small and mid-size Indian companies. Their reason for commissioning it was that
-            the category leaders, successful in other markets, were not shifting morale or output in
-            firms like the ones they knew.
-          </p>
-          <p>
-            That was a claim, not a finding. My first job was to establish whether it was true, and
-            if so, which part of the experience was actually breaking.
-          </p>
-        </Body>
-      </Section>
+      {/* 2 — the problem */}
+      <Spread>
+        <Pills>
+          <Pill tone="rose">The brief</Pill>
+        </Pills>
+        <Say>Tools that thrive elsewhere go flat here.</Say>
+        <Note>
+          The client had watched the category leaders fail to move morale in companies like the ones
+          they knew. That was a hunch, not a finding. I went to check it.
+        </Note>
+      </Spread>
 
-      {/* ── 03 What I needed to understand ───────────────────────── */}
-      <Section n="03" title="What I needed to understand">
-        <div className="cs-questions">
-          <div className="cs-q">What do the incumbents actually do, and where do they strain?</div>
-          <div className="cs-q">What do the people on the receiving end say when nobody is asking?</div>
-          <div className="cs-q">Who decides whether recognition happens at all?</div>
-        </div>
+      {/* 3 — the questions */}
+      <Spread>
+        <Pills>
+          <Pill tone="cyan">Three questions</Pill>
+        </Pills>
+        <ol className="asks">
+          <li>
+            <span className="ask-n">01</span>
+            <span>What do the incumbents actually do?</span>
+          </li>
+          <li>
+            <span className="ask-n">02</span>
+            <span>What do people say when nobody is asking?</span>
+          </li>
+          <li>
+            <span className="ask-n">03</span>
+            <span>Who decides whether recognition happens at all?</span>
+          </li>
+        </ol>
+      </Spread>
 
-        <Body>
-          <p>
-            I worked two of the market leaders directly and read their public reception. They fail
-            in opposite directions, which turned out to be the more useful observation.
-          </p>
-        </Body>
-
-        <div className="cs-table">
-          <div className="cs-row cs-row-head">
-            <span className="t-label">&nbsp;</span>
-            <span className="t-label">The comprehensive one</span>
-            <span className="t-label">The focused one</span>
+      {/* 4 — the competitors */}
+      <Spread>
+        <Pills>
+          <Pill tone="cyan">Two market leaders, worked directly</Pill>
+        </Pills>
+        <div className="tbl">
+          <div className="tr th">
+            <span />
+            <span>
+              <Pill tone="violet">Comprehensive</Pill>
+            </span>
+            <span>
+              <Pill tone="violet">Focused</Pill>
+            </span>
           </div>
-          <Row label="Built for" a="Large organisations" b="Smaller teams and founders" />
-          <Row
-            label="Bet"
-            a="One platform for every part of engagement"
-            b="Recognition and feedback, done narrowly"
-          />
-          <Row
-            label="Strength"
-            a="Breadth, integrations, a deep rewards catalogue"
-            b="Lighter to adopt, clearer to read"
-          />
-          <Row
-            label="Strain"
-            a="Weight and learning curve; measurement aimed at engagement, not return"
-            b="Thinner integrations and shallower analysis; little room to grow into"
-          />
-        </div>
-        <p className="t-meta cs-caption">
-          Redrawn from my competitive audit. Neither product was wrong — they had each chosen an
-          end of a trade-off, and the middle was empty.
-        </p>
-      </Section>
-
-      {/* ── 04 What I learned ────────────────────────────────────── */}
-      <Section n="04" title="What I learned">
-        <Body>
-          <p>
-            Public forums came first — people describing, unprompted, the schemes they were subject
-            to at work. The complaints sorted into three.
-          </p>
-        </Body>
-
-        <div className="cs-cards cs-cards-3">
-          <Card n="01" title="Praise with nothing behind it">
-            Where a quota drives it, thanks arrives unearned and lands as noise. Nothing attached,
-            nothing specific, no reason to believe it.
-          </Card>
-          <Card n="02" title="Rules nobody can see">
-            When the bar for being recognised is unstated, the result looks like favouritism to
-            whoever misses out — and like luck to whoever does not.
-          </Card>
-          <Card n="03" title="Gestures that miss the room">
-            What flatters one team embarrasses another. The same public praise plays differently
-            depending on where it lands.
-          </Card>
-        </div>
-
-        <Statement>Every one of those voices came from the same rung of the ladder.</Statement>
-        <Body>
-          <p>
-            All of it was written by people on the receiving end. Nobody funding a programme,
-            approving it or being asked to run it week to week had said a word — and those are the
-            people who determine whether recognition happens at all. I went and spoke to them.
-          </p>
-          <p>What they added did not overlap with the forums at any point.</p>
-        </Body>
-
-        <div className="cs-cards cs-cards-3">
-          <Card title="No way to justify the spend">
-            Leadership could not connect what recognition cost to anything it produced. A budget you
-            cannot defend is a budget that eventually goes.
-          </Card>
-          <Card title="A chore for the people running it">
-            For a manager, recognising a team was slow and inflexible enough that it became one more
-            obligation rather than something they reached for.
-          </Card>
-          <Card title="Products that overreach">
-            Several tools tried to absorb the HR stack entirely. The result was confusion at rollout
-            and quiet abandonment afterwards.
-          </Card>
-        </div>
-
-        <Statement>Three audiences had been handed one interface and told to share.</Statement>
-      </Section>
-
-      {/* ── 05 Defining the product ──────────────────────────────── */}
-      <Section n="05" title="Defining the product">
-        <Body>
-          <p>
-            The interviews settled into three positions. They are not demographics — each one wants
-            something different from the same feature, and any of them can kill the programme.
-          </p>
-        </Body>
-
-        <div className="cs-cards cs-cards-3">
-          <Card title="Whoever pays for it">
-            Executives and HR leadership. Judge the programme on evidence, need cost to stay
-            predictable as headcount grows, and want one standard applied across departments that
-            do not resemble each other.
-          </Card>
-          <Card title="Whoever runs it">
-            Team and department leads. Carry the programme day to day, want it shaped to how their
-            own team works, and abandon it the moment it costs them time.
-          </Card>
-          <Card title="Whoever receives it">
-            Early-career staff. Want the specific thing they did acknowledged, and want it visible
-            to the people who make decisions about them.
-          </Card>
-        </div>
-
-        <Statement>
-          Recognition had to bend to each company&rsquo;s culture, sit in the hands of managers, and
-          still return a number to the people paying for it.
-        </Statement>
-        <Body>
-          <p>Which left three problems the product had to answer to.</p>
-        </Body>
-
-        <div className="cs-cards cs-cards-3">
-          <Card n="01" title="Nothing to point at">
-            Spending is untraceable, so the programme is defended on faith and cut on instinct.
-          </Card>
-          <Card n="02" title="Rewarding the routine">
-            Recognition attached to attendance rather than achievement teaches people to discount
-            it.
-          </Card>
-          <Card n="03" title="Too stiff to use">
-            Every act of recognition costs the manager more effort than the moment is worth.
-          </Card>
-        </div>
-
-        <div className="cs-split">
-          <div className="cs-list">
-            <span className="t-label">What would count as working</span>
-            <ol>
-              <li>People believe the recognition they receive.</li>
-              <li>A team can set recognition to its own goals rather than inherit a default.</li>
-              <li>Leadership can tie what was spent to what changed.</li>
-              <li>It survives being rolled out to departments that work differently.</li>
-            </ol>
+          <div className="tr">
+            <span className="t-label">Built for</span>
+            <span>Large organisations</span>
+            <span>Small teams, founders</span>
           </div>
-          <div className="cs-list">
-            <span className="t-label">What we were working against</span>
-            <ol>
-              <li>Ten weeks to a shippable MVP, so scope had to be argued down early.</li>
-              <li>No feature bloat — the exact failure we had just documented in a competitor.</li>
-              <li>Configurability that does not arrive as a wall of settings.</li>
-            </ol>
+          <div className="tr">
+            <span className="t-label">Bet</span>
+            <span>Everything, in one place</span>
+            <span>One thing, done narrowly</span>
+          </div>
+          <div className="tr">
+            <span className="t-label">Strain</span>
+            <span>Heavy to learn; measures engagement, not return</span>
+            <span>Thin integrations; nothing to grow into</span>
           </div>
         </div>
-      </Section>
+        <Note>Each had taken an end of the trade-off. Nobody held the middle.</Note>
+      </Spread>
 
-      {/* ── 06 Exploring the solution ────────────────────────────── */}
-      <Section n="06" title="Exploring the solution">
-        <Body>
-          <p>
-            I took each problem, wrote down where things stood against where they needed to be, and
-            listed what would have to exist to close the distance. It produced far more than ten
-            weeks could hold, so everything went onto an effort-against-impact plot and most of it
-            came off again.
-          </p>
-        </Body>
+      {/* 5 — the forums */}
+      <Spread>
+        <Pills>
+          <Pill tone="cyan">Unprompted, in public</Pill>
+        </Pills>
+        <Mid>Three complaints, over and over.</Mid>
+        <div className="cards c3">
+          <Card tone="rose" tag="Hollow" title="Praise with nothing behind it">
+            Quota-driven thanks arrives unearned and lands as noise.
+          </Card>
+          <Card tone="rose" tag="Opaque" title="Rules nobody can see">
+            An unstated bar looks like favouritism to whoever misses it.
+          </Card>
+          <Card tone="rose" tag="Misjudged" title="Gestures that miss the room">
+            The same public praise flatters one team and embarrasses another.
+          </Card>
+        </div>
+      </Spread>
 
-        <div className="cs-split cs-split-3">
-          <div className="cs-list">
-            <span className="t-label">Kept — the spine</span>
-            <ol>
-              <li>The appreciations feed</li>
-              <li>A rewards library</li>
-              <li>The organisation database</li>
+      {/* 6 — the turn */}
+      <Spread>
+        <Say>All of it came from one rung of the ladder.</Say>
+        <Note>
+          Nobody who funds a programme, approves it or runs it weekly had said a word. So I asked
+          them, and none of it overlapped.
+        </Note>
+        <div className="cards c3">
+          <Card tone="amber" tag="Buyer" title="Nothing to justify the spend">
+            Cost could not be tied to anything it produced.
+          </Card>
+          <Card tone="amber" tag="Operator" title="A chore to run">
+            Slow enough that managers quietly stopped.
+          </Card>
+          <Card tone="amber" tag="Both" title="Tools that overreach">
+            Swallowing the HR stack bought confusion, then abandonment.
+          </Card>
+        </div>
+      </Spread>
+
+      {/* 7 — the definition */}
+      <Spread>
+        <Say>Three audiences. One interface. That was the whole problem.</Say>
+        <div className="cards c3">
+          <Card tone="violet" tag="Pays for it" title="Evidence">
+            Wants proof it works, and a bill that stays predictable.
+          </Card>
+          <Card tone="violet" tag="Runs it" title="Speed">
+            Wants it shaped to their team, and wants it now.
+          </Card>
+          <Card tone="violet" tag="Receives it" title="Specificity">
+            Wants the particular thing seen by the people who decide.
+          </Card>
+        </div>
+      </Spread>
+
+      {/* 8 — the cuts */}
+      <Spread>
+        <Pills>
+          <Pill tone="plain">Ten weeks to a shippable MVP</Pill>
+        </Pills>
+        <div className="cuts">
+          <div className="cut cut-lime">
+            <Pill tone="lime" solid>
+              Kept
+            </Pill>
+            <ul>
+              <li>Appreciations feed</li>
+              <li>Rewards library</li>
+              <li>Organisation database</li>
               <li>Appreciation analytics</li>
-            </ol>
+            </ul>
           </div>
-          <div className="cs-list">
-            <span className="t-label">Deferred — real, but not yet</span>
-            <ol>
+          <div className="cut cut-amber">
+            <Pill tone="amber" solid>
+              Deferred
+            </Pill>
+            <ul>
               <li>Insight-to-action prompts</li>
               <li>Pulse surveys</li>
               <li>Scheduled campaigns</li>
               <li>Peer nominations</li>
-            </ol>
+            </ul>
           </div>
-          <div className="cs-list">
-            <span className="t-label">Dropped — not this product</span>
-            <ol>
+          <div className="cut cut-rose">
+            <Pill tone="rose" solid>
+              Dropped
+            </Pill>
+            <ul>
               <li>Wellness tracking</li>
               <li>Video appreciations</li>
-            </ol>
+            </ul>
           </div>
         </div>
-        <p className="t-meta cs-caption">
-          The deferred column mattered more than the kept one. Each item there was defensible, and
-          shipping all of them is how the incumbents arrived at the weight we were trying to avoid.
-        </p>
-      </Section>
+        <Note>
+          The amber column was the hard one. Every item in it was defensible, and shipping all of
+          them is how you become the incumbent you are replacing.
+        </Note>
+      </Spread>
 
-      {/* ── 07 Key design decisions ──────────────────────────────── */}
-      <Section n="07" title="Key design decisions">
-        <div className="cs-decisions">
-          <div className="cs-decision">
-            <span className="t-label">Decision 01</span>
-            <h3 className="cs-decision-title">Stop designing one screen for three jobs</h3>
-            <div className="cs-decision-grid">
-              <div>
-                <span className="t-label">Why</span>
-                <p className="cs-card-body">
-                  With the feature list settled, it was obvious that nothing sensible could hold an
-                  executive allocating money, a lead running a team and someone receiving a thank
-                  you. Trying to is how a product ends up feature-heavy without ever feeling
-                  capable.
-                </p>
-              </div>
-              <div>
-                <span className="t-label">Result</span>
-                <p className="cs-card-body">
-                  Permission became the organising idea rather than a settings page. Every feature
-                  was reduced to a verb per level of the hierarchy, and each level got a workspace
-                  containing only what it can act on.
-                </p>
-              </div>
-            </div>
-
-            <div className="cs-table cs-table-4">
-              <div className="cs-row cs-row-head">
-                <span className="t-label">&nbsp;</span>
-                <span className="t-label">Admin</span>
-                <span className="t-label">Lead</span>
-                <span className="t-label">Employee</span>
-              </div>
-              <div className="cs-row">
-                <span className="t-label">Appreciations</span>
-                <span className="cs-row-v">Send, receive</span>
-                <span className="cs-row-v">Send, receive</span>
-                <span className="cs-row-v">Receive</span>
-              </div>
-              <div className="cs-row">
-                <span className="t-label">Budget</span>
-                <span className="cs-row-v">Allocate</span>
-                <span className="cs-row-v">Request</span>
-                <span className="cs-row-v">—</span>
-              </div>
-              <div className="cs-row">
-                <span className="t-label">Policy</span>
-                <span className="cs-row-v">Manage</span>
-                <span className="cs-row-v">Manage</span>
-                <span className="cs-row-v">View</span>
-              </div>
-              <div className="cs-row">
-                <span className="t-label">Analytics</span>
-                <span className="cs-row-v">Whole org</span>
-                <span className="cs-row-v">Their team</span>
-                <span className="cs-row-v">Their own</span>
-              </div>
-            </div>
-            <p className="t-meta cs-caption">
-              Four rows from the mapping. Budget is the clearest case: the same feature is a
-              decision, a request, or absent, depending on who is looking.
-            </p>
+      {/* 9 — the decision */}
+      <Spread>
+        <Pills>
+          <Pill tone="violet">Decision</Pill>
+        </Pills>
+        <Say>Permission became the structure, not a settings page.</Say>
+        <div className="tbl tbl-4">
+          <div className="tr th">
+            <span />
+            <span>
+              <Pill tone="violet">Admin</Pill>
+            </span>
+            <span>
+              <Pill tone="cyan">Lead</Pill>
+            </span>
+            <span>
+              <Pill tone="lime">Employee</Pill>
+            </span>
           </div>
-
-          <div className="cs-decision">
-            <span className="t-label">Decision 02</span>
-            <h3 className="cs-decision-title">Give the thank you a value</h3>
-            <div className="cs-decision-grid">
-              <div>
-                <span className="t-label">Why</span>
-                <p className="cs-card-body">
-                  Both halves of the research landed in the same place: symbolic praise is
-                  discounted, and people here would rather have something they can spend than
-                  another milestone badge.
-                </p>
-              </div>
-              <div>
-                <span className="t-label">Result</span>
-                <p className="cs-card-body">
-                  Points that redeem against real vouchers, with badges kept for standing rather
-                  than as the reward itself. An appreciation now costs the sender something and is
-                  worth something to the receiver.
-                </p>
-              </div>
-            </div>
+          <div className="tr">
+            <span className="t-label">Appreciations</span>
+            <span>Send, receive</span>
+            <span>Send, receive</span>
+            <span>Receive</span>
           </div>
-
-          <div className="cs-decision">
-            <span className="t-label">Decision 03</span>
-            <h3 className="cs-decision-title">Borrow the interface layer</h3>
-            <div className="cs-decision-grid">
-              <div>
-                <span className="t-label">Why</span>
-                <p className="cs-card-body">
-                  Ten weeks. Any of it spent deciding a button&rsquo;s resting state is time taken
-                  from the hierarchy problem, which was the part nobody else had solved.
-                </p>
-              </div>
-              <div>
-                <span className="t-label">Result</span>
-                <p className="cs-card-body">
-                  An open-source system adopted wholesale, then bent where it fought us: a warmer
-                  typeface in place of its default, and bespoke tables, reward cards and navigation
-                  it had no equivalent for.
-                </p>
-              </div>
-            </div>
+          <div className="tr">
+            <span className="t-label">Budget</span>
+            <span>Allocate</span>
+            <span>Request</span>
+            <span className="nil">—</span>
+          </div>
+          <div className="tr">
+            <span className="t-label">Policy</span>
+            <span>Manage</span>
+            <span>Manage</span>
+            <span>View</span>
+          </div>
+          <div className="tr">
+            <span className="t-label">Analytics</span>
+            <span>Whole org</span>
+            <span>Their team</span>
+            <span>Their own</span>
           </div>
         </div>
-      </Section>
+        <Note>Budget is the clearest case: a decision, a request, or nothing at all.</Note>
+      </Spread>
 
-      {/* ── 08 After review ──────────────────────────────────────── */}
-      <Section n="08" title="What review changed">
-        <Body>
-          <p>
-            The core screens went to the client as a working build, ahead of the supporting ones, to
-            be used and picked apart. The hierarchy held. The reward mechanics held. Three things
-            did not, and all three were structural.
-          </p>
-        </Body>
-
-        <div className="cs-changes">
-          <div className="cs-change">
-            <span className="t-label">Change 01</span>
-            <h3 className="cs-change-title">Two decisions were sharing one engine</h3>
-            <p className="cs-card-body">
-              Policy and budget are related, so we had built them as one thing. In use they are not
-              one thing: setting the rule for what earns recognition and approving the money to pay
-              for it are different judgements, made by different people, on different timescales.
-              Admins kept conflating them. We pulled them apart and gave budget its own surface,
-              with allocation, requests and utilisation in one place.
-            </p>
-          </div>
-
-          <div className="cs-change">
-            <span className="t-label">Change 02</span>
-            <h3 className="cs-change-title">The numbers were scattered on purpose, and it backfired</h3>
-            <p className="cs-card-body">
-              Putting each metric beside the thing it described was meant to make local decisions
-              easy, and it did. What it made impossible was judging the programme as a whole — which
-              was the one thing the people paying for it needed. A single analytics view was added,
-              and the local figures stayed where they were already earning their place.
-            </p>
-          </div>
-
-          <div className="cs-change">
-            <span className="t-label">Change 03</span>
-            <h3 className="cs-change-title">It carried itself like an admin console</h3>
-            <p className="cs-card-body">
-              The interface, and the side rail in particular, read as procedural. On most B2B
-              products that is fine. On one whose entire purpose is morale, a tone that says
-              paperwork is a functional defect, so navigation moved to the top and the product
-              stopped apologising for having colour in it.
-            </p>
-          </div>
+      {/* 10 — the other two decisions */}
+      <Spread>
+        <div className="cards c2">
+          <Card tone="violet" tag="Decision" title="Give the thank you a value">
+            Points that redeem against real vouchers. Badges kept for standing, not used as the
+            prize — symbolic praise was the complaint we started from.
+          </Card>
+          <Card tone="violet" tag="Decision" title="Borrow the interface layer">
+            An open-source system adopted whole, then warmed: a friendlier typeface, and the tables
+            and reward cards it had no answer for. Ten weeks does not buy a button.
+          </Card>
         </div>
-      </Section>
+      </Spread>
 
-      {/* ── 09 The final product ─────────────────────────────────── */}
-      <Section n="09" title="The final product">
-        <Statement>Built around the organisation, not only around the employee.</Statement>
+      {/* 11 — review */}
+      <Spread>
+        <Pills>
+          <Pill tone="amber">Shipped to the client, then picked apart</Pill>
+        </Pills>
+        <Mid>The hierarchy held. Three things did not.</Mid>
+        <div className="cards c3">
+          <Card tone="lime" tag="Split" title="Policy and budget shared an engine">
+            Related, but different judgements by different people. Budget got its own surface.
+          </Card>
+          <Card tone="lime" tag="Collected" title="Analytics sat beside what they measured">
+            Good for one decision, useless for judging the programme. Pulled into one view.
+          </Card>
+          <Card tone="lime" tag="Warmed" title="It read like an admin console">
+            On a product whose job is morale, tone is a functional defect. Navigation moved up, and
+            colour was allowed back.
+          </Card>
+        </div>
+      </Spread>
 
-        <div className="cs-screens">
+      {/* 12 — the product */}
+      <Spread tall>
+        <Pills>
+          <Pill tone="lime" solid>
+            Shipped
+          </Pill>
+        </Pills>
+        <Say>Built around the organisation, not only the employee.</Say>
+        <div className="shots">
           <Screen
             src="/images/incentiwise/02-feed.png"
-            alt="Incentiwise activity feed with an appreciation composer, points balance and leaderboard"
+            alt="Incentiwise activity feed with appreciation composer, points balance and leaderboard"
             title="The feed"
-            note="An employee's entire product. Send something, see what has been recognised, and see what it was worth."
+            note="An employee's whole product: send, see, and see what it was worth."
           />
           <Screen
             src="/images/incentiwise/03-send-appreciation.png"
             alt="Composing an appreciation with value tags and an attached reward"
             title="Sending"
-            note="Tags carry the reason and a reward can ride along, so the message says what happened rather than thank you."
+            note="Tags carry the reason, a reward rides along. Specific, not routine."
           />
           <Screen
             src="/images/incentiwise/05-rewards-catalog.png"
             alt="Rewards catalogue of redeemable vouchers"
             title="Rewards"
-            note="Points spend against things that exist off the platform. This is the answer to praise with nothing behind it."
+            note="Points spend on things that exist off the platform."
           />
           <Screen
             src="/images/incentiwise/15-culture.png"
-            alt="Culture screen showing budget allocated across departments with pending approval requests"
+            alt="Budget allocated across departments with pending approval requests"
             title="Budget"
-            note="The surface that came out of review. Allocation, requests and utilisation per department, separate from policy."
+            note="What review produced. Allocation, requests, utilisation — apart from policy."
           />
           <Screen
             src="/images/incentiwise/13-admins.png"
             alt="Administration screen assigning rights per person and department"
             title="Administration"
-            note="The hierarchy made editable — who holds which rights, over which part of the organisation."
+            note="The hierarchy, made editable."
           />
           <Screen
             src="/images/incentiwise/12-member-detail.png"
-            alt="A member profile showing points earned, badges held and transaction history"
+            alt="A member profile showing points earned, badges held and history"
             title="A person"
-            note="Earned, held and spent in one view. This is where someone checks whether their work is visible."
+            note="Where someone checks whether their work is visible."
           />
         </div>
-      </Section>
+      </Spread>
 
-      {/* ── 10 Reflection ────────────────────────────────────────── */}
-      <Section n="10" title="Reflection">
-        <div className="cs-cards cs-cards-3">
-          <Card n="01" title="The brief was smaller than the problem">
-            I was asked for a way to say thank you. The work turned out to be the permissions,
-            budgets and rules that decide whether thank you is ever said — and that is the part with
-            no competition in it.
+      {/* 13 — reflection */}
+      <Spread>
+        <Mid>What I took from it.</Mid>
+        <div className="cards c3">
+          <Card tone="cyan" tag="Scope" title="The brief was smaller than the problem">
+            Asked for a thank you. The work was the permissions and budgets that decide if one
+            happens.
           </Card>
-          <Card n="02" title="I had only heard from one side">
-            The loudest research was the easiest to find, and it was all from people the programme
-            happened to. The half that changed the product came from the people who fund and run it.
+          <Card tone="cyan" tag="Research" title="I had only heard from one side">
+            The easiest evidence to find came entirely from people it happened to.
           </Card>
-          <Card n="03" title="The wins were rearrangements">
-            Splitting policy from budget, collecting the analytics, dividing one interface into
-            three. Nothing new was added in any of them.
+          <Card tone="cyan" tag="Craft" title="The wins were rearrangements">
+            Split, collect, divide. Nothing new was added in any of them.
           </Card>
         </div>
-      </Section>
+      </Spread>
     </div>
   )
 }

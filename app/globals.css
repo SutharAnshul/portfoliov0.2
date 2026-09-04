@@ -2708,311 +2708,386 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   opacity: 0.3;
   cursor: default;
 }
-/* ─── Case study: the written kind ────────────────────────────────────────
-   An editorial document in this site's own material — same ground, same
-   serif for statements, same monospace for body, same hairlines and 2px
-   corners. What is new is the reading structure, not the surface.
+/* ─── Case study: spreads ─────────────────────────────────────────────────
+   A case study read at two speeds. Slow, it is a document. Fast, it is a
+   sequence of screens, each holding one claim and its evidence and nothing
+   else — so a reader who only scrolls still collects the argument.
 
-   Everything that would elsewhere be a diagram is drawn here in type and
-   rules instead. A comparison is a table; a prioritisation is three columns
-   of a list; a permission model is four rows. Nothing is imported from the
-   source deck, which has a visual language of its own and would arrive as a
-   foreign object on a page like this. */
+   Three rules do most of the work.
+
+   Scale carries hierarchy. The claim is set several times the size of the
+   note under it, which is what a diagram would have done on a page that had
+   diagrams. There are almost no headings, because a sentence that earns
+   56px does not also need a label announcing it.
+
+   Colour carries kind. Five hues say what sort of thing you are looking at
+   before you read it — lime shipped, amber was held back, rose hurt, cyan
+   is a question, violet is a decision. The colour is never the only signal:
+   every pill's word says the same thing, so this survives being colour-blind,
+   printed, or read aloud.
+
+   Space carries structure. A spread is most of a screen tall with its
+   content centred, so the break between two of them is a screenful of
+   nothing. That is why there are no numbers and no dividing rules — the gap
+   already says it, and saying it twice is what makes a case study feel like
+   a form to be filled in. */
 
 .cs {
-  --cs-text: 68ch;
-  --cs-indent: calc(44px + var(--s3));
-  margin-top: var(--s7);
-}
+  /* The sidebar and the chat panel both take width out of this column, so the
+     column runs narrow long before the viewport does. Everything below queries
+     the container, not the window — same reason the About page does. */
+  container: cs / inline-size;
 
-.cs-summary {
-  max-width: 52ch;
-  font-family: var(--family-display);
-  font-size: clamp(18px, 1.5vw, 22px);
-  line-height: 1.5;
-  color: color-mix(in srgb, var(--foreground) 88%, transparent);
-}
+  --lime: #21e07a;
+  --amber: #ffb020;
+  --rose: #ff5f6d;
+  --cyan: #4cd4ff;
+  --violet: #b18cff;
+  --plain: color-mix(in oklab, var(--foreground) 55%, transparent);
 
-.cs-section {
+  /* The reading measure. Claims run narrower than notes: a large line needs
+     fewer characters before it feels long. */
+  --measure: 62ch;
+
   margin-top: var(--s8);
 }
 
-.cs-head {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  align-items: baseline;
-  gap: var(--s3);
-  margin-top: var(--s5);
+/* ── The spread ────────────────────────────────────────────────────
+   One screen, one idea. The height is a floor rather than a fixed 100svh:
+   a spread whose content grows past the viewport simply gets taller, while
+   justify-content still holds the short ones at eye level. */
+.cs .spread {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--s5);
+  min-height: min(78svh, 640px);
+  padding-block: var(--s8);
 }
 
-.cs-n {
-  font-variant-numeric: tabular-nums;
+/* The screens want to start at the top of their spread, not float in it. */
+.cs .spread-tall {
+  justify-content: flex-start;
+  min-height: 0;
 }
 
-.cs-title {
+/* ── The claim ─────────────────────────────────────────────────────
+   The one place type is allowed to be loud. Serif, because this site keeps
+   the serif for things said rather than things listed, and set on a tight
+   leading so a three-line claim reads as one object. */
+.cs .say {
   font-family: var(--family-display);
-  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  font-size: clamp(1.75rem, 4.4vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
   color: var(--foreground);
-}
-
-/* The sentence a section exists to deliver, and the thing a skimming reader
-   is meant to stop on. */
-.cs-statement {
-  margin: var(--s6) 0 0 var(--cs-indent);
-  max-width: 34ch;
-  font-family: var(--family-display);
-  font-size: clamp(1.25rem, 2vw, 1.75rem);
-  line-height: 1.3;
-  color: var(--foreground);
+  max-width: 20ch;
   text-wrap: balance;
-}
-
-.cs-body {
-  margin: var(--s5) 0 0 var(--cs-indent);
-  max-width: var(--cs-text);
-}
-
-.cs-body p + p {
-  margin-top: var(--s4);
-}
-
-/* ── Questions ─────────────────────────────────────────────────────── */
-.cs-questions {
-  margin: var(--s5) 0 0 var(--cs-indent);
-  max-width: var(--cs-text);
-  border-top: 1px solid var(--card-line);
-}
-
-.cs-q {
-  padding: var(--s4) 0;
-  border-bottom: 1px solid var(--card-line);
-  font-family: var(--family-display);
-  font-size: clamp(1.0625rem, 1.5vw, 1.3rem);
-  line-height: 1.35;
-  color: color-mix(in srgb, var(--foreground) 82%, transparent);
-}
-
-/* ── Cards ─────────────────────────────────────────────────────────
-   For the things that genuinely arrive in sets — findings, positions,
-   problems, learnings — and nowhere else. */
-.cs-cards {
-  margin: var(--s5) 0 0 var(--cs-indent);
-  display: grid;
-  gap: var(--s4);
-}
-
-.cs-cards-3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.cs-card {
-  padding: var(--s4);
-  border: 1px solid var(--card-line);
-  border-radius: var(--r);
-  background: var(--card-fill);
-}
-
-.cs-card-n {
-  display: block;
-  margin-bottom: var(--s2);
-  font-variant-numeric: tabular-nums;
-}
-
-.cs-card-title {
-  font-family: var(--family-display);
-  font-size: 1.1875rem;
-  line-height: 1.25;
-  color: var(--foreground);
-}
-
-.cs-card-body {
-  margin-top: var(--s3);
-  font-size: var(--fs-body);
-  line-height: 1.6;
-  color: color-mix(in srgb, var(--foreground) 72%, transparent);
-}
-
-/* ── Tables ────────────────────────────────────────────────────────
-   A comparison drawn in rules and type. Ruled rows, a label column and
-   values — no fills, no chrome, nothing that needs a legend. */
-.cs-table {
-  margin: var(--s5) 0 0 var(--cs-indent);
-  border-top: 1px solid var(--card-line-strong);
-}
-
-.cs-row {
-  display: grid;
-  grid-template-columns: 150px repeat(2, minmax(0, 1fr));
-  gap: var(--s4);
-  padding: var(--s4) 0;
-  border-bottom: 1px solid var(--card-line);
-  align-items: start;
-}
-
-.cs-table-4 .cs-row {
-  grid-template-columns: 150px repeat(3, minmax(0, 1fr));
-}
-
-.cs-row-head {
-  padding-bottom: var(--s3);
-}
-
-.cs-row-v {
-  font-size: var(--fs-body);
-  line-height: 1.55;
-  color: color-mix(in srgb, var(--foreground) 80%, transparent);
-}
-
-/* ── Lists ─────────────────────────────────────────────────────────── */
-.cs-split {
-  margin: var(--s6) 0 0 var(--cs-indent);
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s5);
-}
-
-.cs-split-3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.cs-list ol {
-  margin-top: var(--s3);
-  counter-reset: cs;
-  font-size: var(--fs-body);
-  line-height: 1.6;
-  color: color-mix(in srgb, var(--foreground) 72%, transparent);
-}
-
-.cs-list li {
-  counter-increment: cs;
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  padding: var(--s3) 0;
-  border-top: 1px solid var(--card-line);
-}
-
-.cs-list li::before {
-  content: counter(cs, decimal-leading-zero);
-  color: color-mix(in srgb, var(--foreground) 40%, transparent);
-  font-variant-numeric: tabular-nums;
-}
-
-.cs-caption {
-  margin: var(--s3) 0 0 var(--cs-indent);
-  max-width: 62ch;
-  line-height: 1.55;
-}
-
-/* ── Decisions and changes ─────────────────────────────────────────── */
-.cs-decisions,
-.cs-changes {
-  margin-top: var(--s5);
-  display: grid;
-  gap: var(--s8);
-}
-
-.cs-decision > .t-label,
-.cs-change > .t-label {
-  margin-left: var(--cs-indent);
-}
-
-.cs-decision-title,
-.cs-change-title {
-  margin: var(--s2) 0 0 var(--cs-indent);
-  max-width: 30ch;
-  font-family: var(--family-display);
-  font-size: clamp(1.25rem, 1.8vw, 1.6rem);
-  line-height: 1.25;
-  color: var(--foreground);
-}
-
-.cs-decision-grid {
-  margin: var(--s4) 0 0 var(--cs-indent);
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s5);
-  max-width: var(--cs-text);
-}
-
-.cs-change > .cs-card-body {
-  margin: var(--s3) 0 0 var(--cs-indent);
-  max-width: var(--cs-text);
-}
-
-/* ── Screens ───────────────────────────────────────────────────────
-   Unframed. No plate, no border, no corner marks — the site's usual
-   treatment brackets a screen as a specimen, and here the screens are the
-   only thing on the page that is genuinely the product. They should sit on
-   the ground like a printed plate rather than be fenced. */
-.cs-screens {
-  margin-top: var(--s6);
-  display: grid;
-  gap: var(--s8);
-}
-
-.cs-screen {
   margin: 0;
 }
 
-.cs-screen img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: var(--r);
+/* For spreads whose evidence needs the room — the claim still leads, but it
+   is not competing with three cards for the eye. */
+.cs .say-mid {
+  font-size: clamp(1.375rem, 2.4vw, 2rem);
+  line-height: 1.15;
+  max-width: 28ch;
 }
 
-.cs-screen figcaption {
-  margin-top: var(--s4);
+/* The note under a claim. Small and grey on purpose: it is there for the
+   reader who stopped, not the one who is scrolling. */
+.cs .note {
+  font-family: var(--family-ui);
+  font-size: 15px;
+  line-height: 1.65;
+  color: color-mix(in oklab, var(--foreground) 66%, transparent);
+  max-width: 58ch;
+  margin: 0;
 }
 
-.cs-screen-title {
-  margin-left: var(--cs-indent);
+/* ── Pills ─────────────────────────────────────────────────────────
+   The smallest unit of meaning here. A tinted ground at low alpha keeps the
+   hue legible on near-black without any of them glowing; the solid variant
+   is rationed to one per spread, where the word is a verdict rather than a
+   category. */
+.cs .pils {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  align-items: center;
+}
+
+.cs .pil {
+  --tone: var(--plain);
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--family-ui);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 11px 5px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--tone) 34%, transparent);
+  background: color-mix(in oklab, var(--tone) 12%, transparent);
+  color: color-mix(in oklab, var(--tone) 88%, white);
+  white-space: nowrap;
+}
+
+.cs .pil-lime { --tone: var(--lime); }
+.cs .pil-amber { --tone: var(--amber); }
+.cs .pil-rose { --tone: var(--rose); }
+.cs .pil-cyan { --tone: var(--cyan); }
+.cs .pil-violet { --tone: var(--violet); }
+
+/* Near-black text on the hue itself, so the pill reads as a stamp. */
+.cs .pil-solid {
+  background: var(--tone);
+  border-color: var(--tone);
+  color: #0b0c0b;
+}
+
+.cs .pil-plain.pil-solid {
+  color: var(--background);
+}
+
+/* ── Questions ─────────────────────────────────────────────────────
+   Numerals doing the structural work, so the list needs no bullets, no
+   rules and no heading over it. */
+.cs .asks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s5);
+  max-width: var(--measure);
+}
+
+.cs .asks li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--s4);
+  align-items: baseline;
   font-family: var(--family-display);
-  font-size: 1.25rem;
-  line-height: 1.25;
+  font-size: clamp(1.25rem, 2.2vw, 1.875rem);
+  line-height: 1.2;
   color: var(--foreground);
 }
 
-.cs-screen .cs-caption {
-  margin-top: var(--s2);
+.cs .ask-n {
+  font-family: var(--family-ui);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--cyan);
+  font-variant-numeric: tabular-nums;
 }
 
-/* ── Narrower ──────────────────────────────────────────────────────
-   The indent that aligns text under the section number is a luxury of a
-   wide column; below this it costs more than it earns. */
-@media (max-width: 1023px) {
-  .cs {
-    --cs-indent: 0px;
-  }
+/* ── Cards ─────────────────────────────────────────────────────────
+   Grouping without boxing everything in: a hairline, a barely-there ground,
+   and one tinted edge that ties the card to its pill. */
+.cs .cards {
+  display: grid;
+  gap: var(--s4);
+}
 
-  .cs-head {
-    grid-template-columns: 36px minmax(0, 1fr);
-    gap: var(--s2);
-  }
+.cs .c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cs .c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
-  .cs-cards-3,
-  .cs-split,
-  .cs-split-3,
-  .cs-decision-grid {
+.cs .c {
+  --tone: var(--plain);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s2);
+  padding: var(--s4);
+  border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
+  border-left: 2px solid color-mix(in oklab, var(--tone) 55%, transparent);
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--foreground) 3%, transparent);
+}
+
+.cs .c-lime { --tone: var(--lime); }
+.cs .c-amber { --tone: var(--amber); }
+.cs .c-rose { --tone: var(--rose); }
+.cs .c-cyan { --tone: var(--cyan); }
+.cs .c-violet { --tone: var(--violet); }
+
+.cs .c-t {
+  font-family: var(--family-ui);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.cs .c-b {
+  font-family: var(--family-ui);
+  font-size: 14px;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--foreground) 64%, transparent);
+  margin: 0;
+}
+
+/* ── Tables ────────────────────────────────────────────────────────
+   Hairlines and type only. The header row carries pills instead of labels,
+   which is what lets the table drop its caption. */
+.cs .tbl {
+  display: grid;
+  max-width: 78ch;
+  border-top: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+}
+
+.cs .tr {
+  display: grid;
+  grid-template-columns: 12ch minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--s4);
+  align-items: start;
+  padding-block: var(--s3);
+  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
+  font-family: var(--family-ui);
+  font-size: 14px;
+  line-height: 1.55;
+  color: color-mix(in oklab, var(--foreground) 78%, transparent);
+}
+
+.cs .tbl-4 .tr {
+  grid-template-columns: 13ch repeat(3, minmax(0, 1fr));
+}
+
+.cs .tr.th {
+  border-bottom-color: color-mix(in oklab, var(--foreground) 18%, transparent);
+}
+
+.cs .tr .t-label {
+  color: color-mix(in oklab, var(--foreground) 52%, transparent);
+  padding-top: 2px;
+}
+
+/* An absence, drawn as one. */
+.cs .nil {
+  color: color-mix(in oklab, var(--foreground) 32%, transparent);
+}
+
+/* ── What was cut ──────────────────────────────────────────────────
+   Three columns whose headers are the only colour, because the point of the
+   spread is the comparison between them. */
+.cs .cuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s4);
+}
+
+.cs .cut {
+  --tone: var(--plain);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s3);
+  padding: var(--s4);
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--tone) 6%, transparent);
+  border: 1px solid color-mix(in oklab, var(--tone) 18%, transparent);
+}
+
+.cs .cut-lime { --tone: var(--lime); }
+.cs .cut-amber { --tone: var(--amber); }
+.cs .cut-rose { --tone: var(--rose); }
+
+.cs .cut ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s2);
+  font-family: var(--family-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  color: color-mix(in oklab, var(--foreground) 74%, transparent);
+}
+
+/* ── Screens ───────────────────────────────────────────────────────
+   Unframed, because these six were chosen to make a point rather than to
+   record a set. No plate, no corner marks, no frame number — the caption
+   says what it is and gets out of the way. */
+.cs .shots {
+  display: grid;
+  gap: var(--s7);
+  margin-top: var(--s3);
+}
+
+.cs .shot-plain {
+  margin: 0;
+  display: grid;
+  gap: var(--s3);
+}
+
+.cs .shot-plain img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+}
+
+.cs .shot-plain figcaption {
+  display: grid;
+  gap: 4px;
+  max-width: 56ch;
+}
+
+/* ── Narrower ──────────────────────────────────────────────
+   Two steps, both measured in column width rather than window width.
+
+   At 860 the three-column groupings go: a third of the column stops being
+   enough measure to read a sentence in, and three cramped columns are worse
+   than three stacked ones. At 620 the pairs go too, and the spreads stop
+   reserving most of a screen of height — by then the content already fills
+   one, so the floor would only add dead space. */
+@container cs (max-width: 860px) {
+  .cs .c3,
+  .cs .cuts {
     grid-template-columns: minmax(0, 1fr);
   }
 
   /* A table cannot simply stack: the label has to stay with its values, so
-     each row becomes its own small block. */
-  .cs-row {
+     each row becomes its own small block, and the header row — whose pills
+     have nothing left to head — is dropped. */
+  .cs .tr,
+  .cs .tbl-4 .tr {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--s2);
+    gap: 4px;
   }
 
-  .cs-row-head {
+  .cs .tr.th {
     display: none;
   }
 
-  .cs-decisions,
-  .cs-changes,
-  .cs-screens {
-    gap: var(--s7);
+  .cs .tr .t-label {
+    padding-top: 0;
+  }
+}
+
+@container cs (max-width: 620px) {
+  .cs .spread {
+    min-height: 0;
+    padding-block: var(--s7);
+    gap: var(--s4);
+  }
+
+  .cs .c2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cs .shots {
+    gap: var(--s6);
+  }
+
+  .cs .asks li {
+    gap: var(--s3);
   }
 }
