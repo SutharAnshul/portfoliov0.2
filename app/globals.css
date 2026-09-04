@@ -2708,36 +2708,33 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   opacity: 0.3;
   cursor: default;
 }
-/* ─── Case study: spreads ─────────────────────────────────────────────────
-   A case study read at two speeds. Slow, it is a document. Fast, it is a
-   sequence of screens, each holding one claim and its evidence and nothing
-   else — so a reader who only scrolls still collects the argument.
+/* ─── Case study: a story, in three acts ──────────────────────────────────
+   Context, tension, resolution — and the page is built so you can tell which
+   one you are in before you read a word of it.
 
-   Three rules do most of the work.
+   Three devices do that, and none of them is a label:
 
-   Scale carries hierarchy. The claim is set several times the size of the
-   note under it, which is what a diagram would have done on a page that had
-   diagrams. There are almost no headings, because a sentence that earns
-   56px does not also need a label announcing it.
+   Light. Every beat sits in a wide, very faint wash of colour, and the wash
+   moves through the arc: neutral while the ground is being laid, rose once
+   the complaints start, then cooling through violet to lime as the thing gets
+   built. It alternates left and right so the page breathes rather than
+   pulsing. At 4% alpha none of it is legible as colour — you notice it the
+   way you notice a room getting warmer.
 
-   Colour carries kind. Five hues say what sort of thing you are looking at
-   before you read it — lime shipped, amber was held back, rose hurt, cyan
-   is a question, violet is a decision. The colour is never the only signal:
-   every pill's word says the same thing, so this survives being colour-blind,
-   printed, or read aloud.
+   Scale. The three reversals get a screen each and a claim at up to 88px,
+   with nothing else on it. Everything between them is small. A page that is
+   loud everywhere is quiet everywhere.
 
-   Space carries structure. A spread is most of a screen tall with its
-   content centred, so the break between two of them is a screenful of
-   nothing. That is why there are no numbers and no dividing rules — the gap
-   already says it, and saying it twice is what makes a case study feel like
-   a form to be filled in. */
+   Layout. Every beat is drawn differently: a ruled audit, three overheard
+   voices at three sizes, a roster with a rule between each speaker, a numeral
+   the size of a fist, numbered steps hanging in the margin, a before-and-after
+   ladder, an asymmetric gallery. Thirteen beats cut from one template read as
+   a form no matter how well the type is set, and the eye gives up on forms.
+
+   Nothing here marks where a section starts or ends. The wash, the height and
+   the change of layout already say it three times over. */
 
 .cs {
-  /* The sidebar and the chat panel both take width out of this column, so the
-     column runs narrow long before the viewport does. Everything below queries
-     the container, not the window — same reason the About page does. */
-  container: cs / inline-size;
-
   --lime: #21e07a;
   --amber: #ffb020;
   --rose: #ff5f6d;
@@ -2745,72 +2742,135 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   --violet: #b18cff;
   --plain: color-mix(in oklab, var(--foreground) 55%, transparent);
 
-  /* The reading measure. Claims run narrower than notes: a large line needs
-     fewer characters before it feels long. */
-  --measure: 62ch;
+  /* The sidebar and the chat panel both take width out of this column, so it
+     runs narrow long before the window does. Every breakpoint below queries
+     the container, and every display size is in cqw — the type responds to
+     the column it is actually in, not to a viewport it cannot see. */
+  container: cs / inline-size;
+
+  /* The washes are wider than the column on purpose. */
+  overflow: clip;
 
   margin-top: var(--s8);
 }
 
-/* ── The spread ────────────────────────────────────────────────────
-   One screen, one idea. The height is a floor rather than a fixed 100svh:
-   a spread whose content grows past the viewport simply gets taller, while
-   justify-content still holds the short ones at eye level. */
-.cs .spread {
+/* ── A beat ────────────────────────────────────────────────────────
+   The height is a floor, not a fixed 100svh: a beat that outgrows the
+   viewport simply gets taller, and centring still holds the short ones at
+   eye level. */
+.cs .beat {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
   gap: var(--s5);
-  min-height: min(78svh, 640px);
+  min-height: min(72svh, 560px);
   padding-block: var(--s8);
 }
 
-/* The screens want to start at the top of their spread, not float in it. */
-.cs .spread-tall {
+/* The three reversals. A screen each, and nothing to look at but the claim. */
+.cs .beat-air {
+  min-height: min(88svh, 720px);
+  gap: var(--s6);
+}
+
+/* Sequences — steps, screens — should sit where they start, not float. */
+.cs .beat-flow {
   justify-content: flex-start;
   min-height: 0;
 }
 
+/* The wash. Enormous, soft, and far too faint to read as a colour; it is
+   there to make the temperature of the page change under you. */
+.cs .beat::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -6% -45%;
+  background: radial-gradient(
+    58% 46% at var(--gx, 30%) 50%,
+    color-mix(in oklab, var(--act) 7%, transparent),
+    transparent 72%
+  );
+  pointer-events: none;
+}
+
+.cs .beat-ctx { --act: var(--cyan); }
+.cs .beat-ten { --act: var(--rose); }
+.cs .beat-res { --act: var(--violet); }
+.cs .beat-set { --act: var(--amber); }
+.cs .beat-ship { --act: var(--lime); }
+
+/* Alternate the light so the arc breathes instead of throbbing. Set by a
+   prop rather than :nth-of-type, because Settle gives every section its own
+   wrapper and an only child is always the first of its type. */
+.cs .beat-r::before { --gx: 74%; }
+
 /* ── The claim ─────────────────────────────────────────────────────
-   The one place type is allowed to be loud. Serif, because this site keeps
-   the serif for things said rather than things listed, and set on a tight
-   leading so a three-line claim reads as one object. */
+   The serif, which this site keeps for things said rather than things
+   listed. Tight leading, so a three-line claim reads as one object. */
 .cs .say {
   font-family: var(--family-display);
-  font-size: clamp(1.75rem, 4.4vw, 3.5rem);
+  font-size: clamp(1.625rem, 7cqw, 3.25rem);
   font-weight: 400;
-  line-height: 1.08;
-  letter-spacing: -0.015em;
+  line-height: 1.06;
+  letter-spacing: -0.018em;
   color: var(--foreground);
-  max-width: 20ch;
+  max-width: 17ch;
   text-wrap: balance;
   margin: 0;
 }
 
-/* For spreads whose evidence needs the room — the claim still leads, but it
-   is not competing with three cards for the eye. */
-.cs .say-mid {
-  font-size: clamp(1.375rem, 2.4vw, 2rem);
-  line-height: 1.15;
-  max-width: 28ch;
+/* On a reversal it is allowed to be enormous, because it is the only thing
+   there. */
+.cs .beat-air .say {
+  font-size: clamp(2rem, 10.5cqw, 5.5rem);
+  letter-spacing: -0.028em;
+  max-width: 15ch;
 }
 
-/* The note under a claim. Small and grey on purpose: it is there for the
-   reader who stopped, not the one who is scrolling. */
+/* A claim that has to share its beat with evidence. */
+.cs .say-mid {
+  font-size: clamp(1.25rem, 3.4cqw, 1.875rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  max-width: 26ch;
+}
+
+/* ── Small type ────────────────────────────────────────────────────
+   The note is for the reader who stopped. The lead is for a beat that opens
+   in prose rather than in a claim. */
 .cs .note {
   font-family: var(--family-ui);
   font-size: 15px;
   line-height: 1.65;
-  color: color-mix(in oklab, var(--foreground) 66%, transparent);
-  max-width: 58ch;
+  color: color-mix(in oklab, var(--foreground) 62%, transparent);
+  max-width: 54ch;
+  margin: 0;
+}
+
+.cs .beat-air .note {
+  font-size: 16px;
+  color: color-mix(in oklab, var(--foreground) 72%, transparent);
+  padding-left: var(--s4);
+  border-left: 2px solid color-mix(in oklab, var(--act) 45%, transparent);
+}
+
+.cs .lead {
+  font-family: var(--family-ui);
+  font-size: 16px;
+  line-height: 1.7;
+  color: color-mix(in oklab, var(--foreground) 82%, transparent);
+  max-width: 52ch;
   margin: 0;
 }
 
 /* ── Pills ─────────────────────────────────────────────────────────
-   The smallest unit of meaning here. A tinted ground at low alpha keeps the
-   hue legible on near-black without any of them glowing; the solid variant
-   is rationed to one per spread, where the word is a verdict rather than a
-   category. */
+   A tinted ground at low alpha keeps the hue legible on near-black without
+   any of them glowing. The solid fill is rationed to the three places where
+   the word is a verdict rather than a category. */
 .cs .pils {
   display: flex;
   flex-wrap: wrap;
@@ -2842,110 +2902,25 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .cs .pil-cyan { --tone: var(--cyan); }
 .cs .pil-violet { --tone: var(--violet); }
 
-/* Near-black text on the hue itself, so the pill reads as a stamp. */
 .cs .pil-solid {
   background: var(--tone);
   border-color: var(--tone);
   color: #0b0c0b;
 }
 
-.cs .pil-plain.pil-solid {
-  color: var(--background);
-}
-
-/* ── Questions ─────────────────────────────────────────────────────
-   Numerals doing the structural work, so the list needs no bullets, no
-   rules and no heading over it. */
-.cs .asks {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--s5);
-  max-width: var(--measure);
-}
-
-.cs .asks li {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--s4);
-  align-items: baseline;
-  font-family: var(--family-display);
-  font-size: clamp(1.25rem, 2.2vw, 1.875rem);
-  line-height: 1.2;
-  color: var(--foreground);
-}
-
-.cs .ask-n {
-  font-family: var(--family-ui);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--cyan);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ── Cards ─────────────────────────────────────────────────────────
-   Grouping without boxing everything in: a hairline, a barely-there ground,
-   and one tinted edge that ties the card to its pill. */
-.cs .cards {
-  display: grid;
-  gap: var(--s4);
-}
-
-.cs .c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.cs .c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-
-.cs .c {
-  --tone: var(--plain);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--s2);
-  padding: var(--s4);
-  border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
-  border-left: 2px solid color-mix(in oklab, var(--tone) 55%, transparent);
-  border-radius: 2px;
-  background: color-mix(in oklab, var(--foreground) 3%, transparent);
-}
-
-.cs .c-lime { --tone: var(--lime); }
-.cs .c-amber { --tone: var(--amber); }
-.cs .c-rose { --tone: var(--rose); }
-.cs .c-cyan { --tone: var(--cyan); }
-.cs .c-violet { --tone: var(--violet); }
-
-.cs .c-t {
-  font-family: var(--family-ui);
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--foreground);
-  margin: 0;
-}
-
-.cs .c-b {
-  font-family: var(--family-ui);
-  font-size: 14px;
-  line-height: 1.6;
-  color: color-mix(in oklab, var(--foreground) 64%, transparent);
-  margin: 0;
-}
-
-/* ── Tables ────────────────────────────────────────────────────────
-   Hairlines and type only. The header row carries pills instead of labels,
-   which is what lets the table drop its caption. */
+/* ── The audit ─────────────────────────────────────────────────────
+   Hairlines and type. The header carries pills instead of labels, which is
+   what lets the table go without a caption. */
 .cs .tbl {
   display: grid;
-  max-width: 78ch;
-  border-top: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+  width: 100%;
+  max-width: 76ch;
+  border-top: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
 }
 
 .cs .tr {
   display: grid;
-  grid-template-columns: 12ch minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: 11ch minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--s4);
   align-items: start;
   padding-block: var(--s3);
@@ -2953,32 +2928,130 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   font-family: var(--family-ui);
   font-size: 14px;
   line-height: 1.55;
-  color: color-mix(in oklab, var(--foreground) 78%, transparent);
+  color: color-mix(in oklab, var(--foreground) 80%, transparent);
 }
 
 .cs .tbl-4 .tr {
-  grid-template-columns: 13ch repeat(3, minmax(0, 1fr));
+  grid-template-columns: 12ch repeat(3, minmax(0, 1fr));
 }
 
 .cs .tr.th {
-  border-bottom-color: color-mix(in oklab, var(--foreground) 18%, transparent);
+  border-bottom-color: color-mix(in oklab, var(--foreground) 20%, transparent);
 }
 
 .cs .tr .t-label {
-  color: color-mix(in oklab, var(--foreground) 52%, transparent);
+  color: color-mix(in oklab, var(--foreground) 50%, transparent);
   padding-top: 2px;
 }
 
 /* An absence, drawn as one. */
 .cs .nil {
-  color: color-mix(in oklab, var(--foreground) 32%, transparent);
+  color: color-mix(in oklab, var(--foreground) 30%, transparent);
+}
+
+/* ── The chorus ────────────────────────────────────────────────────
+   Three complaints, overheard rather than collected. Three sizes, three
+   indents and a quote mark hanging outside the measure, so they read as
+   voices arriving from somewhere else instead of as a tidy list of findings.
+   The staircase is what makes the next beat — one flat sentence, alone on a
+   screen — land as a correction. */
+.cs .chorus {
+  display: grid;
+  gap: var(--s4);
+  width: 100%;
+  max-width: 34ch;
+}
+
+.cs .voice {
+  font-family: var(--family-display);
+  font-style: italic;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: color-mix(in oklab, var(--foreground) 92%, transparent);
+  text-indent: -0.42em;
+  margin: 0;
+}
+
+.cs .v1 { font-size: clamp(1.375rem, 4.6cqw, 2.25rem); }
+.cs .v2 {
+  font-size: clamp(1.125rem, 3.6cqw, 1.75rem);
+  margin-left: 9%;
+  color: color-mix(in oklab, var(--foreground) 76%, transparent);
+}
+.cs .v3 {
+  font-size: clamp(1.25rem, 4.1cqw, 2rem);
+  margin-left: 4%;
+  color: color-mix(in oklab, var(--foreground) 86%, transparent);
+}
+
+/* ── The roster ────────────────────────────────────────────────────
+   Four people, one line each, ruled apart. The pill sits in its own column
+   so the four needs line up and can be read down in one pass — the whole
+   point of the beat is that they do not match. */
+.cs .roster {
+  display: grid;
+  width: 100%;
+  max-width: 62ch;
+  margin: 0;
+  border-top: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+}
+
+.cs .roster > div {
+  display: grid;
+  grid-template-columns: 15ch minmax(0, 1fr);
+  gap: var(--s4);
+  align-items: baseline;
+  padding-block: var(--s4);
+  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
+}
+
+.cs .roster dt {
+  margin: 0;
+}
+
+.cs .roster dd {
+  margin: 0;
+  font-family: var(--family-display);
+  font-size: clamp(1.0625rem, 2.6cqw, 1.375rem);
+  line-height: 1.3;
+  color: var(--foreground);
+}
+
+/* ── The constraint ────────────────────────────────────────────────
+   Ten weeks was the single fact that decided what got built, so it is set
+   at the size of a fact that decides things. The label sits on its baseline
+   rather than under it, which keeps a very large numeral from becoming a
+   decoration. */
+.cs .count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s4);
+  flex-wrap: wrap;
+}
+
+.cs .count-n {
+  font-family: var(--family-display);
+  font-size: clamp(4rem, 16cqw, 9rem);
+  line-height: 0.78;
+  letter-spacing: -0.04em;
+  color: var(--foreground);
+  font-variant-numeric: lining-nums;
+}
+
+.cs .count-l {
+  font-family: var(--family-ui);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--foreground) 62%, transparent);
+  max-width: 18ch;
 }
 
 /* ── What was cut ──────────────────────────────────────────────────
-   Three columns whose headers are the only colour, because the point of the
-   spread is the comparison between them. */
+   Three columns whose headers carry the only colour, because the comparison
+   between them is the whole content of the beat. */
 .cs .cuts {
   display: grid;
+  width: 100%;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--s4);
 }
@@ -3008,23 +3081,119 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   font-family: var(--family-ui);
   font-size: 14px;
   line-height: 1.5;
-  color: color-mix(in oklab, var(--foreground) 74%, transparent);
+  color: color-mix(in oklab, var(--foreground) 76%, transparent);
 }
 
-/* ── Screens ───────────────────────────────────────────────────────
-   Unframed, because these six were chosen to make a point rather than to
-   record a set. No plate, no corner marks, no frame number — the caption
-   says what it is and gets out of the way. */
+/* ── The steps ─────────────────────────────────────────────────────
+   Decisions two and three, numbered because the first one was a table and
+   the reader needs to know these belong to it. The numerals hang outside
+   the text column, so the copy keeps one clean left edge down the page. */
+.cs .steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s6);
+  width: 100%;
+  max-width: 60ch;
+}
+
+.cs .steps li {
+  display: grid;
+  grid-template-columns: 4ch minmax(0, 1fr);
+  gap: var(--s4);
+  padding-top: var(--s4);
+  border-top: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
+}
+
+.cs .step-n {
+  font-family: var(--family-ui);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  color: var(--violet);
+  font-variant-numeric: tabular-nums;
+}
+
+.cs .step-t {
+  font-family: var(--family-display);
+  font-size: clamp(1.125rem, 3cqw, 1.625rem);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--foreground);
+  margin: 0 0 var(--s2);
+}
+
+.cs .step-b {
+  font-family: var(--family-ui);
+  font-size: 15px;
+  line-height: 1.65;
+  color: color-mix(in oklab, var(--foreground) 64%, transparent);
+  margin: 0;
+}
+
+/* ── The setback ───────────────────────────────────────────────────
+   What broke, then what fixed it, on two rungs of the same ladder. Reading
+   the first line of each row gives you the three faults; reading the second
+   gives you the three repairs. Both passes work on their own. */
+.cs .fixes {
+  display: grid;
+  gap: var(--s5);
+  width: 100%;
+  max-width: 64ch;
+}
+
+.cs .fix {
+  display: grid;
+  gap: var(--s2);
+  padding-left: var(--s4);
+  border-left: 2px solid color-mix(in oklab, var(--rose) 40%, transparent);
+}
+
+.cs .fix-a {
+  font-family: var(--family-ui);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.cs .fix-b {
+  font-family: var(--family-ui);
+  font-size: 15px;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--foreground) 62%, transparent);
+  margin: 0;
+}
+
+/* ── The screens ───────────────────────────────────────────────────
+   Unframed — no plate, no corner marks, no frame number — because these six
+   were chosen to prove a point, not to record a set. The rhythm is
+   deliberately uneven: the feed and the budget screen get the full column
+   because they are the two the story has been arguing towards, and the rest
+   pair off. */
 .cs .shots {
   display: grid;
-  gap: var(--s7);
-  margin-top: var(--s3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s6) var(--s5);
+  width: 100%;
+  margin-top: var(--s2);
 }
 
 .cs .shot-plain {
   margin: 0;
   display: grid;
   gap: var(--s3);
+  align-content: start;
+}
+
+.cs .shot-plain:nth-child(1),
+.cs .shot-plain:nth-child(4) {
+  grid-column: 1 / -1;
 }
 
 .cs .shot-plain img {
@@ -3034,33 +3203,78 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   border-radius: 2px;
 }
 
-.cs .shot-plain figcaption {
+.cs .shot-t {
+  font-family: var(--family-ui);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--foreground);
+  margin: 0;
+}
+
+/* ── The close ─────────────────────────────────────────────────────
+   Three admissions under the last claim. Hanging rules rather than bullets,
+   so they read as an aside and not as a fourth list of findings. */
+.cs .ends {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  gap: 4px;
+  gap: var(--s3);
+  width: 100%;
   max-width: 56ch;
 }
 
-/* ── Narrower ──────────────────────────────────────────────
-   Two steps, both measured in column width rather than window width.
+.cs .ends li {
+  position: relative;
+  padding-left: var(--s5);
+  font-family: var(--family-ui);
+  font-size: 15px;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--foreground) 60%, transparent);
+}
 
-   At 860 the three-column groupings go: a third of the column stops being
-   enough measure to read a sentence in, and three cramped columns are worse
-   than three stacked ones. At 620 the pairs go too, and the spreads stop
-   reserving most of a screen of height — by then the content already fills
-   one, so the floor would only add dead space. */
+.cs .ends li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: var(--s4);
+  height: 1px;
+  background: color-mix(in oklab, var(--foreground) 32%, transparent);
+}
+
+/* ── Narrower ──────────────────────────────────────────────────────
+   Two steps, both measured in column width, because the column is the thing
+   that actually changes.
+
+   At 860 the three-up groupings and the paired screens go: a third of the
+   column stops being enough measure for a sentence, and three cramped
+   columns are worse than three stacked ones. At 620 the beats give up their
+   reserved height — by then the content fills a screen on its own, so the
+   floor would only add dead space — and the washes pull in, since a glow
+   wider than a phone is just a tint on the whole page. */
 @container cs (max-width: 860px) {
-  .cs .c3,
-  .cs .cuts {
+  .cs .cuts,
+  .cs .shots {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cs .shot-plain:nth-child(1),
+  .cs .shot-plain:nth-child(4) {
+    grid-column: auto;
   }
 
   /* A table cannot simply stack: the label has to stay with its values, so
      each row becomes its own small block, and the header row — whose pills
      have nothing left to head — is dropped. */
   .cs .tr,
-  .cs .tbl-4 .tr {
+  .cs .tbl-4 .tr,
+  .cs .roster > div {
     grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
+    gap: 6px;
   }
 
   .cs .tr.th {
@@ -3070,24 +3284,35 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   .cs .tr .t-label {
     padding-top: 0;
   }
+
+  .cs .roster > div {
+    align-items: start;
+  }
 }
 
-@container cs (max-width: 620px) {
-  .cs .spread {
+@container cs (max-width: 520px) {
+  .cs .beat,
+  .cs .beat-air {
     min-height: 0;
     padding-block: var(--s7);
     gap: var(--s4);
   }
 
-  .cs .c2 {
+  .cs .beat::before {
+    inset: -2% -12%;
+  }
+
+  .cs .steps li {
     grid-template-columns: minmax(0, 1fr);
+    gap: var(--s2);
   }
 
-  .cs .shots {
-    gap: var(--s6);
+  .cs .voice {
+    text-indent: 0;
   }
 
-  .cs .asks li {
-    gap: var(--s3);
+  .cs .v2,
+  .cs .v3 {
+    margin-left: 0;
   }
 }

@@ -1,20 +1,24 @@
 import { Settle } from '@/components/Settle'
 
 /**
- * Incentiwise, told in spreads.
+ * Incentiwise, told as a story rather than a report.
  *
- * One idea to a screen. Each spread holds a single claim, set large enough to
- * land before anything else on it, with whatever evidence that claim needs in
- * small type underneath. Nothing is numbered and nothing is ruled off — a
- * spread ends because the next one begins a screen later, which the eye reads
- * as a break without being told.
+ * The shape is context → tension → resolution, and the page is built so you
+ * can feel which of the three you are in without being told.
  *
- * Two things carry the hierarchy, because the only images here are the product:
- * the distance between a 56px serif claim and a 15px monospace note, and a
- * five-colour pill system that says what kind of thing you are looking at
- * before you read a word of it. Lime is what shipped, amber is what was held
- * back, rose is what hurt, cyan is a question, violet is a decision. The colour
- * is never the only signal — the pill's word always says the same thing.
+ * Context is quiet: small type, a lot of air, one ruled table. Tension is
+ * loud and crowded — overheard complaints at three different sizes, then the
+ * reversal alone on a screen with nothing to read but itself. Resolution is
+ * ordered: a number, a table, numbered steps, then the screens.
+ *
+ * Every beat gets its own layout. That is the point — thirteen spreads built
+ * from one template read as a form, however carefully the type is set, and the
+ * eye stops looking. A layout that changes is a layout that keeps being read.
+ *
+ * The claims are written to hand off: each one ends pointing at the next, so
+ * the argument moves on "but" and "therefore" rather than "and then". The
+ * closing line is the opening line turned over, which is the only ornament
+ * here that exists purely because it is satisfying.
  *
  * Nothing from the source deck: not its artwork, not its sentences. Only what
  * happened, and only what was recorded — no adoption numbers, no engagement
@@ -23,21 +27,49 @@ import { Settle } from '@/components/Settle'
 
 type Tone = 'lime' | 'amber' | 'rose' | 'cyan' | 'violet' | 'plain'
 
-/** One screen, one idea. Vertically centred so the claim sits at eye level. */
-function Spread({ children, tall }: { children: React.ReactNode; tall?: boolean }) {
+/**
+ * One beat. `air` is for the three reversals, which need a screen to
+ * themselves; `flow` is for the beats that are a sequence and should not
+ * pretend to be centred on anything.
+ */
+function Beat({
+  children,
+  act,
+  side,
+  air,
+  flow,
+}: {
+  children: React.ReactNode
+  /**
+   * Which act this belongs to. Sets the temperature of the light behind it:
+   * cool while the ground is laid, hot through the complaints, cool again
+   * while it gets built, one amber flare at the setback, lime once it ships.
+   */
+  act: 'ctx' | 'ten' | 'res' | 'set' | 'ship'
+  /**
+   * Which side the wash sits on. Passed rather than derived: Settle wraps
+   * every section in its own div, so each one is an only child and
+   * :nth-of-type can never see its neighbours.
+   */
+  side?: 'r'
+  air?: boolean
+  flow?: boolean
+}) {
   return (
     <Settle mass="light">
-      <section className={`spread${tall ? ' spread-tall' : ''}`}>{children}</section>
+      <section
+        className={`beat beat-${act}${side === 'r' ? ' beat-r' : ''}${air ? ' beat-air' : ''}${flow ? ' beat-flow' : ''}`}
+      >
+        {children}
+      </section>
     </Settle>
   )
 }
 
-/** The claim. Sized to be read first, and to work without a heading above it. */
 function Say({ children }: { children: React.ReactNode }) {
   return <p className="say">{children}</p>
 }
 
-/** A quieter claim, for spreads whose evidence needs the room. */
 function Mid({ children }: { children: React.ReactNode }) {
   return <p className="say say-mid">{children}</p>
 }
@@ -58,188 +90,143 @@ function Pill({
   return <span className={`pil pil-${tone}${solid ? ' pil-solid' : ''}`}>{children}</span>
 }
 
-/** A row of pills, used where a spread needs a heading it does not deserve. */
+/** A row of pills, where a beat needs a heading it does not deserve. */
 function Pills({ children }: { children: React.ReactNode }) {
   return <div className="pils">{children}</div>
-}
-
-function Card({
-  tag,
-  tone = 'plain',
-  title,
-  children,
-}: {
-  tag?: string
-  tone?: Tone
-  title: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className={`c c-${tone}`}>
-      {tag && <Pill tone={tone}>{tag}</Pill>}
-      <h3 className="c-t">{title}</h3>
-      <p className="c-b">{children}</p>
-    </div>
-  )
-}
-
-function Screen({ src, alt, title, note }: { src: string; alt: string; title: string; note: string }) {
-  return (
-    <figure className="shot-plain">
-      <img src={src} alt={alt} loading="lazy" />
-      <figcaption>
-        <h3 className="c-t">{title}</h3>
-        <p className="note">{note}</p>
-      </figcaption>
-    </figure>
-  )
 }
 
 export function IncentiwiseStory() {
   return (
     <div className="cs">
-      {/* 1 — what it is */}
-      <Spread>
-        <Pills>
-          <Pill tone="lime" solid>
-            Rewards &amp; recognition
-          </Pill>
-          <Pill tone="plain">Indian SMEs</Pill>
-          <Pill tone="plain">Ten weeks</Pill>
-        </Pills>
-        <Say>
-          Asked for a way to say thank you. Built the machinery that decides whether thank you ever
-          gets said.
-        </Say>
-      </Spread>
+      {/* ═══ Context ═════════════════════════════════════════════════
+          Quiet and factual. Nothing here is coloured except one pill, so
+          that the noise three beats later actually reads as noise. */}
 
-      {/* 2 — the problem */}
-      <Spread>
-        <Pills>
-          <Pill tone="rose">The brief</Pill>
-        </Pills>
-        <Say>Tools that thrive elsewhere go flat here.</Say>
-        <Note>
-          The client had watched the category leaders fail to move morale in companies like the ones
-          they knew. That was a hunch, not a finding. I went to check it.
-        </Note>
-      </Spread>
+      {/* The ask, and a promise that it was wrong. */}
+      <Beat act="ctx" air>
+        <Say>The brief was an employee rewards app.</Say>
+        <Note>It took two weeks of research to establish that this was the wrong brief.</Note>
+      </Beat>
 
-      {/* 3 — the questions */}
-      <Spread>
-        <Pills>
-          <Pill tone="cyan">Three questions</Pill>
-        </Pills>
-        <ol className="asks">
-          <li>
-            <span className="ask-n">01</span>
-            <span>What do the incumbents actually do?</span>
-          </li>
-          <li>
-            <span className="ask-n">02</span>
-            <span>What do people say when nobody is asking?</span>
-          </li>
-          <li>
-            <span className="ask-n">03</span>
-            <span>Who decides whether recognition happens at all?</span>
-          </li>
-        </ol>
-      </Spread>
+      {/* Why anyone thought there was an opening. */}
+      <Beat act="ctx" side="r">
+        <p className="lead">
+          Two platforms dominate this category worldwide. The client had watched both of them fail
+          to shift anything at the Indian companies they knew, and wanted to know why.
+        </p>
+        <Mid>A hunch, then. Worth testing before drawing a single screen.</Mid>
+      </Beat>
 
-      {/* 4 — the competitors */}
-      <Spread>
-        <Pills>
-          <Pill tone="cyan">Two market leaders, worked directly</Pill>
-        </Pills>
+      {/* The audit. A table because it is evidence, not argument. */}
+      <Beat act="ctx">
+        <Note>So I used both of them properly, for a fortnight, as a paying customer would.</Note>
         <div className="tbl">
           <div className="tr th">
             <span />
             <span>
-              <Pill tone="violet">Comprehensive</Pill>
+              <Pill tone="cyan">The comprehensive one</Pill>
             </span>
             <span>
-              <Pill tone="violet">Focused</Pill>
+              <Pill tone="cyan">The focused one</Pill>
             </span>
           </div>
           <div className="tr">
             <span className="t-label">Built for</span>
             <span>Large organisations</span>
-            <span>Small teams, founders</span>
+            <span>Small teams and founders</span>
           </div>
           <div className="tr">
-            <span className="t-label">Bet</span>
+            <span className="t-label">The bet</span>
             <span>Everything, in one place</span>
             <span>One thing, done narrowly</span>
           </div>
           <div className="tr">
-            <span className="t-label">Strain</span>
-            <span>Heavy to learn; measures engagement, not return</span>
+            <span className="t-label">The cost</span>
+            <span>Weeks to learn; measures engagement, never return</span>
             <span>Thin integrations; nothing to grow into</span>
           </div>
         </div>
-        <Note>Each had taken an end of the trade-off. Nobody held the middle.</Note>
-      </Spread>
+        <Mid>One is too heavy to learn. The other has nothing to grow into.</Mid>
+        <Note>Which explained the software. It said nothing at all about the people using it.</Note>
+      </Beat>
 
-      {/* 5 — the forums */}
-      <Spread>
+      {/* ═══ Tension ═════════════════════════════════════════════════
+          Crowded, hot, and deliberately harder to read cleanly. */}
+
+      {/* The chorus. Three sizes, staggered, because they were overheard. */}
+      <Beat act="ten" side="r">
         <Pills>
-          <Pill tone="cyan">Unprompted, in public</Pill>
+          <Pill tone="rose">Public forums, unprompted</Pill>
         </Pills>
-        <Mid>Three complaints, over and over.</Mid>
-        <div className="cards c3">
-          <Card tone="rose" tag="Hollow" title="Praise with nothing behind it">
-            Quota-driven thanks arrives unearned and lands as noise.
-          </Card>
-          <Card tone="rose" tag="Opaque" title="Rules nobody can see">
-            An unstated bar looks like favouritism to whoever misses it.
-          </Card>
-          <Card tone="rose" tag="Misjudged" title="Gestures that miss the room">
-            The same public praise flatters one team and embarrasses another.
-          </Card>
+        <div className="chorus">
+          <p className="voice v1">“Thanks with nothing behind it.”</p>
+          <p className="voice v2">“A bar nobody can see.”</p>
+          <p className="voice v3">“Praise that lands wrong in the room.”</p>
         </div>
-      </Spread>
-
-      {/* 6 — the turn */}
-      <Spread>
-        <Say>All of it came from one rung of the ladder.</Say>
         <Note>
-          Nobody who funds a programme, approves it or runs it weekly had said a word. So I asked
-          them, and none of it overlapped.
+          Hundreds of posts about recognition software, and they collapsed into those three
+          complaints.
         </Note>
-        <div className="cards c3">
-          <Card tone="amber" tag="Buyer" title="Nothing to justify the spend">
-            Cost could not be tied to anything it produced.
-          </Card>
-          <Card tone="amber" tag="Operator" title="A chore to run">
-            Slow enough that managers quietly stopped.
-          </Card>
-          <Card tone="amber" tag="Both" title="Tools that overreach">
-            Swallowing the HR stack bought confusion, then abandonment.
-          </Card>
-        </div>
-      </Spread>
+      </Beat>
 
-      {/* 7 — the definition */}
-      <Spread>
-        <Say>Three audiences. One interface. That was the whole problem.</Say>
-        <div className="cards c3">
-          <Card tone="violet" tag="Pays for it" title="Evidence">
-            Wants proof it works, and a bill that stays predictable.
-          </Card>
-          <Card tone="violet" tag="Runs it" title="Speed">
-            Wants it shaped to their team, and wants it now.
-          </Card>
-          <Card tone="violet" tag="Receives it" title="Specificity">
-            Wants the particular thing seen by the people who decide.
-          </Card>
-        </div>
-      </Spread>
+      {/* The reversal. Nothing else on the screen. */}
+      <Beat act="ten" air>
+        <Say>Every last one of them was an employee.</Say>
+        <Note>
+          Nobody who funds a programme, approves it, or runs it week to week had said a word.
+        </Note>
+      </Beat>
 
-      {/* 8 — the cuts */}
-      <Spread>
-        <Pills>
-          <Pill tone="plain">Ten weeks to a shippable MVP</Pill>
-        </Pills>
+      {/* So I asked them. A roster — four voices, one line each. */}
+      <Beat act="ten" side="r">
+        <Note>So I went and found the other three.</Note>
+        <dl className="roster">
+          <div>
+            <dt>
+              <Pill tone="lime">Employee</Pill>
+            </dt>
+            <dd>To be seen for the particular thing they did.</dd>
+          </div>
+          <div>
+            <dt>
+              <Pill tone="cyan">Team lead</Pill>
+            </dt>
+            <dd>To recognise someone today, not at the next review.</dd>
+          </div>
+          <div>
+            <dt>
+              <Pill tone="amber">Operator</Pill>
+            </dt>
+            <dd>A programme that is not a weekly chore to keep alive.</dd>
+          </div>
+          <div>
+            <dt>
+              <Pill tone="violet">Founder</Pill>
+            </dt>
+            <dd>Evidence the spend does something, and a bill that holds still.</dd>
+          </div>
+        </dl>
+        <Mid>No two of them wanted the same thing.</Mid>
+      </Beat>
+
+      {/* The thesis. The second reversal, and the hinge of the whole page. */}
+      <Beat act="ten" air>
+        <Say>Four people, one screen, nothing they agree on.</Say>
+        <Note>
+          The product was never the thank you. It was who may spend, who must approve, and who gets
+          to see any of it.
+        </Note>
+      </Beat>
+
+      {/* ═══ Resolution ══════════════════════════════════════════════
+          Ordered and cool. A number, a table, numbered steps, screens. */}
+
+      {/* The constraint, sized like the constraint it was. */}
+      <Beat act="res" side="r">
+        <div className="count">
+          <span className="count-n">10</span>
+          <span className="count-l">weeks to something shippable</span>
+        </div>
         <div className="cuts">
           <div className="cut cut-lime">
             <Pill tone="lime" solid>
@@ -274,17 +261,14 @@ export function IncentiwiseStory() {
           </div>
         </div>
         <Note>
-          The amber column was the hard one. Every item in it was defensible, and shipping all of
-          them is how you become the incumbent you are replacing.
+          The amber column was the hard one. Every item in it answered a real need — and shipping
+          all of them is precisely how the heavy platform got heavy.
         </Note>
-      </Spread>
+      </Beat>
 
-      {/* 9 — the decision */}
-      <Spread>
-        <Pills>
-          <Pill tone="violet">Decision</Pill>
-        </Pills>
-        <Say>Permission became the structure, not a settings page.</Say>
+      {/* Decision one, which is the thesis made structural. */}
+      <Beat act="res">
+        <Mid>Permission stopped being a settings page and became the layout.</Mid>
         <div className="tbl tbl-4">
           <div className="tr th">
             <span />
@@ -323,107 +307,149 @@ export function IncentiwiseStory() {
             <span>Their own</span>
           </div>
         </div>
-        <Note>Budget is the clearest case: a decision, a request, or nothing at all.</Note>
-      </Spread>
+        <Note>Budget makes it plainest: a decision, a request, or nothing at all.</Note>
+      </Beat>
 
-      {/* 10 — the other two decisions */}
-      <Spread>
-        <div className="cards c2">
-          <Card tone="violet" tag="Decision" title="Give the thank you a value">
-            Points that redeem against real vouchers. Badges kept for standing, not used as the
-            prize — symbolic praise was the complaint we started from.
-          </Card>
-          <Card tone="violet" tag="Decision" title="Borrow the interface layer">
-            An open-source system adopted whole, then warmed: a friendlier typeface, and the tables
-            and reward cards it had no answer for. Ten weeks does not buy a button.
-          </Card>
+      {/* Decisions two and three, as steps rather than cards. */}
+      <Beat act="res" side="r" flow>
+        <ol className="steps">
+          <li>
+            <span className="step-n">02</span>
+            <div>
+              <h3 className="step-t">Points, not applause.</h3>
+              <p className="step-b">
+                Redeemable against real vouchers. Badges kept for standing and never used as the
+                prize, because hollow praise was the complaint we started from.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span className="step-n">03</span>
+            <div>
+              <h3 className="step-t">Borrow the interface, then warm it.</h3>
+              <p className="step-b">
+                An open-source system taken whole, given a friendlier face and the two things it had
+                no answer for: dense tables, and a reward that has to look worth having. Ten weeks
+                does not buy a button.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </Beat>
+
+      {/* The late setback. Short, blunt, and the last tension in the page. */}
+      <Beat act="set">
+        <Mid>Then the client took it apart.</Mid>
+        <div className="fixes">
+          <div className="fix">
+            <p className="fix-a">Budget and policy shared one engine.</p>
+            <p className="fix-b">
+              Different judgements made by different people. Budget got its own surface.
+            </p>
+          </div>
+          <div className="fix">
+            <p className="fix-a">Analytics sat beside whatever they measured.</p>
+            <p className="fix-b">
+              Fine for one decision, useless for judging a programme. Collected into one view.
+            </p>
+          </div>
+          <div className="fix">
+            <p className="fix-a">It carried itself like an admin console.</p>
+            <p className="fix-b">
+              On a product whose job is morale, that is a functional defect. Navigation came up,
+              colour came back.
+            </p>
+          </div>
         </div>
-      </Spread>
+        <Note>Three rearrangements. Nothing new was added to build any of them.</Note>
+      </Beat>
 
-      {/* 11 — review */}
-      <Spread>
-        <Pills>
-          <Pill tone="amber">Shipped to the client, then picked apart</Pill>
-        </Pills>
-        <Mid>The hierarchy held. Three things did not.</Mid>
-        <div className="cards c3">
-          <Card tone="lime" tag="Split" title="Policy and budget shared an engine">
-            Related, but different judgements by different people. Budget got its own surface.
-          </Card>
-          <Card tone="lime" tag="Collected" title="Analytics sat beside what they measured">
-            Good for one decision, useless for judging the programme. Pulled into one view.
-          </Card>
-          <Card tone="lime" tag="Warmed" title="It read like an admin console">
-            On a product whose job is morale, tone is a functional defect. Navigation moved up, and
-            colour was allowed back.
-          </Card>
-        </div>
-      </Spread>
-
-      {/* 12 — the product */}
-      <Spread tall>
+      {/* The product. */}
+      <Beat act="ship" side="r" flow>
         <Pills>
           <Pill tone="lime" solid>
             Shipped
           </Pill>
         </Pills>
-        <Say>Built around the organisation, not only the employee.</Say>
         <div className="shots">
-          <Screen
-            src="/images/incentiwise/02-feed.png"
-            alt="Incentiwise activity feed with appreciation composer, points balance and leaderboard"
-            title="The feed"
-            note="An employee's whole product: send, see, and see what it was worth."
-          />
-          <Screen
-            src="/images/incentiwise/03-send-appreciation.png"
-            alt="Composing an appreciation with value tags and an attached reward"
-            title="Sending"
-            note="Tags carry the reason, a reward rides along. Specific, not routine."
-          />
-          <Screen
-            src="/images/incentiwise/05-rewards-catalog.png"
-            alt="Rewards catalogue of redeemable vouchers"
-            title="Rewards"
-            note="Points spend on things that exist off the platform."
-          />
-          <Screen
-            src="/images/incentiwise/15-culture.png"
-            alt="Budget allocated across departments with pending approval requests"
-            title="Budget"
-            note="What review produced. Allocation, requests, utilisation — apart from policy."
-          />
-          <Screen
-            src="/images/incentiwise/13-admins.png"
-            alt="Administration screen assigning rights per person and department"
-            title="Administration"
-            note="The hierarchy, made editable."
-          />
-          <Screen
-            src="/images/incentiwise/12-member-detail.png"
-            alt="A member profile showing points earned, badges held and history"
-            title="A person"
-            note="Where someone checks whether their work is visible."
-          />
+          <figure className="shot-plain">
+            <img
+              src="/images/incentiwise/02-feed.png"
+              alt="Incentiwise activity feed with appreciation composer, points balance and leaderboard"
+              loading="lazy"
+            />
+            <figcaption>
+              <h3 className="shot-t">The feed</h3>
+              <p className="note">Send, see, and see what it was worth. An employee's whole product.</p>
+            </figcaption>
+          </figure>
+          <figure className="shot-plain">
+            <img
+              src="/images/incentiwise/03-send-appreciation.png"
+              alt="Composing an appreciation with value tags and an attached reward"
+              loading="lazy"
+            />
+            <figcaption>
+              <h3 className="shot-t">Sending</h3>
+              <p className="note">Tags carry the reason and a reward rides along, so it cannot be routine.</p>
+            </figcaption>
+          </figure>
+          <figure className="shot-plain">
+            <img
+              src="/images/incentiwise/05-rewards-catalog.png"
+              alt="Rewards catalogue of redeemable vouchers"
+              loading="lazy"
+            />
+            <figcaption>
+              <h3 className="shot-t">Rewards</h3>
+              <p className="note">Points spend on things that exist off the platform.</p>
+            </figcaption>
+          </figure>
+          <figure className="shot-plain">
+            <img
+              src="/images/incentiwise/15-culture.png"
+              alt="Budget allocated across departments with pending approval requests"
+              loading="lazy"
+            />
+            <figcaption>
+              <h3 className="shot-t">Budget</h3>
+              <p className="note">What review produced: allocation, requests and utilisation, apart from policy.</p>
+            </figcaption>
+          </figure>
+          <figure className="shot-plain">
+            <img
+              src="/images/incentiwise/13-admins.png"
+              alt="Administration screen assigning rights per person and department"
+              loading="lazy"
+            />
+            <figcaption>
+              <h3 className="shot-t">Administration</h3>
+              <p className="note">The table from four beats ago, made editable.</p>
+            </figcaption>
+          </figure>
+          <figure className="shot-plain">
+            <img
+              src="/images/incentiwise/12-member-detail.png"
+              alt="A member profile showing points earned, badges held and history"
+              loading="lazy"
+            />
+            <figcaption>
+              <h3 className="shot-t">A person</h3>
+              <p className="note">Where someone goes to check whether their work is visible.</p>
+            </figcaption>
+          </figure>
         </div>
-      </Spread>
+      </Beat>
 
-      {/* 13 — reflection */}
-      <Spread>
-        <Mid>What I took from it.</Mid>
-        <div className="cards c3">
-          <Card tone="cyan" tag="Scope" title="The brief was smaller than the problem">
-            Asked for a thank you. The work was the permissions and budgets that decide if one
-            happens.
-          </Card>
-          <Card tone="cyan" tag="Research" title="I had only heard from one side">
-            The easiest evidence to find came entirely from people it happened to.
-          </Card>
-          <Card tone="cyan" tag="Craft" title="The wins were rearrangements">
-            Split, collect, divide. Nothing new was added in any of them.
-          </Card>
-        </div>
-      </Spread>
+      {/* The close: the opening line, turned over. */}
+      <Beat act="ship" air>
+        <Say>They asked for a thank you. What they needed was permission to give one.</Say>
+        <ul className="ends">
+          <li>The easiest research to find came entirely from one side of the problem.</li>
+          <li>Every fix at review was a rearrangement, which is the cheapest kind of win.</li>
+          <li>The brief was smaller than the problem, and I very nearly built the brief.</li>
+        </ul>
+      </Beat>
     </div>
   )
 }
