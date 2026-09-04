@@ -2902,18 +2902,17 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 /* ── The cast ──────────────────────────────────────────────────────
-   Four roles, set as type. The deck used photographs of actors here; those
-   are not mine to publish, and the roles turn out to read better as four
-   plain statements of what each person is on the platform to do. */
+   Two by two rather than four across. Four abreast turns each person into a
+   column of five wrapped words; a square keeps the portrait large enough to
+   be a face and the sentence long enough to be a sentence. */
 .cs .cast {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--s4);
   width: 100%;
 }
 
 .cs .who-card {
-  --tone: var(--foreground);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -2921,24 +2920,18 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   padding: var(--s4);
   border-radius: 2px;
   border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
-  border-top: 2px solid var(--tone);
   background: color-mix(in oklab, var(--foreground) 3%, transparent);
 }
 
-.cs .wc-admin { --tone: var(--admin); }
-.cs .wc-lead { --tone: var(--lead); }
-.cs .wc-emp { --tone: var(--emp); }
-
-/* The deck's portraits, cropped to a consistent 16:10 so four faces of
-   different framings still line up along one edge. */
+/* The deck's portraits, cropped to one ratio so four faces framed differently
+   still line up along a single edge. */
 .cs .face {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 10;
   object-fit: cover;
-  object-position: 50% 30%;
+  object-position: 50% 28%;
   border-radius: 2px;
-  margin-bottom: var(--s1, 4px);
 }
 
 .cs .who-card p {
@@ -2949,65 +2942,30 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   margin: 0;
 }
 
-/* ── The feature map ───────────────────────────────────────────────
-   Hairlines and type. The header row carries the pills, which is what lets
-   the table go without a caption explaining its columns. */
-.cs .map {
-  display: grid;
-  width: 100%;
-  border-top: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
-}
-
-.cs .mrow {
-  display: grid;
-  grid-template-columns: 16ch repeat(3, minmax(0, 1fr));
-  gap: var(--s4);
-  align-items: baseline;
-  padding-block: var(--s3);
-  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 9%, transparent);
-  font-family: var(--family-ui);
-  font-size: 14px;
-  line-height: 1.5;
-  color: color-mix(in oklab, var(--foreground) 74%, transparent);
-}
-
-.cs .mhead {
-  border-bottom-color: color-mix(in oklab, var(--foreground) 20%, transparent);
-  align-items: center;
-}
-
-.cs .mf {
-  color: var(--foreground);
-}
-
-.cs .nil {
-  font-style: normal;
-  color: color-mix(in oklab, var(--foreground) 30%, transparent);
-}
-
-/* ── The architecture ──────────────────────────────────────────────
-   Four branches, each a node and its leaves, with the access chips carried
-   all the way down. Drawn with borders rather than an image so it stays
-   readable at any column width and can be searched, selected and read out. */
+/* ── The access key ────────────────────────────────────────────────
+   The deck drew this beside the architecture's title, which is cropped off,
+   so the page sets it instead. Each chip carries its role as text for anyone
+   not reading in colour — the diagram's squares are the only place on the
+   page where colour has to stand on its own. */
 .cs .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--s4);
+  gap: var(--s2) var(--s4);
   font-family: var(--family-ui);
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.02em;
-  color: color-mix(in oklab, var(--foreground) 58%, transparent);
+  color: color-mix(in oklab, var(--foreground) 60%, transparent);
 }
 
 .cs .legend span {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 }
 
 .cs .chip {
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   border-radius: 2px;
   flex: none;
 }
@@ -3015,53 +2973,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .cs .chip-admin { background: var(--admin); }
 .cs .chip-lead { background: var(--lead); }
 .cs .chip-emp { background: var(--emp); }
-
-.cs .chips {
-  display: inline-flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.cs .tree {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s5) var(--s6);
-  width: 100%;
-}
-
-.cs .node {
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  padding-bottom: var(--s2);
-  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
-}
-
-.cs .node-n {
-  font-family: var(--family-ui);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--foreground);
-}
-
-.cs .leaves {
-  list-style: none;
-  margin: 0;
-  padding: 0 0 0 var(--s4);
-  display: grid;
-}
-
-.cs .leaves li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s3);
-  padding-block: 7px;
-  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent);
-  font-family: var(--family-ui);
-  font-size: 14px;
-  color: color-mix(in oklab, var(--foreground) 70%, transparent);
-}
 
 /* ── A step ────────────────────────────────────────────────────────
    Its head is the deck's: label and blurb on the left, who it is for on the
@@ -3154,11 +3065,16 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   color: #fff;
 }
 
-/* ── Screens ───────────────────────────────────────────────────────
-   Unframed. These were chosen to prove something, not to record a set, so
-   there is no plate, no corner mark and no frame number — just the image and
-   a caption saying what to look at. */
+/* ── Screens ──────────────────────────────────────────────────────
+   Every image here is a whole slide composition, carrying the deck's own
+   ground and its own margin. So there is no plate, no border and no corner
+   mark: the picture already has its frame, and adding another would give it
+   two. The figure paints that same ground behind the image, which does two
+   things — it hides the seam at the rounded corners, and inside an iteration
+   it makes the crop and the band the identical colour, so a rejected screen
+   reads as part of the band rather than as something dropped onto it. */
 .cs .shot {
+  --ground: #171717;
   margin: 0;
   display: grid;
   gap: var(--s3);
@@ -3170,6 +3086,45 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   width: 100%;
   height: auto;
   border-radius: 3px;
+  background: var(--ground);
+}
+
+/* The warm slides, and the one blue-grey slide the deck closes on. */
+.cs .iter .shot {
+  --ground: #332d2d;
+}
+
+.cs .beat-air .shot {
+  --ground: #222831;
+}
+
+/* Screens inside a step are a sequence, spaced by the same measure the page
+   uses between a beat and its neighbour. */
+.cs .shots {
+  display: grid;
+  gap: var(--s7);
+  width: 100%;
+}
+
+.cs .iter-shots {
+  display: grid;
+  gap: var(--s5);
+}
+
+/* A diagram is a picture of type, and type shrinks. Give it the full width of
+   the column — past the padding on both sides, like the cover — and it gets
+   back the roughly 8% that the page's own margin was costing it. */
+.cs .shot-wide {
+  margin-inline: calc(var(--s6) * -1);
+  width: calc(100% + var(--s6) * 2);
+}
+
+.cs .shot-wide img {
+  border-radius: 0;
+}
+
+.cs .shot-wide .cap {
+  padding-inline: var(--s6);
 }
 
 .cs .cap {
@@ -3177,7 +3132,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   font-size: 14px;
   line-height: 1.55;
   color: color-mix(in oklab, var(--foreground) 55%, transparent);
-  max-width: 62ch;
+  max-width: 66ch;
   margin: 0;
 }
 
@@ -3185,76 +3140,36 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   color: color-mix(in oklab, #fff 52%, transparent);
 }
 
-.cs .pair {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s5);
-  width: 100%;
-  align-items: start;
-}
-
-.cs .step .shot + .shot,
-.cs .step .pair + .shot,
-.cs .step .shot + .pair {
-  margin-top: var(--s5);
+/* The way out of a diagram that has been scaled past reading. */
+.cs .full {
+  color: var(--cyan);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
 }
 
 /* ── Narrower ──────────────────────────────────────────────────────
    Measured in column width, because the column is what actually changes.
 
-   At 900 the four-up cast and the two-up tree and screen pairs collapse, and
-   an iteration stops setting its reasoning beside the screen — at a third of
-   a column a paragraph has no measure left. At 620 the feature map stops
-   being a table: each row becomes its own block with the role written in
-   front of each value, since a table that stacks silently loses the only
-   thing it was drawing. */
+   At 900 the iteration stops setting its reasoning beside the screen: at a
+   third of a column a paragraph has no measure left. At 620 the cast gives
+   up its square — two portraits abreast at that width are postage stamps —
+   and each card turns on its side, face to the left, so the sentence keeps
+   the full column. */
 @container cs (max-width: 900px) {
-  .cs .cast,
-  .cs .tree,
-  .cs .pair {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  /* Stacked, a card is as wide as the column, and a 16:10 portrait at that
-     width becomes the loudest thing on the page for a person who is only
-     there to be introduced. Turn the card on its side and the face goes back
-     to being a thumbnail. */
-  .cs .who-card {
-    display: grid;
-    grid-template-columns: 92px minmax(0, 1fr);
-    grid-template-rows: auto auto;
-    column-gap: var(--s4);
-    row-gap: var(--s2);
-    align-items: center;
-  }
-
-  .cs .face {
-    grid-row: 1 / 3;
-    aspect-ratio: 1;
-    margin-bottom: 0;
-  }
-
-  .cs .who-card .pil {
-    justify-self: start;
-    align-self: end;
-  }
-
-  .cs .who-card p {
-    align-self: start;
-  }
-
   .cs .iter-body {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--s5);
   }
 
+}
+
+/* The step head keeps the deck's arrangement — what and who, on one line —
+   for as long as the blurb and the three pills both fit. They stop fitting
+   at about 700. */
+@container cs (max-width: 700px) {
   .cs .head {
     flex-direction: column;
-    gap: var(--s3);
-  }
-
-  .cs .mrow {
-    grid-template-columns: 12ch repeat(3, minmax(0, 1fr));
     gap: var(--s3);
   }
 }
@@ -3273,24 +3188,32 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     padding-block: var(--s7);
   }
 
-  .cs .mrow {
+  .cs .cast {
     grid-template-columns: minmax(0, 1fr);
-    gap: 2px;
-    padding-block: var(--s3);
   }
 
-  .cs .mhead {
-    display: none;
+  .cs .who-card {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: var(--s3);
+    row-gap: var(--s2);
+    align-items: start;
   }
 
-  .cs .mf {
-    font-weight: 700;
-    padding-bottom: 4px;
+  /* Square, and pinned to the top of the card rather than floating in the
+     middle of it, so four cards of different text lengths still line their
+     faces up along one edge. */
+  .cs .face {
+    grid-row: 1 / 3;
+    aspect-ratio: 1;
   }
 
-  /* With the header row gone, each value has to name its own column. */
-  .cs .mrow > span[data-r]::before {
-    content: attr(data-r) ' — ';
-    color: color-mix(in oklab, var(--foreground) 42%, transparent);
+  .cs .who-card .pil {
+    justify-self: start;
+  }
+
+  .cs .who-card p {
+    align-self: start;
   }
 }

@@ -1,26 +1,31 @@
 import { Settle } from '@/components/Settle'
 
 /**
- * Incentiwise, built on the spine of the deck rather than a copy of it.
+ * Incentiwise, built on the spine of the deck.
  *
- * The deck's own best idea is its two tracks. A cyan-labelled step is a thing
+ * Its best idea is that it runs on two tracks. A cyan-labelled step is a thing
  * that shipped; a red-labelled one on warm ground is a road not taken. Here
- * they alternate — every step is followed immediately by the version of it
- * that was rejected — so scrolling the page is scrolling through the argument,
- * and the reader passes physically in and out of the warm bands where the
- * product went wrong. It is the one device on the page doing three jobs at
- * once: sectioning, sequencing, and saying which of two things you are reading.
+ * they alternate — every step is followed at once by the version of it that was
+ * rejected — so scrolling the page is scrolling the argument, and the reader
+ * passes in and out of the warm bands where the product went wrong. One device
+ * sectioning the page, sequencing it, and saying which of two kinds of thing
+ * you are reading, which is why nothing else marks a beginning or an end.
  *
- * The role colours are the deck's, sampled from the slides: indigo Admin, red
- * lead, amber employee. They are load-bearing rather than decorative, because
- * who may do what is what this product actually is — the same three pills mark
- * the feature map, the architecture and the head of every step.
+ * The role colours are the deck's, sampled from the slides rather than guessed.
+ * They are load-bearing, because who may do what is what this product is: the
+ * same three pills head every step, and the deck's own access diagrams carry
+ * the same three again.
  *
- * What is not carried over is the deck's writing. Every sentence here is new,
- * and the two diagrams — the feature map and the architecture — are redrawn as
- * markup rather than pasted as pictures, so they reflow, stay searchable and
- * can be read aloud. The screens, the portraits and the cover are the deck's
- * own, cropped out of the slides.
+ * Every screen here is a whole composition lifted off its slide, not a screen
+ * cut out of one. The deck offsets, stacks and overlaps deliberately — the
+ * login panel with its two reset states down the right, the three appreciation
+ * cards running off both edges — and cropping each rectangle out separately
+ * would throw that away. So each crop is bounded by everything on the slide
+ * that is not the ground, plus an even margin of the ground itself. That is
+ * also why these images sit seamlessly inside the iteration bands: the band is
+ * painted the same colour the slide used.
+ *
+ * The writing is new throughout. Only the pictures are the deck's.
  */
 
 /** The three access colours, used everywhere the question is "who". */
@@ -31,6 +36,8 @@ const ROLE_LABEL: Record<Role, string> = {
   lead: 'Dept / Team lead',
   emp: 'Employee',
 }
+
+const ALL: Role[] = ['admin', 'lead', 'emp']
 
 function Pill({ role, children }: { role?: Role; children?: React.ReactNode }) {
   return <span className={`pil${role ? ` pil-${role}` : ''}`}>{children ?? ROLE_LABEL[role!]}</span>
@@ -47,7 +54,7 @@ function Who({ roles }: { roles: Role[] }) {
   )
 }
 
-/** The small square that marks access on the architecture tree. */
+/** The access key. It lived in the slide's title column, which is cropped off. */
 function Chip({ role }: { role: Role }) {
   return (
     <span className={`chip chip-${role}`}>
@@ -56,13 +63,19 @@ function Chip({ role }: { role: Role }) {
   )
 }
 
-function Beat({
-  children,
-  air,
-}: {
-  children: React.ReactNode
-  air?: boolean
-}) {
+function Legend() {
+  return (
+    <div className="legend">
+      {ALL.map((r) => (
+        <span key={r}>
+          <Chip role={r} /> {ROLE_LABEL[r]}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+function Beat({ children, air }: { children: React.ReactNode; air?: boolean }) {
   return (
     <Settle mass="light">
       <section className={`beat${air ? ' beat-air' : ''}`}>{children}</section>
@@ -96,7 +109,7 @@ function Step({
           </div>
           <Who roles={roles} />
         </header>
-        {children}
+        <div className="shots">{children}</div>
       </section>
     </Settle>
   )
@@ -104,8 +117,8 @@ function Step({
 
 /**
  * A version that did not ship. Full-bleed warm ground, red label, and the
- * reasoning set beside the screen rather than under it — the argument is the
- * point here, and the screen is only the evidence for it.
+ * reasoning beside the screen rather than under it — the argument is the point
+ * here, and the screen is only its evidence.
  */
 function Iteration({
   title,
@@ -141,64 +154,36 @@ function Iteration({
   )
 }
 
+const SRC = (name: string) => `/images/incentiwise/story/${name}.png`
+
 function Shot({ src, alt, cap }: { src: string; alt: string; cap?: string }) {
   return (
     <figure className="shot">
-      <img src={`/images/incentiwise/story/${src}.png`} alt={alt} loading="lazy" />
+      <img src={SRC(src)} alt={alt} loading="lazy" />
       {cap && <figcaption className="cap">{cap}</figcaption>}
     </figure>
   )
 }
 
-/** One row of the feature map: what it is, then what each role may do with it. */
-function Row({ f, a, l, e }: { f: string; a: string; l: string; e: string }) {
+/**
+ * A diagram taken whole from the deck, at the full width of the column. Even
+ * there it cannot show eleven features across three roles at the size it was
+ * drawn, so it carries a link to the file — the one honest answer to a picture
+ * of type that has been scaled past reading.
+ */
+function Diagram({ src, alt, cap }: { src: string; alt: string; cap: string }) {
   return (
-    <div className="mrow">
-      <span className="mf">{f}</span>
-      <span data-r="Admin">{a}</span>
-      <span data-r="Dept / Team lead">{l}</span>
-      <span data-r="Employee">{e === '—' ? <em className="nil">—</em> : e}</span>
-    </div>
+    <figure className="shot shot-wide">
+      <img src={SRC(src)} alt={alt} loading="lazy" />
+      <figcaption className="cap">
+        {cap}{' '}
+        <a href={SRC(src)} target="_blank" rel="noreferrer" className="full">
+          Open full size ↗
+        </a>
+      </figcaption>
+    </figure>
   )
 }
-
-/** A branch of the architecture: a section, its access, and what sits under it. */
-function Branch({
-  name,
-  roles,
-  leaves,
-}: {
-  name: string
-  roles: Role[]
-  leaves: { name: string; roles: Role[] }[]
-}) {
-  return (
-    <div className="branch">
-      <div className="node">
-        <span className="node-n">{name}</span>
-        <span className="chips">
-          {roles.map((r) => (
-            <Chip key={r} role={r} />
-          ))}
-        </span>
-      </div>
-      <ul className="leaves">
-        {leaves.map((l) => (
-          <li key={l.name}>
-            <span>{l.name}</span>
-            <span className="chips">
-              {l.roles.map((r) => (
-                <Chip key={r} role={r} />
-              ))}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
-const ALL: Role[] = ['admin', 'lead', 'emp']
 
 export function IncentiwiseStory() {
   return (
@@ -219,13 +204,10 @@ export function IncentiwiseStory() {
         </p>
       </Beat>
 
-      {/* The three surfaces the product actually is, before any of it is
-          explained. Bleeds the full width of the column: it is the only
-          picture here doing a purely atmospheric job. */}
       <Settle mass="medium">
         <figure className="cover">
           <img
-            src="/images/incentiwise/story/cover.png"
+            src={SRC('cover')}
             alt="The Incentiwise feed, organisation and badges screens, shown in perspective"
           />
         </figure>
@@ -236,153 +218,58 @@ export function IncentiwiseStory() {
         <p className="eyebrow">Four people</p>
         <p className="say say-mid">Only one of them is here to be thanked.</p>
         <div className="cast">
-          <div className="who-card wc-admin">
-            <img
-              className="face"
-              src="/images/incentiwise/story/p-admin.png"
-              alt="Portrait used for the Admin persona"
-              loading="lazy"
-            />
+          <div className="who-card">
+            <img src={SRC('p-admin')} alt="" className="face" loading="lazy" />
             <Pill role="admin" />
             <p>
               Owns the programme. Funds the pool, builds the badges, brings people in, and signs off
               what the leads ask for.
             </p>
           </div>
-          <div className="who-card wc-lead">
-            <img
-              className="face"
-              src="/images/incentiwise/story/p-dept.png"
-              alt="Portrait used for the Dept. head persona"
-              loading="lazy"
-            />
+          <div className="who-card">
+            <img src={SRC('p-dept')} alt="" className="face" loading="lazy" />
             <Pill role="lead">Dept. head</Pill>
             <p>
               Approves budget requests coming up from the leads, and answers for the culture of
               everything underneath.
             </p>
           </div>
-          <div className="who-card wc-lead">
-            <img
-              className="face"
-              src="/images/incentiwise/story/p-lead.png"
-              alt="Portrait used for the Team lead persona"
-              loading="lazy"
-            />
+          <div className="who-card">
+            <img src={SRC('p-lead')} alt="" className="face" loading="lazy" />
             <Pill role="lead">Team lead</Pill>
             <p>
               Recognises their own team against a quarterly budget, and asks for more when it runs
               dry.
             </p>
           </div>
-          <div className="who-card wc-emp">
-            <img
-              className="face"
-              src="/images/incentiwise/story/p-emp.png"
-              alt="Portrait used for the Employee persona"
-              loading="lazy"
-            />
+          <div className="who-card">
+            <img src={SRC('p-emp')} alt="" className="face" loading="lazy" />
             <Pill role="emp" />
             <p>Sends and receives appreciation. Collects badges, holds points, spends them.</p>
           </div>
         </div>
       </Beat>
 
-      {/* ── The feature map ────────────────────────────────────────── */}
+      {/* ── Access, and the shape it makes ─────────────────────────── */}
       <Beat>
         <p className="eyebrow">Platform access</p>
         <h2 className="hmono">Role-based feature mapping</h2>
-        <div className="map">
-          <div className="mrow mhead">
-            <span />
-            <span>
-              <Pill role="admin" />
-            </span>
-            <span>
-              <Pill role="lead" />
-            </span>
-            <span>
-              <Pill role="emp" />
-            </span>
-          </div>
-          <Row f="Appreciation" a="Send, view all" l="Send, receive, view team" e="Send, own" />
-          <Row f="Reactions & comments" a="React, comment" l="React, comment" e="React, comment" />
-          <Row f="Recognition flow" a="Send" l="Send" e="Send, receive" />
-          <Row f="Collectibles & badges" a="Create, assign" l="Award to members" e="Earn, view" />
-          <Row f="Custom rewards" a="Create, manage" l="Nominate, approve" e="Receive" />
-          <Row f="Rewards library" a="Manage, curate" l="Recommend, redeem" e="Browse, redeem" />
-          <Row f="Catalogue items" a="Add new" l="Create team-level" e="Redeem" />
-          <Row f="Appreciation analytics" a="Org-level" l="Team metrics" e="Personal insights" />
-          <Row f="Cost–benefit analytics" a="Budget utilisation" l="Dept / team spend" e="—" />
-          <Row f="Recognition analytics" a="Org-wide trends" l="Dept / team distribution" e="Personal stats" />
-          <Row f="Dashboards" a="All" l="Dept / team" e="Personal" />
-        </div>
-        <p className="note">
-          Read across a row and it is one feature. Read down a column and it is a different product.
-          Budget is the sharpest case: a decision, a request, or nothing at all.
-        </p>
+        <Diagram
+          src="map"
+          alt="Role-based feature mapping: eleven features across Admin, Dept and Team lead, and Employee columns"
+          cap="Read across a row and it is one feature. Read down a column and it is a different product. Cost–benefit analytics is the sharpest case — a number the buyer needs and the employee never sees."
+        />
       </Beat>
 
-      {/* ── The architecture ───────────────────────────────────────── */}
       <Beat>
         <p className="eyebrow">Structure</p>
         <h2 className="hmono">Information architecture</h2>
-        <div className="legend">
-          <span>
-            <Chip role="admin" /> Admin
-          </span>
-          <span>
-            <Chip role="lead" /> Dept / team lead
-          </span>
-          <span>
-            <Chip role="emp" /> Employee
-          </span>
-        </div>
-        <div className="tree">
-          <Branch
-            name="Feed"
-            roles={ALL}
-            leaves={[
-              { name: 'Send appreciations', roles: ['admin', 'lead'] },
-              { name: 'Redeem points', roles: ALL },
-              { name: 'Leaderboard', roles: ALL },
-            ]}
-          />
-          <Branch
-            name="Rewards"
-            roles={ALL}
-            leaves={[
-              { name: 'Overview', roles: ALL },
-              { name: 'Catalogue', roles: ['admin', 'lead'] },
-              { name: 'Badges', roles: ['admin', 'lead'] },
-              { name: 'Transactions', roles: ['admin', 'lead'] },
-            ]}
-          />
-          <Branch
-            name="Organisation"
-            roles={['admin', 'lead']}
-            leaves={[
-              { name: 'View org.', roles: ['lead', 'emp'] },
-              { name: 'People', roles: ['admin'] },
-              { name: 'Teams', roles: ['admin'] },
-              { name: 'Departments', roles: ['admin'] },
-              { name: 'Admins', roles: ['admin'] },
-              { name: 'Import', roles: ['admin'] },
-            ]}
-          />
-          <Branch
-            name="Culture"
-            roles={['admin', 'lead']}
-            leaves={[
-              { name: 'Overview', roles: ['admin', 'lead'] },
-              { name: 'Budget', roles: ['admin', 'lead'] },
-              { name: 'Transactions', roles: ['admin'] },
-            ]}
-          />
-        </div>
-        <p className="note">
-          Nothing is hidden behind a settings page. What you can reach is what you are.
-        </p>
+        <Legend />
+        <Diagram
+          src="ia"
+          alt="Information architecture: Login branching to Feed, Rewards, Organisation and Culture, every node marked with the roles that can reach it"
+          cap="Access is drawn onto the architecture rather than kept in a settings page. What you can reach is what you are."
+        />
       </Beat>
 
       {/* ── The walkthrough ────────────────────────────────────────── */}
@@ -401,9 +288,9 @@ export function IncentiwiseStory() {
         blurb="A registered ID, or the workspace the company already lives in."
       >
         <Shot
-          src="login"
-          alt="Incentiwise sign-in with email and password, plus Google Workspace and Microsoft Teams options"
-          cap="Password reset runs in the same panel rather than a separate page — it is the one flow people hit on day one."
+          src="s1-login"
+          alt="Incentiwise sign-in with email, password, Google Workspace and Teams, beside the two states of password reset"
+          cap="Reset sits beside sign-in rather than on a page of its own — it is the one flow everybody hits on day one."
         />
       </Step>
 
@@ -431,22 +318,15 @@ export function IncentiwiseStory() {
         roles={['admin']}
         blurb="The whole organisation in one pass: upload a sheet, map the columns, confirm what will be created."
       >
-        <div className="pair">
-          <Shot
-            src="import-start"
-            alt="An empty Organisation screen alongside the bulk import panel with column mapping"
-            cap="An empty state that says what to do next, and a mapper that does not assume your spreadsheet matches ours."
-          />
-          <Shot
-            src="import-confirm"
-            alt="Confirm import listing sixteen people with new, existing and error rows"
-            cap="Every row is shown before anything is written, including the ones that will fail and why."
-          />
-        </div>
         <Shot
-          src="org-teams"
-          alt="Organisation teams view showing rewards given, budget used and redemption ratio per team"
-          cap="What the import produces: teams that already carry their own numbers."
+          src="s2-import"
+          alt="An empty Organisation screen beside the bulk import panel, before and after a file is chosen and its columns mapped"
+          cap="An empty state that says what to do next, and a mapper that does not assume your spreadsheet matches ours."
+        />
+        <Shot
+          src="s2-confirm"
+          alt="Confirm import listing new, existing and failed rows, beside the populated Organisation teams view"
+          cap="Every row is shown before anything is written, including the ones that will fail and why. What comes out the other side is teams that already carry their own numbers."
         />
       </Step>
 
@@ -477,13 +357,13 @@ export function IncentiwiseStory() {
         blurb="Badges are the vocabulary. Artwork, what it is worth, and exactly who can earn it."
       >
         <Shot
-          src="badges"
-          alt="Badges dashboard with totals, most common and most rare, and the badge catalogue"
-          cap="Rarity is shown next to points, because the two together are what makes a badge mean anything."
+          src="s3-badges"
+          alt="The badges dashboard with totals, rarity counts and the badge catalogue"
+          cap="Rarity sits next to points, because the two together are the whole of what a badge means."
         />
         <Shot
-          src="badge-create"
-          alt="Create badge panel with image picker, points, category, attached values and a per-team access list"
+          src="s3-badges-create"
+          alt="The empty badges screen beside the create-badge panel with artwork, points, category and a per-team access list"
           cap="Access is set at creation, down to the team. A badge everyone can earn is not a badge."
         />
       </Step>
@@ -515,22 +395,25 @@ export function IncentiwiseStory() {
         blurb="Pick someone, say why, and attach what it is worth — points, a reward, or a badge."
       >
         <Shot
-          src="feed"
-          alt="The activity feed with a composer, points owned, and a badge leaderboard"
+          src="s4-feed"
+          alt="The activity feed with a composer at the top, points owned, and a badge leaderboard"
           cap="The feed is the whole product for most people: send from the top, see what came back below."
         />
-        <div className="pair">
-          <Shot
-            src="send-badge"
-            alt="Send appreciation dialog with tags, a written message and a badge attached"
-            cap="Tags carry the reason. Points, reward and badge are one control, not three flows."
-          />
-          <Shot
-            src="card-new"
-            alt="The final appreciation card addressed to two people with an editable prompt and the sender's available points"
-            cap="Where it ended up. Several recipients, a prompt that asks to be typed in, and the balance in view."
-          />
-        </div>
+        <Shot
+          src="s4-tags"
+          alt="The send dialog with the value-tag list open over the card"
+          cap="Tags carry the reason, and are picked on the card itself, so you never lose sight of what you are sending."
+        />
+        <Shot
+          src="s4-variants"
+          alt="Three appreciation cards side by side, attaching points, a reward and a badge"
+          cap="Points, reward and badge are one control with three states rather than three flows. Kept in the deck's own arrangement, because seeing the three side by side is what shows the card never changes shape."
+        />
+        <Shot
+          src="s4-card-new"
+          alt="The final appreciation card addressed to two people, with an editable prompt and the sender's available points"
+          cap="Where it ended up: several recipients, a prompt that asks to be typed in, and the balance in view."
+        />
       </Step>
 
       <Iteration
@@ -544,7 +427,11 @@ export function IncentiwiseStory() {
             />
             <Shot
               src="it-card-old-b"
-              alt="Two earlier appreciation cards showing no visible points balance and a message that looks fixed"
+              alt="Two earlier appreciation cards overlapping, showing no visible points balance and a message that looks fixed"
+            />
+            <Shot
+              src="it-card-new"
+              alt="The replacement card, with a searchable multi-select of recipients"
             />
           </>
         }
@@ -552,7 +439,8 @@ export function IncentiwiseStory() {
         <p>Four faults, all of them found by using it rather than by looking at it.</p>
         <ol className="faults">
           <li>
-            <b>One recipient at a time.</b> Most thanks in a team is owed to more than one person.
+            <b>One recipient at a time.</b> Most thanks owed in a team is owed to more than one
+            person.
           </li>
           <li>
             <b>No search.</b> You scrolled a list of everyone until you found the name.
@@ -561,7 +449,7 @@ export function IncentiwiseStory() {
             <b>No balance.</b> You could not see how many points you had left to give.
           </li>
           <li>
-            <b>A message that looked fixed.</b> It was editable, and nothing about it said so, so
+            <b>A message that looked fixed.</b> It was editable, nothing about it said so, and so
             everybody sent the default.
           </li>
         </ol>
