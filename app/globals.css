@@ -2708,170 +2708,151 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   opacity: 0.3;
   cursor: default;
 }
-/* ─── Case study: a story, in three acts ──────────────────────────────────
-   Context, tension, resolution — and the page is built so you can tell which
-   one you are in before you read a word of it.
+/* ─── Case study: two tracks ──────────────────────────────────────────────
+   Built on the spine of the source deck, in this site's material.
 
-   Three devices do that, and none of them is a label:
+   The deck's own best idea is that it runs on two tracks: a cyan label means
+   a thing that shipped, a red label on warm ground means a road not taken.
+   Here they alternate — every step is followed at once by the version of it
+   that was rejected — so the reader passes physically in and out of warm
+   bands where the product went wrong. One device doing three jobs: it
+   sections the page, it sequences it, and it says which of two kinds of thing
+   you are reading. Nothing else needs to mark a beginning or an end.
 
-   Light. Every beat sits in a wide, very faint wash of colour, and the wash
-   moves through the arc: neutral while the ground is being laid, rose once
-   the complaints start, then cooling through violet to lime as the thing gets
-   built. It alternates left and right so the page breathes rather than
-   pulsing. At 4% alpha none of it is legible as colour — you notice it the
-   way you notice a room getting warmer.
+   The role colours are the deck's, sampled from the slides. They are
+   load-bearing rather than decorative: who may do what IS this product, so
+   the same three pills head every step, mark every row of the feature map,
+   and sit on every node of the architecture. Colour is never the only signal
+   — every pill carries its word, and every chip carries a screen-reader
+   label — so the page still works in greyscale and out loud.
 
-   Scale. The three reversals get a screen each and a claim at up to 88px,
-   with nothing else on it. Everything between them is small. A page that is
-   loud everywhere is quiet everywhere.
-
-   Layout. Every beat is drawn differently: a ruled audit, three overheard
-   voices at three sizes, a roster with a rule between each speaker, a numeral
-   the size of a fist, numbered steps hanging in the margin, a before-and-after
-   ladder, an asymmetric gallery. Thirteen beats cut from one template read as
-   a form no matter how well the type is set, and the eye gives up on forms.
-
-   Nothing here marks where a section starts or ends. The wash, the height and
-   the change of layout already say it three times over. */
+   Type stays inside 14–16px for anything that is read as prose, with the
+   monospace reserved for headings and labels, matching the deck's habit of
+   setting its section titles in a typewriter face. */
 
 .cs {
-  --lime: #21e07a;
-  --amber: #ffb020;
-  --rose: #ff5f6d;
-  --cyan: #4cd4ff;
-  --violet: #b18cff;
-  --plain: color-mix(in oklab, var(--foreground) 55%, transparent);
+  /* The deck's palette, sampled from the slides rather than guessed. */
+  --admin: #6252ff;
+  --lead: #d40000;
+  --emp: #cd7e00;
+  --cyan: #00e5ff;
+  --no: #ff2a1f;
+  /* The warm ground the deck puts under everything it rejected. */
+  --iter-bg: #332d2d;
 
   /* The sidebar and the chat panel both take width out of this column, so it
-     runs narrow long before the window does. Every breakpoint below queries
-     the container, and every display size is in cqw — the type responds to
-     the column it is actually in, not to a viewport it cannot see. */
+     runs narrow long before the window does. Everything below queries the
+     container, and the display type is sized in cqw for the same reason. */
   container: cs / inline-size;
-
-  /* The washes are wider than the column on purpose. */
-  overflow: clip;
-
   margin-top: var(--s8);
 }
 
-/* ── A beat ────────────────────────────────────────────────────────
-   The height is a floor, not a fixed 100svh: a beat that outgrows the
-   viewport simply gets taller, and centring still holds the short ones at
-   eye level. */
+/* ── Beats ─────────────────────────────────────────────────────────
+   A floor rather than a fixed height: a beat that outgrows the viewport just
+   gets taller, while centring holds the short ones at eye level. */
 .cs .beat {
-  position: relative;
-  isolation: isolate;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: flex-start;
   gap: var(--s5);
-  min-height: min(72svh, 560px);
   padding-block: var(--s8);
 }
 
-/* The three reversals. A screen each, and nothing to look at but the claim. */
 .cs .beat-air {
-  min-height: min(88svh, 720px);
+  min-height: min(74svh, 620px);
+  justify-content: center;
   gap: var(--s6);
 }
 
-/* Sequences — steps, screens — should sit where they start, not float. */
-.cs .beat-flow {
-  justify-content: flex-start;
-  min-height: 0;
-}
-
-/* The wash. Enormous, soft, and far too faint to read as a colour; it is
-   there to make the temperature of the page change under you. */
-.cs .beat::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: -6% -45%;
-  background: radial-gradient(
-    58% 46% at var(--gx, 30%) 50%,
-    color-mix(in oklab, var(--act) 7%, transparent),
-    transparent 72%
-  );
-  pointer-events: none;
-}
-
-.cs .beat-ctx { --act: var(--cyan); }
-.cs .beat-ten { --act: var(--rose); }
-.cs .beat-res { --act: var(--violet); }
-.cs .beat-set { --act: var(--amber); }
-.cs .beat-ship { --act: var(--lime); }
-
-/* Alternate the light so the arc breathes instead of throbbing. Set by a
-   prop rather than :nth-of-type, because Settle gives every section its own
-   wrapper and an only child is always the first of its type. */
-.cs .beat-r::before { --gx: 74%; }
-
-/* ── The claim ─────────────────────────────────────────────────────
-   The serif, which this site keeps for things said rather than things
-   listed. Tight leading, so a three-line claim reads as one object. */
+/* ── Voices ────────────────────────────────────────────────────────
+   Three of them, and they never overlap in size: a claim, a heading, prose. */
 .cs .say {
   font-family: var(--family-display);
-  font-size: clamp(1.625rem, 7cqw, 3.25rem);
+  font-size: clamp(1.75rem, 8cqw, 3.5rem);
   font-weight: 400;
-  line-height: 1.06;
-  letter-spacing: -0.018em;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
   color: var(--foreground);
-  max-width: 17ch;
+  max-width: 18ch;
   text-wrap: balance;
   margin: 0;
 }
 
-/* On a reversal it is allowed to be enormous, because it is the only thing
-   there. */
-.cs .beat-air .say {
-  font-size: clamp(2rem, 10.5cqw, 5.5rem);
-  letter-spacing: -0.028em;
-  max-width: 15ch;
+.cs .say em {
+  font-style: italic;
 }
 
-/* A claim that has to share its beat with evidence. */
+/* The deck's trick of greying everything except the phrase that matters. */
+.cs .say .dim {
+  color: color-mix(in oklab, var(--foreground) 42%, transparent);
+}
+
 .cs .say-mid {
-  font-size: clamp(1.25rem, 3.4cqw, 1.875rem);
+  font-size: clamp(1.25rem, 3.6cqw, 2rem);
   line-height: 1.15;
-  letter-spacing: -0.01em;
   max-width: 26ch;
 }
 
-/* ── Small type ────────────────────────────────────────────────────
-   The note is for the reader who stopped. The lead is for a beat that opens
-   in prose rather than in a claim. */
+/* Section titles, in the typewriter face the deck uses for the same job. */
+.cs .hmono {
+  font-family: var(--family-ui);
+  font-size: clamp(1.0625rem, 2.8cqw, 1.5rem);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--foreground);
+  margin: 0;
+}
+
 .cs .note {
   font-family: var(--family-ui);
   font-size: 15px;
   line-height: 1.65;
   color: color-mix(in oklab, var(--foreground) 62%, transparent);
-  max-width: 54ch;
+  max-width: 56ch;
   margin: 0;
 }
 
-.cs .beat-air .note {
-  font-size: 16px;
-  color: color-mix(in oklab, var(--foreground) 72%, transparent);
-  padding-left: var(--s4);
-  border-left: 2px solid color-mix(in oklab, var(--act) 45%, transparent);
-}
-
-.cs .lead {
+.cs .blurb {
   font-family: var(--family-ui);
-  font-size: 16px;
-  line-height: 1.7;
-  color: color-mix(in oklab, var(--foreground) 82%, transparent);
+  font-size: 15px;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--foreground) 74%, transparent);
   max-width: 52ch;
+  margin: var(--s2) 0 0;
+}
+
+/* ── The eyebrow ───────────────────────────────────────────────────
+   Wide-tracked monospace, cyan on the shipped track and red on the other.
+   It is the only thing on the page that ever announces a section, and it
+   earns that by also telling you which of the two tracks you are on. */
+.cs .eyebrow {
+  font-family: var(--family-ui);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cyan);
   margin: 0;
+}
+
+.cs .eyebrow-no {
+  color: var(--no);
+}
+
+.cs .eyebrow .sep {
+  opacity: 0.55;
+  margin-inline: 0.15em;
 }
 
 /* ── Pills ─────────────────────────────────────────────────────────
-   A tinted ground at low alpha keeps the hue legible on near-black without
-   any of them glowing. The solid fill is rationed to the three places where
-   the word is a verdict rather than a category. */
-.cs .pils {
+   Solid, like the deck's. On near-black a filled pill is the only treatment
+   that reads at 12px, and these have to be legible at a glance because they
+   are the answer to "can I do this?" on every screen in the case study. */
+.cs .pils,
+.cs .who {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s2);
@@ -2879,440 +2860,437 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 .cs .pil {
-  --tone: var(--plain);
   display: inline-flex;
   align-items: center;
   font-family: var(--family-ui);
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 6px 11px 5px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in oklab, var(--tone) 34%, transparent);
-  background: color-mix(in oklab, var(--tone) 12%, transparent);
-  color: color-mix(in oklab, var(--tone) 88%, white);
-  white-space: nowrap;
-}
-
-.cs .pil-lime { --tone: var(--lime); }
-.cs .pil-amber { --tone: var(--amber); }
-.cs .pil-rose { --tone: var(--rose); }
-.cs .pil-cyan { --tone: var(--cyan); }
-.cs .pil-violet { --tone: var(--violet); }
-
-.cs .pil-solid {
-  background: var(--tone);
-  border-color: var(--tone);
-  color: #0b0c0b;
-}
-
-/* ── The audit ─────────────────────────────────────────────────────
-   Hairlines and type. The header carries pills instead of labels, which is
-   what lets the table go without a caption. */
-.cs .tbl {
-  display: grid;
-  width: 100%;
-  max-width: 76ch;
-  border-top: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
-}
-
-.cs .tr {
-  display: grid;
-  grid-template-columns: 11ch minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--s4);
-  align-items: start;
-  padding-block: var(--s3);
-  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
-  font-family: var(--family-ui);
-  font-size: 14px;
-  line-height: 1.55;
-  color: color-mix(in oklab, var(--foreground) 80%, transparent);
-}
-
-.cs .tbl-4 .tr {
-  grid-template-columns: 12ch repeat(3, minmax(0, 1fr));
-}
-
-.cs .tr.th {
-  border-bottom-color: color-mix(in oklab, var(--foreground) 20%, transparent);
-}
-
-.cs .tr .t-label {
-  color: color-mix(in oklab, var(--foreground) 50%, transparent);
-  padding-top: 2px;
-}
-
-/* An absence, drawn as one. */
-.cs .nil {
-  color: color-mix(in oklab, var(--foreground) 30%, transparent);
-}
-
-/* ── The chorus ────────────────────────────────────────────────────
-   Three complaints, overheard rather than collected. Three sizes, three
-   indents and a quote mark hanging outside the measure, so they read as
-   voices arriving from somewhere else instead of as a tidy list of findings.
-   The staircase is what makes the next beat — one flat sentence, alone on a
-   screen — land as a correction. */
-.cs .chorus {
-  display: grid;
-  gap: var(--s4);
-  width: 100%;
-  max-width: 34ch;
-}
-
-.cs .voice {
-  font-family: var(--family-display);
-  font-style: italic;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  color: color-mix(in oklab, var(--foreground) 92%, transparent);
-  text-indent: -0.42em;
-  margin: 0;
-}
-
-.cs .v1 { font-size: clamp(1.375rem, 4.6cqw, 2.25rem); }
-.cs .v2 {
-  font-size: clamp(1.125rem, 3.6cqw, 1.75rem);
-  margin-left: 9%;
-  color: color-mix(in oklab, var(--foreground) 76%, transparent);
-}
-.cs .v3 {
-  font-size: clamp(1.25rem, 4.1cqw, 2rem);
-  margin-left: 4%;
-  color: color-mix(in oklab, var(--foreground) 86%, transparent);
-}
-
-/* ── The roster ────────────────────────────────────────────────────
-   Four people, one line each, ruled apart. The pill sits in its own column
-   so the four needs line up and can be read down in one pass — the whole
-   point of the beat is that they do not match. */
-.cs .roster {
-  display: grid;
-  width: 100%;
-  max-width: 62ch;
-  margin: 0;
-  border-top: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
-}
-
-.cs .roster > div {
-  display: grid;
-  grid-template-columns: 15ch minmax(0, 1fr);
-  gap: var(--s4);
-  align-items: baseline;
-  padding-block: var(--s4);
-  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
-}
-
-.cs .roster dt {
-  margin: 0;
-}
-
-.cs .roster dd {
-  margin: 0;
-  font-family: var(--family-display);
-  font-size: clamp(1.0625rem, 2.6cqw, 1.375rem);
-  line-height: 1.3;
-  color: var(--foreground);
-}
-
-/* ── The constraint ────────────────────────────────────────────────
-   Ten weeks was the single fact that decided what got built, so it is set
-   at the size of a fact that decides things. The label sits on its baseline
-   rather than under it, which keeps a very large numeral from becoming a
-   decoration. */
-.cs .count {
-  display: flex;
-  align-items: baseline;
-  gap: var(--s4);
-  flex-wrap: wrap;
-}
-
-.cs .count-n {
-  font-family: var(--family-display);
-  font-size: clamp(4rem, 16cqw, 9rem);
-  line-height: 0.78;
-  letter-spacing: -0.04em;
-  color: var(--foreground);
-  font-variant-numeric: lining-nums;
-}
-
-.cs .count-l {
-  font-family: var(--family-ui);
-  font-size: 14px;
   letter-spacing: 0.02em;
-  color: color-mix(in oklab, var(--foreground) 62%, transparent);
-  max-width: 18ch;
+  padding: 7px 13px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+  /* The neutral pill, for things that are not a role. */
+  border: 1px solid color-mix(in oklab, var(--foreground) 26%, transparent);
+  color: color-mix(in oklab, var(--foreground) 78%, transparent);
 }
 
-/* ── What was cut ──────────────────────────────────────────────────
-   Three columns whose headers carry the only colour, because the comparison
-   between them is the whole content of the beat. */
-.cs .cuts {
-  display: grid;
+.cs .pil-admin,
+.cs .pil-lead,
+.cs .pil-emp {
+  border-color: transparent;
+  color: #fff;
+}
+
+.cs .pil-admin { background: var(--admin); }
+.cs .pil-lead { background: var(--lead); }
+.cs .pil-emp { background: var(--emp); }
+
+/* ── The cover ─────────────────────────────────────────────────────
+   The one picture on the page doing a purely atmospheric job, so it gets the
+   only full-bleed treatment: pulled out to the page's padding on both sides,
+   where every other image sits inside the measure. */
+.cs .cover {
+  margin: 0 calc(var(--s6) * -1);
+  width: calc(100% + var(--s6) * 2);
+}
+
+.cs .cover img {
+  display: block;
   width: 100%;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--s4);
+  height: auto;
 }
 
-.cs .cut {
-  --tone: var(--plain);
+/* ── The cast ──────────────────────────────────────────────────────
+   Four roles, set as type. The deck used photographs of actors here; those
+   are not mine to publish, and the roles turn out to read better as four
+   plain statements of what each person is on the platform to do. */
+.cs .cast {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s4);
+  width: 100%;
+}
+
+.cs .who-card {
+  --tone: var(--foreground);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--s3);
   padding: var(--s4);
   border-radius: 2px;
-  background: color-mix(in oklab, var(--tone) 6%, transparent);
-  border: 1px solid color-mix(in oklab, var(--tone) 18%, transparent);
+  border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
+  border-top: 2px solid var(--tone);
+  background: color-mix(in oklab, var(--foreground) 3%, transparent);
 }
 
-.cs .cut-lime { --tone: var(--lime); }
-.cs .cut-amber { --tone: var(--amber); }
-.cs .cut-rose { --tone: var(--rose); }
+.cs .wc-admin { --tone: var(--admin); }
+.cs .wc-lead { --tone: var(--lead); }
+.cs .wc-emp { --tone: var(--emp); }
 
-.cs .cut ul {
-  list-style: none;
+/* The deck's portraits, cropped to a consistent 16:10 so four faces of
+   different framings still line up along one edge. */
+.cs .face {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: 50% 30%;
+  border-radius: 2px;
+  margin-bottom: var(--s1, 4px);
+}
+
+.cs .who-card p {
+  font-family: var(--family-ui);
+  font-size: 14px;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--foreground) 66%, transparent);
   margin: 0;
-  padding: 0;
+}
+
+/* ── The feature map ───────────────────────────────────────────────
+   Hairlines and type. The header row carries the pills, which is what lets
+   the table go without a caption explaining its columns. */
+.cs .map {
   display: grid;
-  gap: var(--s2);
+  width: 100%;
+  border-top: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
+}
+
+.cs .mrow {
+  display: grid;
+  grid-template-columns: 16ch repeat(3, minmax(0, 1fr));
+  gap: var(--s4);
+  align-items: baseline;
+  padding-block: var(--s3);
+  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 9%, transparent);
   font-family: var(--family-ui);
   font-size: 14px;
   line-height: 1.5;
-  color: color-mix(in oklab, var(--foreground) 76%, transparent);
+  color: color-mix(in oklab, var(--foreground) 74%, transparent);
 }
 
-/* ── The steps ─────────────────────────────────────────────────────
-   Decisions two and three, numbered because the first one was a table and
-   the reader needs to know these belong to it. The numerals hang outside
-   the text column, so the copy keeps one clean left edge down the page. */
-.cs .steps {
+.cs .mhead {
+  border-bottom-color: color-mix(in oklab, var(--foreground) 20%, transparent);
+  align-items: center;
+}
+
+.cs .mf {
+  color: var(--foreground);
+}
+
+.cs .nil {
+  font-style: normal;
+  color: color-mix(in oklab, var(--foreground) 30%, transparent);
+}
+
+/* ── The architecture ──────────────────────────────────────────────
+   Four branches, each a node and its leaves, with the access chips carried
+   all the way down. Drawn with borders rather than an image so it stays
+   readable at any column width and can be searched, selected and read out. */
+.cs .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s4);
+  font-family: var(--family-ui);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--foreground) 58%, transparent);
+}
+
+.cs .legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cs .chip {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.cs .chip-admin { background: var(--admin); }
+.cs .chip-lead { background: var(--lead); }
+.cs .chip-emp { background: var(--emp); }
+
+.cs .chips {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.cs .tree {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s5) var(--s6);
+  width: 100%;
+}
+
+.cs .node {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding-bottom: var(--s2);
+  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+}
+
+.cs .node-n {
+  font-family: var(--family-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.cs .leaves {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 var(--s4);
+  display: grid;
+}
+
+.cs .leaves li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding-block: 7px;
+  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent);
+  font-family: var(--family-ui);
+  font-size: 14px;
+  color: color-mix(in oklab, var(--foreground) 70%, transparent);
+}
+
+/* ── A step ────────────────────────────────────────────────────────
+   Its head is the deck's: label and blurb on the left, who it is for on the
+   right, because "who" is the question this product keeps answering. */
+.cs .head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s5);
+  width: 100%;
+}
+
+/* ── An iteration ──────────────────────────────────────────────────
+   Full-bleed warm ground, pulled out to the page's own padding and re-padded
+   inside, so the band runs edge to edge of the column and the change of
+   temperature is unmistakable. */
+.cs .iter {
+  background: var(--iter-bg);
+  margin-inline: calc(var(--s6) * -1);
+  padding: var(--s8) var(--s6);
+  gap: 0;
+}
+
+.cs .iter-in {
   display: grid;
   gap: var(--s6);
   width: 100%;
-  max-width: 60ch;
 }
 
-.cs .steps li {
+.cs .iter-body {
   display: grid;
-  grid-template-columns: 4ch minmax(0, 1fr);
-  gap: var(--s4);
-  padding-top: var(--s4);
-  border-top: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
+  grid-template-columns: minmax(0, 26ch) minmax(0, 1fr);
+  gap: var(--s6);
+  align-items: start;
 }
 
-.cs .step-n {
-  font-family: var(--family-ui);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  line-height: 1.5;
-  color: var(--violet);
-  font-variant-numeric: tabular-nums;
-}
-
-.cs .step-t {
-  font-family: var(--family-display);
-  font-size: clamp(1.125rem, 3cqw, 1.625rem);
-  font-weight: 400;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  text-transform: none;
-  color: var(--foreground);
-  margin: 0 0 var(--s2);
-}
-
-.cs .step-b {
-  font-family: var(--family-ui);
-  font-size: 15px;
-  line-height: 1.65;
-  color: color-mix(in oklab, var(--foreground) 64%, transparent);
-  margin: 0;
-}
-
-/* ── The setback ───────────────────────────────────────────────────
-   What broke, then what fixed it, on two rungs of the same ladder. Reading
-   the first line of each row gives you the three faults; reading the second
-   gives you the three repairs. Both passes work on their own. */
-.cs .fixes {
-  display: grid;
-  gap: var(--s5);
-  width: 100%;
-  max-width: 64ch;
-}
-
-.cs .fix {
-  display: grid;
-  gap: var(--s2);
-  padding-left: var(--s4);
-  border-left: 2px solid color-mix(in oklab, var(--rose) 40%, transparent);
-}
-
-.cs .fix-a {
-  font-family: var(--family-ui);
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.45;
-  color: var(--foreground);
-  margin: 0;
-}
-
-.cs .fix-b {
-  font-family: var(--family-ui);
-  font-size: 15px;
-  line-height: 1.6;
-  color: color-mix(in oklab, var(--foreground) 62%, transparent);
-  margin: 0;
-}
-
-/* ── The screens ───────────────────────────────────────────────────
-   Unframed — no plate, no corner marks, no frame number — because these six
-   were chosen to prove a point, not to record a set. The rhythm is
-   deliberately uneven: the feed and the budget screen get the full column
-   because they are the two the story has been arguing towards, and the rest
-   pair off. */
-.cs .shots {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s6) var(--s5);
-  width: 100%;
-  margin-top: var(--s2);
-}
-
-.cs .shot-plain {
-  margin: 0;
+.cs .iter-why {
   display: grid;
   gap: var(--s3);
   align-content: start;
 }
 
-.cs .shot-plain:nth-child(1),
-.cs .shot-plain:nth-child(4) {
-  grid-column: 1 / -1;
-}
-
-.cs .shot-plain img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 2px;
-}
-
-.cs .shot-t {
+.cs .iter-why p {
   font-family: var(--family-ui);
   font-size: 15px;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--foreground);
+  line-height: 1.65;
+  color: color-mix(in oklab, #fff 66%, transparent);
   margin: 0;
 }
 
-/* ── The close ─────────────────────────────────────────────────────
-   Three admissions under the last claim. Hanging rules rather than bullets,
-   so they read as an aside and not as a fourth list of findings. */
-.cs .ends {
-  list-style: none;
-  margin: 0;
+.cs .iter-shots {
+  display: grid;
+  gap: var(--s5);
+}
+
+/* The rejected card had four separate faults, so they are numbered rather
+   than run together — the count is part of the point. */
+.cs .faults {
+  margin: var(--s2) 0 0;
   padding: 0;
+  list-style: none;
+  counter-reset: f;
   display: grid;
   gap: var(--s3);
-  width: 100%;
-  max-width: 56ch;
 }
 
-.cs .ends li {
+.cs .faults li {
+  counter-increment: f;
   position: relative;
   padding-left: var(--s5);
   font-family: var(--family-ui);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.6;
-  color: color-mix(in oklab, var(--foreground) 60%, transparent);
+  color: color-mix(in oklab, #fff 60%, transparent);
 }
 
-.cs .ends li::before {
-  content: '';
+.cs .faults li::before {
+  content: counter(f, decimal-leading-zero);
   position: absolute;
   left: 0;
-  top: 0.72em;
-  width: var(--s4);
-  height: 1px;
-  background: color-mix(in oklab, var(--foreground) 32%, transparent);
+  top: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--no);
+  font-variant-numeric: tabular-nums;
+}
+
+.cs .faults b {
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ── Screens ───────────────────────────────────────────────────────
+   Unframed. These were chosen to prove something, not to record a set, so
+   there is no plate, no corner mark and no frame number — just the image and
+   a caption saying what to look at. */
+.cs .shot {
+  margin: 0;
+  display: grid;
+  gap: var(--s3);
+  width: 100%;
+}
+
+.cs .shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 3px;
+}
+
+.cs .cap {
+  font-family: var(--family-ui);
+  font-size: 14px;
+  line-height: 1.55;
+  color: color-mix(in oklab, var(--foreground) 55%, transparent);
+  max-width: 62ch;
+  margin: 0;
+}
+
+.cs .iter .cap {
+  color: color-mix(in oklab, #fff 52%, transparent);
+}
+
+.cs .pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s5);
+  width: 100%;
+  align-items: start;
+}
+
+.cs .step .shot + .shot,
+.cs .step .pair + .shot,
+.cs .step .shot + .pair {
+  margin-top: var(--s5);
 }
 
 /* ── Narrower ──────────────────────────────────────────────────────
-   Two steps, both measured in column width, because the column is the thing
-   that actually changes.
+   Measured in column width, because the column is what actually changes.
 
-   At 860 the three-up groupings and the paired screens go: a third of the
-   column stops being enough measure for a sentence, and three cramped
-   columns are worse than three stacked ones. At 620 the beats give up their
-   reserved height — by then the content fills a screen on its own, so the
-   floor would only add dead space — and the washes pull in, since a glow
-   wider than a phone is just a tint on the whole page. */
-@container cs (max-width: 860px) {
-  .cs .cuts,
-  .cs .shots {
+   At 900 the four-up cast and the two-up tree and screen pairs collapse, and
+   an iteration stops setting its reasoning beside the screen — at a third of
+   a column a paragraph has no measure left. At 620 the feature map stops
+   being a table: each row becomes its own block with the role written in
+   front of each value, since a table that stacks silently loses the only
+   thing it was drawing. */
+@container cs (max-width: 900px) {
+  .cs .cast,
+  .cs .tree,
+  .cs .pair {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .cs .shot-plain:nth-child(1),
-  .cs .shot-plain:nth-child(4) {
-    grid-column: auto;
+  /* Stacked, a card is as wide as the column, and a 16:10 portrait at that
+     width becomes the loudest thing on the page for a person who is only
+     there to be introduced. Turn the card on its side and the face goes back
+     to being a thumbnail. */
+  .cs .who-card {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: var(--s4);
+    row-gap: var(--s2);
+    align-items: center;
   }
 
-  /* A table cannot simply stack: the label has to stay with its values, so
-     each row becomes its own small block, and the header row — whose pills
-     have nothing left to head — is dropped. */
-  .cs .tr,
-  .cs .tbl-4 .tr,
-  .cs .roster > div {
+  .cs .face {
+    grid-row: 1 / 3;
+    aspect-ratio: 1;
+    margin-bottom: 0;
+  }
+
+  .cs .who-card .pil {
+    justify-self: start;
+    align-self: end;
+  }
+
+  .cs .who-card p {
+    align-self: start;
+  }
+
+  .cs .iter-body {
     grid-template-columns: minmax(0, 1fr);
-    gap: 6px;
+    gap: var(--s5);
   }
 
-  .cs .tr.th {
-    display: none;
+  .cs .head {
+    flex-direction: column;
+    gap: var(--s3);
   }
 
-  .cs .tr .t-label {
-    padding-top: 0;
-  }
-
-  .cs .roster > div {
-    align-items: start;
+  .cs .mrow {
+    grid-template-columns: 12ch repeat(3, minmax(0, 1fr));
+    gap: var(--s3);
   }
 }
 
-@container cs (max-width: 520px) {
-  .cs .beat,
-  .cs .beat-air {
-    min-height: 0;
+@container cs (max-width: 620px) {
+  .cs .beat {
     padding-block: var(--s7);
     gap: var(--s4);
   }
 
-  .cs .beat::before {
-    inset: -2% -12%;
+  .cs .beat-air {
+    min-height: 0;
   }
 
-  .cs .steps li {
+  .cs .iter {
+    padding-block: var(--s7);
+  }
+
+  .cs .mrow {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--s2);
+    gap: 2px;
+    padding-block: var(--s3);
   }
 
-  .cs .voice {
-    text-indent: 0;
+  .cs .mhead {
+    display: none;
   }
 
-  .cs .v2,
-  .cs .v3 {
-    margin-left: 0;
+  .cs .mf {
+    font-weight: 700;
+    padding-bottom: 4px;
+  }
+
+  /* With the header row gone, each value has to name its own column. */
+  .cs .mrow > span[data-r]::before {
+    content: attr(data-r) ' — ';
+    color: color-mix(in oklab, var(--foreground) 42%, transparent);
   }
 }

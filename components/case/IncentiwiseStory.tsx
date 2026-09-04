@@ -1,454 +1,579 @@
 import { Settle } from '@/components/Settle'
 
 /**
- * Incentiwise, told as a story rather than a report.
+ * Incentiwise, built on the spine of the deck rather than a copy of it.
  *
- * The shape is context → tension → resolution, and the page is built so you
- * can feel which of the three you are in without being told.
+ * The deck's own best idea is its two tracks. A cyan-labelled step is a thing
+ * that shipped; a red-labelled one on warm ground is a road not taken. Here
+ * they alternate — every step is followed immediately by the version of it
+ * that was rejected — so scrolling the page is scrolling through the argument,
+ * and the reader passes physically in and out of the warm bands where the
+ * product went wrong. It is the one device on the page doing three jobs at
+ * once: sectioning, sequencing, and saying which of two things you are reading.
  *
- * Context is quiet: small type, a lot of air, one ruled table. Tension is
- * loud and crowded — overheard complaints at three different sizes, then the
- * reversal alone on a screen with nothing to read but itself. Resolution is
- * ordered: a number, a table, numbered steps, then the screens.
+ * The role colours are the deck's, sampled from the slides: indigo Admin, red
+ * lead, amber employee. They are load-bearing rather than decorative, because
+ * who may do what is what this product actually is — the same three pills mark
+ * the feature map, the architecture and the head of every step.
  *
- * Every beat gets its own layout. That is the point — thirteen spreads built
- * from one template read as a form, however carefully the type is set, and the
- * eye stops looking. A layout that changes is a layout that keeps being read.
- *
- * The claims are written to hand off: each one ends pointing at the next, so
- * the argument moves on "but" and "therefore" rather than "and then". The
- * closing line is the opening line turned over, which is the only ornament
- * here that exists purely because it is satisfying.
- *
- * Nothing from the source deck: not its artwork, not its sentences. Only what
- * happened, and only what was recorded — no adoption numbers, no engagement
- * lift, no test scores, because the project produced none.
+ * What is not carried over is the deck's writing. Every sentence here is new,
+ * and the two diagrams — the feature map and the architecture — are redrawn as
+ * markup rather than pasted as pictures, so they reflow, stay searchable and
+ * can be read aloud. The screens, the portraits and the cover are the deck's
+ * own, cropped out of the slides.
  */
 
-type Tone = 'lime' | 'amber' | 'rose' | 'cyan' | 'violet' | 'plain'
+/** The three access colours, used everywhere the question is "who". */
+type Role = 'admin' | 'lead' | 'emp'
 
-/**
- * One beat. `air` is for the three reversals, which need a screen to
- * themselves; `flow` is for the beats that are a sequence and should not
- * pretend to be centred on anything.
- */
+const ROLE_LABEL: Record<Role, string> = {
+  admin: 'Admin',
+  lead: 'Dept / Team lead',
+  emp: 'Employee',
+}
+
+function Pill({ role, children }: { role?: Role; children?: React.ReactNode }) {
+  return <span className={`pil${role ? ` pil-${role}` : ''}`}>{children ?? ROLE_LABEL[role!]}</span>
+}
+
+/** Who a step is for. Sits at the head of the step, opposite its title. */
+function Who({ roles }: { roles: Role[] }) {
+  return (
+    <div className="who">
+      {roles.map((r) => (
+        <Pill key={r} role={r} />
+      ))}
+    </div>
+  )
+}
+
+/** The small square that marks access on the architecture tree. */
+function Chip({ role }: { role: Role }) {
+  return (
+    <span className={`chip chip-${role}`}>
+      <span className="sr-only">{ROLE_LABEL[role]}</span>
+    </span>
+  )
+}
+
 function Beat({
   children,
-  act,
-  side,
   air,
-  flow,
 }: {
   children: React.ReactNode
-  /**
-   * Which act this belongs to. Sets the temperature of the light behind it:
-   * cool while the ground is laid, hot through the complaints, cool again
-   * while it gets built, one amber flare at the setback, lime once it ships.
-   */
-  act: 'ctx' | 'ten' | 'res' | 'set' | 'ship'
-  /**
-   * Which side the wash sits on. Passed rather than derived: Settle wraps
-   * every section in its own div, so each one is an only child and
-   * :nth-of-type can never see its neighbours.
-   */
-  side?: 'r'
   air?: boolean
-  flow?: boolean
 }) {
   return (
     <Settle mass="light">
-      <section
-        className={`beat beat-${act}${side === 'r' ? ' beat-r' : ''}${air ? ' beat-air' : ''}${flow ? ' beat-flow' : ''}`}
-      >
+      <section className={`beat${air ? ' beat-air' : ''}`}>{children}</section>
+    </Settle>
+  )
+}
+
+/** A step that shipped. Cyan, on the page's own ground. */
+function Step({
+  n,
+  title,
+  roles,
+  blurb,
+  children,
+}: {
+  n: number
+  title: string
+  roles: Role[]
+  blurb: string
+  children: React.ReactNode
+}) {
+  return (
+    <Settle mass="light">
+      <section className="beat step">
+        <header className="head">
+          <div>
+            <p className="eyebrow">
+              Step {n} <span className="sep">·</span> {title}
+            </p>
+            <p className="blurb">{blurb}</p>
+          </div>
+          <Who roles={roles} />
+        </header>
         {children}
       </section>
     </Settle>
   )
 }
 
-function Say({ children }: { children: React.ReactNode }) {
-  return <p className="say">{children}</p>
-}
-
-function Mid({ children }: { children: React.ReactNode }) {
-  return <p className="say say-mid">{children}</p>
-}
-
-function Note({ children }: { children: React.ReactNode }) {
-  return <p className="note">{children}</p>
-}
-
-function Pill({
-  tone = 'plain',
-  solid,
+/**
+ * A version that did not ship. Full-bleed warm ground, red label, and the
+ * reasoning set beside the screen rather than under it — the argument is the
+ * point here, and the screen is only the evidence for it.
+ */
+function Iteration({
+  title,
+  roles,
   children,
+  shots,
 }: {
-  tone?: Tone
-  solid?: boolean
+  title: string
+  roles?: Role[]
   children: React.ReactNode
+  shots: React.ReactNode
 }) {
-  return <span className={`pil pil-${tone}${solid ? ' pil-solid' : ''}`}>{children}</span>
+  return (
+    <Settle mass="light">
+      <section className="beat iter">
+        <div className="iter-in">
+          <header className="head">
+            <p className="eyebrow eyebrow-no">
+              Iteration <span className="sep">·</span> not shipped
+            </p>
+            {roles && <Who roles={roles} />}
+          </header>
+          <div className="iter-body">
+            <div className="iter-why">
+              <h3 className="hmono">{title}</h3>
+              {children}
+            </div>
+            <div className="iter-shots">{shots}</div>
+          </div>
+        </div>
+      </section>
+    </Settle>
+  )
 }
 
-/** A row of pills, where a beat needs a heading it does not deserve. */
-function Pills({ children }: { children: React.ReactNode }) {
-  return <div className="pils">{children}</div>
+function Shot({ src, alt, cap }: { src: string; alt: string; cap?: string }) {
+  return (
+    <figure className="shot">
+      <img src={`/images/incentiwise/story/${src}.png`} alt={alt} loading="lazy" />
+      {cap && <figcaption className="cap">{cap}</figcaption>}
+    </figure>
+  )
 }
+
+/** One row of the feature map: what it is, then what each role may do with it. */
+function Row({ f, a, l, e }: { f: string; a: string; l: string; e: string }) {
+  return (
+    <div className="mrow">
+      <span className="mf">{f}</span>
+      <span data-r="Admin">{a}</span>
+      <span data-r="Dept / Team lead">{l}</span>
+      <span data-r="Employee">{e === '—' ? <em className="nil">—</em> : e}</span>
+    </div>
+  )
+}
+
+/** A branch of the architecture: a section, its access, and what sits under it. */
+function Branch({
+  name,
+  roles,
+  leaves,
+}: {
+  name: string
+  roles: Role[]
+  leaves: { name: string; roles: Role[] }[]
+}) {
+  return (
+    <div className="branch">
+      <div className="node">
+        <span className="node-n">{name}</span>
+        <span className="chips">
+          {roles.map((r) => (
+            <Chip key={r} role={r} />
+          ))}
+        </span>
+      </div>
+      <ul className="leaves">
+        {leaves.map((l) => (
+          <li key={l.name}>
+            <span>{l.name}</span>
+            <span className="chips">
+              {l.roles.map((r) => (
+                <Chip key={r} role={r} />
+              ))}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+const ALL: Role[] = ['admin', 'lead', 'emp']
 
 export function IncentiwiseStory() {
   return (
     <div className="cs">
-      {/* ═══ Context ═════════════════════════════════════════════════
-          Quiet and factual. Nothing here is coloured except one pill, so
-          that the noise three beats later actually reads as noise. */}
-
-      {/* The ask, and a promise that it was wrong. */}
-      <Beat act="ctx" air>
-        <Say>The brief was an employee rewards app.</Say>
-        <Note>It took two weeks of research to establish that this was the wrong brief.</Note>
-      </Beat>
-
-      {/* Why anyone thought there was an opening. */}
-      <Beat act="ctx" side="r">
-        <p className="lead">
-          Two platforms dominate this category worldwide. The client had watched both of them fail
-          to shift anything at the Indian companies they knew, and wanted to know why.
+      {/* ── The thesis ─────────────────────────────────────────────── */}
+      <Beat air>
+        <div className="pils">
+          <Pill>B2B product design</Pill>
+          <Pill>HR tech</Pill>
+        </div>
+        <p className="say">
+          A point is money. Which makes saying thank you a <em>spend</em>.
         </p>
-        <Mid>A hunch, then. Worth testing before drawing a single screen.</Mid>
+        <p className="note">
+          Colleagues award each other badges; every badge carries points, drawn from a pool someone
+          funded and redeemable against real vouchers. The whole design problem is in that sentence.
+          The gesture has to stay warm, and the ledger underneath it has to stay exact.
+        </p>
       </Beat>
 
-      {/* The audit. A table because it is evidence, not argument. */}
-      <Beat act="ctx">
-        <Note>So I used both of them properly, for a fortnight, as a paying customer would.</Note>
-        <div className="tbl">
-          <div className="tr th">
+      {/* The three surfaces the product actually is, before any of it is
+          explained. Bleeds the full width of the column: it is the only
+          picture here doing a purely atmospheric job. */}
+      <Settle mass="medium">
+        <figure className="cover">
+          <img
+            src="/images/incentiwise/story/cover.png"
+            alt="The Incentiwise feed, organisation and badges screens, shown in perspective"
+          />
+        </figure>
+      </Settle>
+
+      {/* ── Who is on it ───────────────────────────────────────────── */}
+      <Beat>
+        <p className="eyebrow">Four people</p>
+        <p className="say say-mid">Only one of them is here to be thanked.</p>
+        <div className="cast">
+          <div className="who-card wc-admin">
+            <img
+              className="face"
+              src="/images/incentiwise/story/p-admin.png"
+              alt="Portrait used for the Admin persona"
+              loading="lazy"
+            />
+            <Pill role="admin" />
+            <p>
+              Owns the programme. Funds the pool, builds the badges, brings people in, and signs off
+              what the leads ask for.
+            </p>
+          </div>
+          <div className="who-card wc-lead">
+            <img
+              className="face"
+              src="/images/incentiwise/story/p-dept.png"
+              alt="Portrait used for the Dept. head persona"
+              loading="lazy"
+            />
+            <Pill role="lead">Dept. head</Pill>
+            <p>
+              Approves budget requests coming up from the leads, and answers for the culture of
+              everything underneath.
+            </p>
+          </div>
+          <div className="who-card wc-lead">
+            <img
+              className="face"
+              src="/images/incentiwise/story/p-lead.png"
+              alt="Portrait used for the Team lead persona"
+              loading="lazy"
+            />
+            <Pill role="lead">Team lead</Pill>
+            <p>
+              Recognises their own team against a quarterly budget, and asks for more when it runs
+              dry.
+            </p>
+          </div>
+          <div className="who-card wc-emp">
+            <img
+              className="face"
+              src="/images/incentiwise/story/p-emp.png"
+              alt="Portrait used for the Employee persona"
+              loading="lazy"
+            />
+            <Pill role="emp" />
+            <p>Sends and receives appreciation. Collects badges, holds points, spends them.</p>
+          </div>
+        </div>
+      </Beat>
+
+      {/* ── The feature map ────────────────────────────────────────── */}
+      <Beat>
+        <p className="eyebrow">Platform access</p>
+        <h2 className="hmono">Role-based feature mapping</h2>
+        <div className="map">
+          <div className="mrow mhead">
             <span />
             <span>
-              <Pill tone="cyan">The comprehensive one</Pill>
+              <Pill role="admin" />
             </span>
             <span>
-              <Pill tone="cyan">The focused one</Pill>
-            </span>
-          </div>
-          <div className="tr">
-            <span className="t-label">Built for</span>
-            <span>Large organisations</span>
-            <span>Small teams and founders</span>
-          </div>
-          <div className="tr">
-            <span className="t-label">The bet</span>
-            <span>Everything, in one place</span>
-            <span>One thing, done narrowly</span>
-          </div>
-          <div className="tr">
-            <span className="t-label">The cost</span>
-            <span>Weeks to learn; measures engagement, never return</span>
-            <span>Thin integrations; nothing to grow into</span>
-          </div>
-        </div>
-        <Mid>One is too heavy to learn. The other has nothing to grow into.</Mid>
-        <Note>Which explained the software. It said nothing at all about the people using it.</Note>
-      </Beat>
-
-      {/* ═══ Tension ═════════════════════════════════════════════════
-          Crowded, hot, and deliberately harder to read cleanly. */}
-
-      {/* The chorus. Three sizes, staggered, because they were overheard. */}
-      <Beat act="ten" side="r">
-        <Pills>
-          <Pill tone="rose">Public forums, unprompted</Pill>
-        </Pills>
-        <div className="chorus">
-          <p className="voice v1">“Thanks with nothing behind it.”</p>
-          <p className="voice v2">“A bar nobody can see.”</p>
-          <p className="voice v3">“Praise that lands wrong in the room.”</p>
-        </div>
-        <Note>
-          Hundreds of posts about recognition software, and they collapsed into those three
-          complaints.
-        </Note>
-      </Beat>
-
-      {/* The reversal. Nothing else on the screen. */}
-      <Beat act="ten" air>
-        <Say>Every last one of them was an employee.</Say>
-        <Note>
-          Nobody who funds a programme, approves it, or runs it week to week had said a word.
-        </Note>
-      </Beat>
-
-      {/* So I asked them. A roster — four voices, one line each. */}
-      <Beat act="ten" side="r">
-        <Note>So I went and found the other three.</Note>
-        <dl className="roster">
-          <div>
-            <dt>
-              <Pill tone="lime">Employee</Pill>
-            </dt>
-            <dd>To be seen for the particular thing they did.</dd>
-          </div>
-          <div>
-            <dt>
-              <Pill tone="cyan">Team lead</Pill>
-            </dt>
-            <dd>To recognise someone today, not at the next review.</dd>
-          </div>
-          <div>
-            <dt>
-              <Pill tone="amber">Operator</Pill>
-            </dt>
-            <dd>A programme that is not a weekly chore to keep alive.</dd>
-          </div>
-          <div>
-            <dt>
-              <Pill tone="violet">Founder</Pill>
-            </dt>
-            <dd>Evidence the spend does something, and a bill that holds still.</dd>
-          </div>
-        </dl>
-        <Mid>No two of them wanted the same thing.</Mid>
-      </Beat>
-
-      {/* The thesis. The second reversal, and the hinge of the whole page. */}
-      <Beat act="ten" air>
-        <Say>Four people, one screen, nothing they agree on.</Say>
-        <Note>
-          The product was never the thank you. It was who may spend, who must approve, and who gets
-          to see any of it.
-        </Note>
-      </Beat>
-
-      {/* ═══ Resolution ══════════════════════════════════════════════
-          Ordered and cool. A number, a table, numbered steps, screens. */}
-
-      {/* The constraint, sized like the constraint it was. */}
-      <Beat act="res" side="r">
-        <div className="count">
-          <span className="count-n">10</span>
-          <span className="count-l">weeks to something shippable</span>
-        </div>
-        <div className="cuts">
-          <div className="cut cut-lime">
-            <Pill tone="lime" solid>
-              Kept
-            </Pill>
-            <ul>
-              <li>Appreciations feed</li>
-              <li>Rewards library</li>
-              <li>Organisation database</li>
-              <li>Appreciation analytics</li>
-            </ul>
-          </div>
-          <div className="cut cut-amber">
-            <Pill tone="amber" solid>
-              Deferred
-            </Pill>
-            <ul>
-              <li>Insight-to-action prompts</li>
-              <li>Pulse surveys</li>
-              <li>Scheduled campaigns</li>
-              <li>Peer nominations</li>
-            </ul>
-          </div>
-          <div className="cut cut-rose">
-            <Pill tone="rose" solid>
-              Dropped
-            </Pill>
-            <ul>
-              <li>Wellness tracking</li>
-              <li>Video appreciations</li>
-            </ul>
-          </div>
-        </div>
-        <Note>
-          The amber column was the hard one. Every item in it answered a real need — and shipping
-          all of them is precisely how the heavy platform got heavy.
-        </Note>
-      </Beat>
-
-      {/* Decision one, which is the thesis made structural. */}
-      <Beat act="res">
-        <Mid>Permission stopped being a settings page and became the layout.</Mid>
-        <div className="tbl tbl-4">
-          <div className="tr th">
-            <span />
-            <span>
-              <Pill tone="violet">Admin</Pill>
+              <Pill role="lead" />
             </span>
             <span>
-              <Pill tone="cyan">Lead</Pill>
-            </span>
-            <span>
-              <Pill tone="lime">Employee</Pill>
+              <Pill role="emp" />
             </span>
           </div>
-          <div className="tr">
-            <span className="t-label">Appreciations</span>
-            <span>Send, receive</span>
-            <span>Send, receive</span>
-            <span>Receive</span>
-          </div>
-          <div className="tr">
-            <span className="t-label">Budget</span>
-            <span>Allocate</span>
-            <span>Request</span>
-            <span className="nil">—</span>
-          </div>
-          <div className="tr">
-            <span className="t-label">Policy</span>
-            <span>Manage</span>
-            <span>Manage</span>
-            <span>View</span>
-          </div>
-          <div className="tr">
-            <span className="t-label">Analytics</span>
-            <span>Whole org</span>
-            <span>Their team</span>
-            <span>Their own</span>
-          </div>
+          <Row f="Appreciation" a="Send, view all" l="Send, receive, view team" e="Send, own" />
+          <Row f="Reactions & comments" a="React, comment" l="React, comment" e="React, comment" />
+          <Row f="Recognition flow" a="Send" l="Send" e="Send, receive" />
+          <Row f="Collectibles & badges" a="Create, assign" l="Award to members" e="Earn, view" />
+          <Row f="Custom rewards" a="Create, manage" l="Nominate, approve" e="Receive" />
+          <Row f="Rewards library" a="Manage, curate" l="Recommend, redeem" e="Browse, redeem" />
+          <Row f="Catalogue items" a="Add new" l="Create team-level" e="Redeem" />
+          <Row f="Appreciation analytics" a="Org-level" l="Team metrics" e="Personal insights" />
+          <Row f="Cost–benefit analytics" a="Budget utilisation" l="Dept / team spend" e="—" />
+          <Row f="Recognition analytics" a="Org-wide trends" l="Dept / team distribution" e="Personal stats" />
+          <Row f="Dashboards" a="All" l="Dept / team" e="Personal" />
         </div>
-        <Note>Budget makes it plainest: a decision, a request, or nothing at all.</Note>
+        <p className="note">
+          Read across a row and it is one feature. Read down a column and it is a different product.
+          Budget is the sharpest case: a decision, a request, or nothing at all.
+        </p>
       </Beat>
 
-      {/* Decisions two and three, as steps rather than cards. */}
-      <Beat act="res" side="r" flow>
-        <ol className="steps">
+      {/* ── The architecture ───────────────────────────────────────── */}
+      <Beat>
+        <p className="eyebrow">Structure</p>
+        <h2 className="hmono">Information architecture</h2>
+        <div className="legend">
+          <span>
+            <Chip role="admin" /> Admin
+          </span>
+          <span>
+            <Chip role="lead" /> Dept / team lead
+          </span>
+          <span>
+            <Chip role="emp" /> Employee
+          </span>
+        </div>
+        <div className="tree">
+          <Branch
+            name="Feed"
+            roles={ALL}
+            leaves={[
+              { name: 'Send appreciations', roles: ['admin', 'lead'] },
+              { name: 'Redeem points', roles: ALL },
+              { name: 'Leaderboard', roles: ALL },
+            ]}
+          />
+          <Branch
+            name="Rewards"
+            roles={ALL}
+            leaves={[
+              { name: 'Overview', roles: ALL },
+              { name: 'Catalogue', roles: ['admin', 'lead'] },
+              { name: 'Badges', roles: ['admin', 'lead'] },
+              { name: 'Transactions', roles: ['admin', 'lead'] },
+            ]}
+          />
+          <Branch
+            name="Organisation"
+            roles={['admin', 'lead']}
+            leaves={[
+              { name: 'View org.', roles: ['lead', 'emp'] },
+              { name: 'People', roles: ['admin'] },
+              { name: 'Teams', roles: ['admin'] },
+              { name: 'Departments', roles: ['admin'] },
+              { name: 'Admins', roles: ['admin'] },
+              { name: 'Import', roles: ['admin'] },
+            ]}
+          />
+          <Branch
+            name="Culture"
+            roles={['admin', 'lead']}
+            leaves={[
+              { name: 'Overview', roles: ['admin', 'lead'] },
+              { name: 'Budget', roles: ['admin', 'lead'] },
+              { name: 'Transactions', roles: ['admin'] },
+            ]}
+          />
+        </div>
+        <p className="note">
+          Nothing is hidden behind a settings page. What you can reach is what you are.
+        </p>
+      </Beat>
+
+      {/* ── The walkthrough ────────────────────────────────────────── */}
+      <Beat air>
+        <p className="eyebrow">How it works</p>
+        <p className="say">
+          <span className="dim">A recognition programme, running in</span> four steps.
+        </p>
+        <p className="note">Each one followed by the version of it that did not survive.</p>
+      </Beat>
+
+      <Step
+        n={1}
+        title="Log in"
+        roles={ALL}
+        blurb="A registered ID, or the workspace the company already lives in."
+      >
+        <Shot
+          src="login"
+          alt="Incentiwise sign-in with email and password, plus Google Workspace and Microsoft Teams options"
+          cap="Password reset runs in the same panel rather than a separate page — it is the one flow people hit on day one."
+        />
+      </Step>
+
+      <Iteration
+        title="Role tiles before sign-in"
+        roles={ALL}
+        shots={
+          <Shot
+            src="it-role-tiles"
+            alt="A rejected screen asking the user to pick Admin, Department head, Team lead or Employee before signing in"
+          />
+        }
+      >
+        <p>
+          Asking who you are before you have signed in makes one product read as four. It also
+          invites optimism — people chose the most senior tile that looked plausible, then met a
+          permission wall on the very next screen.
+        </p>
+        <p>Your role is a fact about your account. It was never a question worth asking.</p>
+      </Iteration>
+
+      <Step
+        n={2}
+        title="Import and onboard"
+        roles={['admin']}
+        blurb="The whole organisation in one pass: upload a sheet, map the columns, confirm what will be created."
+      >
+        <div className="pair">
+          <Shot
+            src="import-start"
+            alt="An empty Organisation screen alongside the bulk import panel with column mapping"
+            cap="An empty state that says what to do next, and a mapper that does not assume your spreadsheet matches ours."
+          />
+          <Shot
+            src="import-confirm"
+            alt="Confirm import listing sixteen people with new, existing and error rows"
+            cap="Every row is shown before anything is written, including the ones that will fail and why."
+          />
+        </div>
+        <Shot
+          src="org-teams"
+          alt="Organisation teams view showing rewards given, budget used and redemption ratio per team"
+          cap="What the import produces: teams that already carry their own numbers."
+        />
+      </Step>
+
+      <Iteration
+        title="Leads invite their own teams"
+        roles={['admin']}
+        shots={
+          <Shot
+            src="it-leads-invite"
+            alt="A rejected screen where a team lead invites their own team by email and watches their budget grow"
+          />
+        }
+      >
+        <p>
+          Faster on paper, and an operational problem in practice. Onboarding stops being one
+          afternoon and becomes a queue of people to chase.
+        </p>
+        <p>
+          A recognition programme that launches half-populated looks broken to the half who are
+          already in it.
+        </p>
+      </Iteration>
+
+      <Step
+        n={3}
+        title="Set up badges"
+        roles={['admin', 'lead']}
+        blurb="Badges are the vocabulary. Artwork, what it is worth, and exactly who can earn it."
+      >
+        <Shot
+          src="badges"
+          alt="Badges dashboard with totals, most common and most rare, and the badge catalogue"
+          cap="Rarity is shown next to points, because the two together are what makes a badge mean anything."
+        />
+        <Shot
+          src="badge-create"
+          alt="Create badge panel with image picker, points, category, attached values and a per-team access list"
+          cap="Access is set at creation, down to the team. A badge everyone can earn is not a badge."
+        />
+      </Step>
+
+      <Iteration
+        title="Badges as pure collectibles"
+        roles={['admin']}
+        shots={
+          <Shot
+            src="it-badge-collectible"
+            alt="A rejected create-badge dialog where badges carry rarity but no points, with points awarded separately"
+          />
+        }
+      >
+        <p>
+          Badges with no points attached, and points awarded as a second, separate action. Cleaner
+          as a model, worse as a moment: two gestures for one piece of thanks.
+        </p>
+        <p>
+          It also broke the ledger. If a badge is not worth anything, the pool no longer explains
+          where the money went.
+        </p>
+      </Iteration>
+
+      <Step
+        n={4}
+        title="Send an appreciation"
+        roles={ALL}
+        blurb="Pick someone, say why, and attach what it is worth — points, a reward, or a badge."
+      >
+        <Shot
+          src="feed"
+          alt="The activity feed with a composer, points owned, and a badge leaderboard"
+          cap="The feed is the whole product for most people: send from the top, see what came back below."
+        />
+        <div className="pair">
+          <Shot
+            src="send-badge"
+            alt="Send appreciation dialog with tags, a written message and a badge attached"
+            cap="Tags carry the reason. Points, reward and badge are one control, not three flows."
+          />
+          <Shot
+            src="card-new"
+            alt="The final appreciation card addressed to two people with an editable prompt and the sender's available points"
+            cap="Where it ended up. Several recipients, a prompt that asks to be typed in, and the balance in view."
+          />
+        </div>
+      </Step>
+
+      <Iteration
+        title="The card, before it worked"
+        roles={ALL}
+        shots={
+          <>
+            <Shot
+              src="it-card-old-a"
+              alt="An earlier appreciation card with a single recipient chosen from an unsearchable scrolling list"
+            />
+            <Shot
+              src="it-card-old-b"
+              alt="Two earlier appreciation cards showing no visible points balance and a message that looks fixed"
+            />
+          </>
+        }
+      >
+        <p>Four faults, all of them found by using it rather than by looking at it.</p>
+        <ol className="faults">
           <li>
-            <span className="step-n">02</span>
-            <div>
-              <h3 className="step-t">Points, not applause.</h3>
-              <p className="step-b">
-                Redeemable against real vouchers. Badges kept for standing and never used as the
-                prize, because hollow praise was the complaint we started from.
-              </p>
-            </div>
+            <b>One recipient at a time.</b> Most thanks in a team is owed to more than one person.
           </li>
           <li>
-            <span className="step-n">03</span>
-            <div>
-              <h3 className="step-t">Borrow the interface, then warm it.</h3>
-              <p className="step-b">
-                An open-source system taken whole, given a friendlier face and the two things it had
-                no answer for: dense tables, and a reward that has to look worth having. Ten weeks
-                does not buy a button.
-              </p>
-            </div>
+            <b>No search.</b> You scrolled a list of everyone until you found the name.
+          </li>
+          <li>
+            <b>No balance.</b> You could not see how many points you had left to give.
+          </li>
+          <li>
+            <b>A message that looked fixed.</b> It was editable, and nothing about it said so, so
+            everybody sent the default.
           </li>
         </ol>
-      </Beat>
+      </Iteration>
 
-      {/* The late setback. Short, blunt, and the last tension in the page. */}
-      <Beat act="set">
-        <Mid>Then the client took it apart.</Mid>
-        <div className="fixes">
-          <div className="fix">
-            <p className="fix-a">Budget and policy shared one engine.</p>
-            <p className="fix-b">
-              Different judgements made by different people. Budget got its own surface.
-            </p>
-          </div>
-          <div className="fix">
-            <p className="fix-a">Analytics sat beside whatever they measured.</p>
-            <p className="fix-b">
-              Fine for one decision, useless for judging a programme. Collected into one view.
-            </p>
-          </div>
-          <div className="fix">
-            <p className="fix-a">It carried itself like an admin console.</p>
-            <p className="fix-b">
-              On a product whose job is morale, that is a functional defect. Navigation came up,
-              colour came back.
-            </p>
-          </div>
-        </div>
-        <Note>Three rearrangements. Nothing new was added to build any of them.</Note>
-      </Beat>
-
-      {/* The product. */}
-      <Beat act="ship" side="r" flow>
-        <Pills>
-          <Pill tone="lime" solid>
-            Shipped
-          </Pill>
-        </Pills>
-        <div className="shots">
-          <figure className="shot-plain">
-            <img
-              src="/images/incentiwise/02-feed.png"
-              alt="Incentiwise activity feed with appreciation composer, points balance and leaderboard"
-              loading="lazy"
-            />
-            <figcaption>
-              <h3 className="shot-t">The feed</h3>
-              <p className="note">Send, see, and see what it was worth. An employee's whole product.</p>
-            </figcaption>
-          </figure>
-          <figure className="shot-plain">
-            <img
-              src="/images/incentiwise/03-send-appreciation.png"
-              alt="Composing an appreciation with value tags and an attached reward"
-              loading="lazy"
-            />
-            <figcaption>
-              <h3 className="shot-t">Sending</h3>
-              <p className="note">Tags carry the reason and a reward rides along, so it cannot be routine.</p>
-            </figcaption>
-          </figure>
-          <figure className="shot-plain">
-            <img
-              src="/images/incentiwise/05-rewards-catalog.png"
-              alt="Rewards catalogue of redeemable vouchers"
-              loading="lazy"
-            />
-            <figcaption>
-              <h3 className="shot-t">Rewards</h3>
-              <p className="note">Points spend on things that exist off the platform.</p>
-            </figcaption>
-          </figure>
-          <figure className="shot-plain">
-            <img
-              src="/images/incentiwise/15-culture.png"
-              alt="Budget allocated across departments with pending approval requests"
-              loading="lazy"
-            />
-            <figcaption>
-              <h3 className="shot-t">Budget</h3>
-              <p className="note">What review produced: allocation, requests and utilisation, apart from policy.</p>
-            </figcaption>
-          </figure>
-          <figure className="shot-plain">
-            <img
-              src="/images/incentiwise/13-admins.png"
-              alt="Administration screen assigning rights per person and department"
-              loading="lazy"
-            />
-            <figcaption>
-              <h3 className="shot-t">Administration</h3>
-              <p className="note">The table from four beats ago, made editable.</p>
-            </figcaption>
-          </figure>
-          <figure className="shot-plain">
-            <img
-              src="/images/incentiwise/12-member-detail.png"
-              alt="A member profile showing points earned, badges held and history"
-              loading="lazy"
-            />
-            <figcaption>
-              <h3 className="shot-t">A person</h3>
-              <p className="note">Where someone goes to check whether their work is visible.</p>
-            </figcaption>
-          </figure>
-        </div>
-      </Beat>
-
-      {/* The close: the opening line, turned over. */}
-      <Beat act="ship" air>
-        <Say>They asked for a thank you. What they needed was permission to give one.</Say>
-        <ul className="ends">
-          <li>The easiest research to find came entirely from one side of the problem.</li>
-          <li>Every fix at review was a rearrangement, which is the cheapest kind of win.</li>
-          <li>The brief was smaller than the problem, and I very nearly built the brief.</li>
-        </ul>
+      {/* ── The close ──────────────────────────────────────────────── */}
+      <Beat air>
+        <p className="say say-mid">One more, using the product itself.</p>
+        <Shot
+          src="thanks"
+          alt="An appreciation card addressed to Recruiters, tagged patient and supportive, reading thank you for this opportunity, worth one million points"
+        />
       </Beat>
     </div>
   )
