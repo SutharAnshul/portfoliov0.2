@@ -2708,24 +2708,25 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   opacity: 0.3;
   cursor: default;
 }
-
 /* ─── Case study: the written kind ────────────────────────────────────────
-   An editorial document inside the site's existing material — same near-black
-   ground, same serif for statements, same monospace for body, same hairlines
-   and 2px corners. What is new is the reading structure.
+   An editorial document in this site's own material — same ground, same
+   serif for statements, same monospace for body, same hairlines and 2px
+   corners. What is new is the reading structure, not the surface.
 
-   One grid, two measures. Text sits in a column narrow enough to read; the
-   evidence breaks out wider, because an artefact is only worth showing at a
-   size where it can be examined. Sections are numbered and ruled so the page
-   can be skimmed by heading alone. */
+   Everything that would elsewhere be a diagram is drawn here in type and
+   rules instead. A comparison is a table; a prioritisation is three columns
+   of a list; a permission model is four rows. Nothing is imported from the
+   source deck, which has a visual language of its own and would arrive as a
+   foreign object on a page like this. */
 
 .cs {
   --cs-text: 68ch;
+  --cs-indent: calc(44px + var(--s3));
   margin-top: var(--s7);
 }
 
 .cs-summary {
-  max-width: 56ch;
+  max-width: 52ch;
   font-family: var(--family-display);
   font-size: clamp(18px, 1.5vw, 22px);
   line-height: 1.5;
@@ -2756,11 +2757,10 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   color: var(--foreground);
 }
 
-/* The sentence a section exists to deliver. Serif, larger than the body, and
-   the thing a skimming reader is meant to stop on. */
+/* The sentence a section exists to deliver, and the thing a skimming reader
+   is meant to stop on. */
 .cs-statement {
-  margin-top: var(--s6);
-  margin-left: calc(44px + var(--s3));
+  margin: var(--s6) 0 0 var(--cs-indent);
   max-width: 34ch;
   font-family: var(--family-display);
   font-size: clamp(1.25rem, 2vw, 1.75rem);
@@ -2770,8 +2770,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 .cs-body {
-  margin-top: var(--s5);
-  margin-left: calc(44px + var(--s3));
+  margin: var(--s5) 0 0 var(--cs-indent);
   max-width: var(--cs-text);
 }
 
@@ -2781,10 +2780,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 /* ── Questions ─────────────────────────────────────────────────────── */
 .cs-questions {
-  margin-top: var(--s5);
-  margin-left: calc(44px + var(--s3));
-  display: grid;
-  gap: 0;
+  margin: var(--s5) 0 0 var(--cs-indent);
   max-width: var(--cs-text);
   border-top: 1px solid var(--card-line);
 }
@@ -2799,11 +2795,10 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 /* ── Cards ─────────────────────────────────────────────────────────
-   Used for the things that genuinely come in sets — findings, roles,
+   For the things that genuinely arrive in sets — findings, positions,
    problems, learnings — and nowhere else. */
 .cs-cards {
-  margin-top: var(--s5);
-  margin-left: calc(44px + var(--s3));
+  margin: var(--s5) 0 0 var(--cs-indent);
   display: grid;
   gap: var(--s4);
 }
@@ -2839,20 +2834,47 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   color: color-mix(in srgb, var(--foreground) 72%, transparent);
 }
 
-.cs-card-body em {
-  font-family: var(--family-display);
-  font-style: italic;
-  font-size: 1.05em;
-  color: color-mix(in srgb, var(--foreground) 92%, transparent);
+/* ── Tables ────────────────────────────────────────────────────────
+   A comparison drawn in rules and type. Ruled rows, a label column and
+   values — no fills, no chrome, nothing that needs a legend. */
+.cs-table {
+  margin: var(--s5) 0 0 var(--cs-indent);
+  border-top: 1px solid var(--card-line-strong);
 }
 
-/* ── Two lists side by side ────────────────────────────────────────── */
+.cs-row {
+  display: grid;
+  grid-template-columns: 150px repeat(2, minmax(0, 1fr));
+  gap: var(--s4);
+  padding: var(--s4) 0;
+  border-bottom: 1px solid var(--card-line);
+  align-items: start;
+}
+
+.cs-table-4 .cs-row {
+  grid-template-columns: 150px repeat(3, minmax(0, 1fr));
+}
+
+.cs-row-head {
+  padding-bottom: var(--s3);
+}
+
+.cs-row-v {
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--foreground) 80%, transparent);
+}
+
+/* ── Lists ─────────────────────────────────────────────────────────── */
 .cs-split {
-  margin-top: var(--s6);
-  margin-left: calc(44px + var(--s3));
+  margin: var(--s6) 0 0 var(--cs-indent);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--s5);
+}
+
+.cs-split-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .cs-list ol {
@@ -2877,47 +2899,28 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Evidence ──────────────────────────────────────────────────────
-   Breaks the text measure, because an artefact you cannot read is
-   decoration. */
-.cs-figure {
-  margin: var(--s6) 0 0;
-}
-
-.cs-figure-wide {
-  margin-left: 0;
-}
-
-.cs-figure .plate img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 .cs-caption {
-  margin-top: var(--s3);
-  margin-left: calc(44px + var(--s3));
+  margin: var(--s3) 0 0 var(--cs-indent);
   max-width: 62ch;
   line-height: 1.55;
 }
 
-/* ── Decisions ─────────────────────────────────────────────────────── */
+/* ── Decisions and changes ─────────────────────────────────────────── */
 .cs-decisions,
-.cs-iterations {
+.cs-changes {
   margin-top: var(--s5);
   display: grid;
   gap: var(--s8);
 }
 
 .cs-decision > .t-label,
-.cs-iteration > .t-label {
-  margin-left: calc(44px + var(--s3));
+.cs-change > .t-label {
+  margin-left: var(--cs-indent);
 }
 
 .cs-decision-title,
-.cs-iteration-title {
-  margin-top: var(--s2);
-  margin-left: calc(44px + var(--s3));
+.cs-change-title {
+  margin: var(--s2) 0 0 var(--cs-indent);
   max-width: 30ch;
   font-family: var(--family-display);
   font-size: clamp(1.25rem, 1.8vw, 1.6rem);
@@ -2926,44 +2929,62 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 .cs-decision-grid {
-  margin-top: var(--s4);
-  margin-left: calc(44px + var(--s3));
+  margin: var(--s4) 0 0 var(--cs-indent);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--s5);
   max-width: var(--cs-text);
 }
 
-.cs-iteration > .cs-card-body {
-  margin-left: calc(44px + var(--s3));
-  margin-top: var(--s3);
+.cs-change > .cs-card-body {
+  margin: var(--s3) 0 0 var(--cs-indent);
   max-width: var(--cs-text);
 }
 
-/* ── Final screens ─────────────────────────────────────────────────── */
+/* ── Screens ───────────────────────────────────────────────────────
+   Unframed. No plate, no border, no corner marks — the site's usual
+   treatment brackets a screen as a specimen, and here the screens are the
+   only thing on the page that is genuinely the product. They should sit on
+   the ground like a printed plate rather than be fenced. */
 .cs-screens {
   margin-top: var(--s6);
   display: grid;
-  gap: var(--s7);
+  gap: var(--s8);
+}
+
+.cs-screen {
+  margin: 0;
+}
+
+.cs-screen img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--r);
+}
+
+.cs-screen figcaption {
+  margin-top: var(--s4);
+}
+
+.cs-screen-title {
+  margin-left: var(--cs-indent);
+  font-family: var(--family-display);
+  font-size: 1.25rem;
+  line-height: 1.25;
+  color: var(--foreground);
+}
+
+.cs-screen .cs-caption {
+  margin-top: var(--s2);
 }
 
 /* ── Narrower ──────────────────────────────────────────────────────
-   The indent that aligns text under the section number is a luxury of a wide
-   column. Below this it costs more than it buys, and the cards stack. */
+   The indent that aligns text under the section number is a luxury of a
+   wide column; below this it costs more than it earns. */
 @media (max-width: 1023px) {
-  .cs-statement,
-  .cs-body,
-  .cs-questions,
-  .cs-cards,
-  .cs-split,
-  .cs-caption,
-  .cs-decision > .t-label,
-  .cs-iteration > .t-label,
-  .cs-decision-title,
-  .cs-iteration-title,
-  .cs-decision-grid,
-  .cs-iteration > .cs-card-body {
-    margin-left: 0;
+  .cs {
+    --cs-indent: 0px;
   }
 
   .cs-head {
@@ -2973,12 +2994,25 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
   .cs-cards-3,
   .cs-split,
+  .cs-split-3,
   .cs-decision-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* A table cannot simply stack: the label has to stay with its values, so
+     each row becomes its own small block. */
+  .cs-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s2);
+  }
+
+  .cs-row-head {
+    display: none;
+  }
+
   .cs-decisions,
-  .cs-iterations {
+  .cs-changes,
+  .cs-screens {
     gap: var(--s7);
   }
 }
