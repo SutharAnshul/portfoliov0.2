@@ -49,7 +49,13 @@ export function BreadcrumbNav({
     <div
       data-breadcrumb
       style={{ left, right, transition, padding: 'var(--s4) var(--s6)' }}
-      className="fixed top-0 z-[70] bg-background"
+      /* z-30, under the structure rather than over it. The divider between the
+         panels and the frame marks around the column are the window this page
+         sits in, and a window's edges do not stop where a label starts — the
+         breadcrumb was cutting the nav divider off at the top and hiding the
+         top two corner marks behind itself. It still outranks the page content
+         it masks, which is all it ever needed to do. */
+      className="fixed top-0 z-30 bg-background"
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">

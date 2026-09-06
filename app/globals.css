@@ -2,6 +2,21 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
+/* Registered so the two closing axes can be transitioned. An unregistered
+   custom property is a string as far as the engine is concerned, and the
+   marks would snap back to the corners rather than travelling. */
+@property --kx {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --ky {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -685,288 +700,153 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   }
 }
 
-/* ─── Overscroll-to-advance ───────────────────────────────────────────── */
+/* ─── Overscroll to turn the page ─────────────────────────────────────────
+   Four corner marks around the content column: vertex on the corner, arms
+   running along the inside edges, so at rest they read as a viewfinder on the
+   page rather than as chrome added to it.
 
-/* Docked chrome, not an overlay. It spans the content column (left/width are
-   measured each frame in ScrollAdvance) and pins to whichever edge is being
-   pushed — bottom when advancing, top when going back. A scrim fades the
-   content out beneath it, so nothing ever collides with the readout. */
-.scroll-advance {
-  --sa: 0;
+   --ky closes the vertical, leaving a ⊢ and a ⊣ facing each other across the
+   middle. --kx closes the horizontal and brings those two together, at which
+   point all four right angles lie on one another as the plus they were cut
+   from — every arm accounted for exactly once. Both are published from
+   ScrollAdvance, eased, with a band of dead travel between them.
+
+   Positioned in percentages of this element rather than of themselves: that is
+   what lets all four vertices land exactly on 50% / 50%. */
+.turn {
+  --kx: 0;
+  --ky: 0;
+  --arm: 14px;
+
+  /* top and height are measured in ScrollAdvance: the frame starts below the
+     breadcrumb, which stays put through a turn. */
   position: fixed;
+  top: 0;
+  height: 100svh;
   z-index: 60;
   pointer-events: none;
-  transition: opacity 240ms ease;
+  padding: 12px;
+  opacity: 0;
+  transition: opacity 260ms ease;
 }
 
-.scroll-advance[data-dir='down'] {
-  bottom: 0;
+/* Three weights, not two. Reaching an edge that leads somewhere shows the
+   frame quietly, so the gesture is offered rather than having to be guessed;
+   pushing brings it up; the turn itself is at full strength. */
+.turn[data-state='resting'] { opacity: 0.3; }
+.turn[data-state='charging'],
+.turn[data-state='out'],
+.turn[data-state='hold'],
+.turn[data-state='in'] { opacity: 1; }
+
+.turn-cnr {
+  position: absolute;
+  width: var(--arm);
+  height: var(--arm);
 }
 
-/* top is set from JS: docked below the breadcrumb, whose height varies */
-.scroll-advance[data-dir='up'] {
-  top: 0;
-}
-
-/* Always present, in three states rather than two.
-
-   It used to be invisible until you were already overscrolling, so the only
-   way to learn there was a next page was to overshoot into it by accident.
-   Now it stands in its inactive form the whole time — destination named,
-   gauge empty — brightens on reaching the edge that leads there, and comes
-   fully up as the gauge charges. Quiet enough to ignore, present enough to
-   answer the question before it is asked. */
-.scroll-advance[data-active='false'] {
-  opacity: 0.3;
-}
-
-.scroll-advance[data-active='false'] .scroll-advance-hit {
-  pointer-events: auto;
-}
-
-.scroll-advance[data-active='false'][data-resting='true'] {
-  opacity: 0.58;
-  transition: opacity 420ms ease 140ms;
-}
-
-.scroll-advance[data-active='false']:hover {
-  opacity: 0.85;
-}
-
-/* The head travels the empty track and repeats, which is what says the strip
-   is a gesture rather than a caption. Slow and dim enough not to nag: a long
-   pause sits between passes, and the pass itself is most of a second. */
-@media (prefers-reduced-motion: no-preference) {
-  .scroll-advance[data-active='false'] .scroll-advance-head {
-    animation: sa-hint 4.2s var(--ease-medium, ease-out) infinite;
-  }
-}
-
-/* One pass, then a long rest. The head fades in at the start mark, travels,
-   and fades out — it never sits static at the far end, which would read as a
-   gauge that had already been filled. */
-@keyframes sa-hint {
-  0%, 8% { opacity: 0; transform: translate(0, -50%); }
-  20% { opacity: 1; }
-  46% { opacity: 1; transform: translate(16px, -50%); }
-  58%, 100% { opacity: 0; transform: translate(16px, -50%); }
-}
-
-.scroll-advance:has(.scroll-advance-hit:focus-visible) {
-  opacity: 1;
-}
-.scroll-advance:has(.scroll-advance-hit:focus-visible) .scroll-advance-hit {
-  pointer-events: auto;
-}
-
-/* Scrim — masks content passing under the panel */
-.scroll-advance::before {
+.turn-cnr::before,
+.turn-cnr::after {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 190%;
-  pointer-events: none;
-  background: linear-gradient(to top, var(--background) 42%, transparent 100%);
+  background: var(--foreground);
 }
 
-.scroll-advance[data-dir='down']::before {
-  bottom: 0;
+.turn-cnr::before { width: var(--arm); height: 1px; }
+.turn-cnr::after { width: 1px; height: var(--arm); }
+
+.turn-tl { left: calc(var(--kx) * 50%); top: calc(var(--ky) * 50%); }
+.turn-tl::before, .turn-tl::after { left: 0; top: 0; }
+.turn-tr { right: calc(var(--kx) * 50%); top: calc(var(--ky) * 50%); }
+.turn-tr::before, .turn-tr::after { right: 0; top: 0; }
+.turn-bl { left: calc(var(--kx) * 50%); bottom: calc(var(--ky) * 50%); }
+.turn-bl::before, .turn-bl::after { left: 0; bottom: 0; }
+.turn-br { right: calc(var(--kx) * 50%); bottom: calc(var(--ky) * 50%); }
+.turn-br::before, .turn-br::after { right: 0; bottom: 0; }
+
+/* Coming apart is the same two stages in reverse, so the sequence reads the
+   same forwards and backwards. The transition is only attached during the
+   retraction — while you are pushing, the marks must track the scroll exactly
+   rather than chase it. */
+.turn[data-back='x'] .turn-cnr {
+  transition: --kx 260ms cubic-bezier(0.25, 0.9, 0.3, 1);
 }
 
-.scroll-advance[data-dir='up']::before {
-  top: 0;
-  background: linear-gradient(to bottom, var(--background) 42%, transparent 100%);
+.turn[data-back='y'] .turn-cnr {
+  transition: --ky 240ms cubic-bezier(0.25, 0.9, 0.3, 1);
 }
 
-/* Instrument strip: action — progress — destination */
-.scroll-advance-hit {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 1.15rem;
-  width: 100%;
-  padding: 1.15rem 1.75rem 1.35rem;
-  pointer-events: auto;
-  text-decoration: none;
-}
-
-/* Hairline separating the panel from the content it sits over */
-.scroll-advance-hit::before {
-  content: '';
+/* Exists only between the two stages: once the halves have formed and before
+   they meet. Without it they are two marks on a line; with it they are two
+   marks aimed at each other. */
+.turn-rail {
   position: absolute;
-  left: 1.75rem;
-  right: 1.75rem;
+  left: 12px;
+  right: 12px;
+  top: 50%;
   height: 1px;
-  background: var(--border);
-  opacity: calc(0.4 + var(--sa) * 0.6);
+  translate: 0 -50%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--foreground) 20%, transparent),
+    transparent
+  );
+  opacity: calc(min(var(--ky), 1) * (1 - var(--kx)));
 }
 
-.scroll-advance[data-dir='down'] .scroll-advance-hit::before {
-  top: 0;
-}
-.scroll-advance[data-dir='up'] .scroll-advance-hit::before {
-  bottom: 0;
-}
-
-.scroll-advance-action,
-.scroll-advance-target {
-  flex-shrink: 0;
-  font-size: 10px;
+/* The destination, named before you commit to it. Sits against the edge you
+   are pushing toward. */
+.turn-label {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  padding: 4px 10px;
+  pointer-events: auto;
+  font-family: var(--family-ui);
+  font-size: var(--fs-label);
   font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--foreground);
-  white-space: nowrap;
+  color: color-mix(in srgb, var(--foreground) 62%, transparent);
+  transition: color 160ms ease;
 }
 
-.scroll-advance-action {
-  opacity: calc(0.35 + var(--sa) * 0.4);
-}
+.turn[data-dir='down'] .turn-label { bottom: 14px; }
+.turn[data-dir='up'] .turn-label { top: 14px; }
+.turn-label:hover { color: var(--foreground); }
 
-.scroll-advance-target {
-  opacity: calc(0.4 + var(--sa) * 0.6);
-}
+.turn[data-state='out'] .turn-label,
+.turn[data-state='hold'] .turn-label,
+.turn[data-state='in'] .turn-label { opacity: 0; }
 
-/* ── The bar ─────────────────────────────────────────────────────────── */
-
-.scroll-advance-bar {
-  position: relative;
-  display: block;
-  flex: 1;
-  height: 16px;
-}
-
-.scroll-advance[data-dir='up'] .scroll-advance-bar {
-  transform: scaleX(-1);
-}
-
-.scroll-advance-track {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 100%;
-  height: 1px;
-  background: var(--border);
-  transform: translateY(-50%);
-}
-
-.scroll-advance-fill {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  height: 1px;
-  width: calc(var(--sa) * 100%);
-  background: var(--foreground);
-  transform: translateY(-50%);
-}
-
-/* Explicit start and finish marks */
-.scroll-advance-cap {
-  position: absolute;
-  top: 50%;
-  width: 1px;
-  height: 14px;
-  background: var(--foreground);
-  transform: translateY(-50%);
-}
-
-.scroll-advance-cap-start {
-  left: 0;
-  opacity: calc(0.4 + var(--sa) * 0.6);
-}
-
-.scroll-advance-cap-end {
-  right: 0;
-  /* Brightens and grows as the head closes on it */
-  opacity: calc(0.28 + var(--sa) * 0.72);
-  height: calc(14px + var(--sa) * 6px);
-}
-
-.scroll-advance-head {
-  position: absolute;
-  top: 50%;
-  left: calc(var(--sa) * 100%);
-  width: 14px;
-  height: 14px;
-  transform: translate(-50%, -50%);
-  opacity: calc(0.25 + var(--sa) * 0.75);
-}
-
-.scroll-advance-head-h,
-.scroll-advance-head-v {
-  position: absolute;
-  background: var(--foreground);
-}
-
-.scroll-advance-head-h {
-  left: 50%;
-  top: 50%;
-  width: 14px;
-  height: 1px;
-  transform: translate(-50%, -50%);
-}
-
-.scroll-advance-head-v {
-  left: 50%;
-  top: 50%;
-  width: 1px;
-  height: 14px;
-  transform: translate(-50%, -50%);
-}
-
-/* ── Commit ──────────────────────────────────────────────────────────── */
-
-/* Accent is reserved for state: only at the moment it commits */
-.scroll-advance[data-state='firing'] .scroll-advance-fill,
-.scroll-advance[data-state='firing'] .scroll-advance-head-h,
-.scroll-advance[data-state='firing'] .scroll-advance-head-v,
-.scroll-advance[data-state='firing'] .scroll-advance-cap-end {
-  background: var(--cursor-accent);
-}
-
-/* One decisive gesture as it lets go, rather than the panel simply vanishing */
-.scroll-advance[data-state='firing'] .scroll-advance-hit {
-  animation: sa-commit 300ms cubic-bezier(0.32, 0, 0.2, 1) forwards;
-}
-
-@keyframes sa-commit {
-  0% { transform: scale(1); opacity: 1; }
-  30% { transform: scale(1.035); opacity: 1; }
-  100% { transform: scale(0.97); opacity: 0; }
-}
-
-/* ── Scroll-scrubbed page exit ───────────────────────────────────────── */
-
-/* Driven by the same value as the gauge, so the transition is scrubbed by the
-   scroll and reverses if the user lets go. During the release beat --page-exit
-   is pushed past 1, which carries the page well clear of the frame.
-   perspective() is applied per-element rather than on an ancestor so it cannot
-   affect anything else's containing block. */
-[data-page-content] {
-  transform: perspective(1500px)
-    translate3d(0, calc(var(--page-exit, 0) * var(--page-exit-dir, -1) * 150px), 0)
-    translateZ(calc(var(--page-exit, 0) * -420px))
-    rotateX(calc(var(--page-exit, 0) * var(--page-exit-dir, -1) * -5deg));
-  /* Deliberately still ~0.4 at full charge. Fading to zero by then would make
-     the release beat animate an already-invisible page — the payoff has to be
-     visible, so the page only clears during the release overshoot. */
-  opacity: calc(1 - var(--page-exit, 0) * 0.62);
+/* ── The page shutting ─────────────────────────────────────────────
+   Untouched while you push — no dimming, no scaling, no cropping. It only
+   moves once the turn has been committed, and then it shuts onto the line the
+   plus has made and the next page opens back out of it. */
+[data-turn] [data-page-content] {
+  transform: scaleY(calc(1 - var(--page-shut, 0)));
   transform-origin: 50% 50%;
+  opacity: calc(1 - var(--page-shut, 0));
+}
+
+/* Scoped to [data-turn] on purpose: a transform left on permanently, even an
+   identity one, makes this element the containing block for every fixed
+   descendant inside it. */
+
+[data-turn='out'] [data-page-content] {
+  transition: transform 130ms cubic-bezier(0.45, 0, 0.9, 0.35), opacity 80ms ease;
+}
+
+[data-turn='shut'] [data-page-content] { transition: none; }
+
+[data-turn='in'] [data-page-content] {
+  transition: transform 300ms cubic-bezier(0.25, 0.9, 0.3, 1), opacity 70ms ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-page-content] {
-    transform: none;
-    opacity: 1;
-  }
-  .scroll-advance-cap-end {
-    height: 14px;
-  }
-  .scroll-advance[data-state='firing'] .scroll-advance-hit {
-    animation: none;
-    opacity: 0;
-  }
+  .turn { display: none; }
+  [data-page-content] { transform: none; opacity: 1; transition: none; }
 }
 
 /* ─── The transport ───────────────────────────────────────────────────── */
@@ -2673,7 +2553,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    all times now, so every page has to stand clear of it or its last line sits
    behind it. Reserved once here rather than page by page. */
 [data-page-content] {
-  padding-bottom: var(--advance-h, 0px);
 }
 
 .about-page {
@@ -2697,7 +2576,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     display: flex;
     flex-direction: column;
     /* 5rem is the main column's top padding; the strip is reserved below. */
-    min-height: calc(100vh - 5rem - var(--advance-h, 0px));
+    min-height: calc(100vh - 5rem);
   }
 
   /* The last child, not `.about-band` — the band is wrapped in a Settle, so
@@ -2952,12 +2831,10 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    Page content only. The sidebar sits outside [data-page-content], so its
    scale is untouched by anything here.
 
-   The breadcrumb and the advance strip are fixed rather than in the flow, so
-   they miss the selector — but they span the content column, are read at the
-   same distance, and were the last two things under the floor. */
+   The breadcrumb is fixed rather than in the flow, so it misses the selector —
+   but it spans the content column and is read at the same distance. */
 [data-page-content],
-[data-breadcrumb],
-.scroll-advance {
+[data-breadcrumb] {
   --fs-meta: var(--fs-meta-content);
   --fs-label: var(--fs-label-content);
 }
@@ -2967,8 +2844,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   font-size: var(--fs-meta-content);
 }
 
-.scroll-advance-action,
-.scroll-advance-target {
+.turn-label {
   font-size: var(--fs-label-content);
 }
 

@@ -3,27 +3,39 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { MASS, clamp, installMaterial, springStep } from '@/lib/physics'
 import { neighbours, type Page } from '@/lib/flow'
 import { sfx } from '@/lib/audio'
 
 /**
- * Overscroll-to-advance, in both directions.
+ * Overscroll to turn the page, in both directions.
  *
- * Past the bottom of a page, further downward input charges a gauge toward the
- * next page. Past the top, upward input charges toward the previous one. Stop
- * pushing and the charge drains back.
+ * Four corner marks stand at the corners of the content column — vertex on the
+ * corner, arms running along the inside edges, so at rest they read as a
+ * viewfinder around the page rather than as chrome added to it. Pushing past
+ * an edge closes them, in two stages:
  *
- * The transition has three beats, and the middle one is what gives it weight:
+ *   1. VERTICAL   the top pair and the bottom pair meet on the centre line,
+ *                 which leaves a ⊢ and a ⊣ facing each other across the page.
+ *   2. HORIZONTAL those two halves come together, and the four right angles
+ *                 lie on one another as the plus they were cut from — every
+ *                 arm of it accounted for exactly once.
  *
- *   1. CHARGE   scrubbed by the scroll. The outgoing page recedes in
- *               proportion, and reverses if the user lets go.
- *   2. RELEASE  on reaching full charge the page is *not* swapped straight
- *               away. Tension is released over RELEASE_MS: the exit keeps
- *               accelerating past 1 while the gauge commits. Without this the
- *               buildup has no payoff — the content just blinks out.
- *   3. ARRIVE   navigation happens at the end of the release, and the incoming
- *               page settles in from the direction of travel.
+ * Between the stages is a band of dead travel. It costs a seventh of the push
+ * and buys the thing the rough version was missing: the halves stop being a
+ * frame you pass through on the way to somewhere and become a position you can
+ * hold, so the gesture has a place to pause and a second, deliberate half.
+ *
+ * Each stage eases out rather than tracking the push linearly, so the marks
+ * arrive at the halves and settle instead of sliding at a constant rate.
+ *
+ * The page itself is not touched while you push — no dimming, no scaling, no
+ * cropping. Everything the interaction has to say before it commits is said by
+ * where four small right angles are.
+ *
+ * On commit the page shuts onto the line the plus has made, holds for a beat
+ * so the plus is actually seen, and the next page opens out of it while the
+ * marks come apart again in the same order, reversed: the plus opens to the
+ * halves, the halves back to the corners.
  *
  * Why wheel deltas rather than scroll position: Lenis clamps scrollY at both
  * ends of the document, so once you are against an edge the position stops
@@ -31,18 +43,28 @@ import { sfx } from '@/lib/audio'
  * fires — Lenis calls preventDefault but does not stop propagation.
  */
 
-/** Total wheel distance, in px, required past an edge. */
-const THRESHOLD_PX = 1240
-/** No single event may contribute more than this share of the gauge. */
-const MAX_EVENT_SHARE = 0.06
-/** Gauge units drained per second once input stops. */
-const DRAIN_PER_S = 1.35
+/** Total wheel distance, in px, to go from four marks to one. */
+const PUSH_PX = 760
+/** Share of that push which closes the vertical. */
+const SPLIT = 0.42
+/** Dead travel between the stages — the detent. */
+const DEAD = 0.14
+/** No single event may contribute more than this share. */
+const MAX_EVENT_SHARE = 0.07
+/** Charge drained per second once input stops. */
+const DRAIN_PER_S = 1.4
 /** Input is considered stopped after this long without an event. */
-const IDLE_MS = 180
-/** The release beat: how long the page keeps flying before the route swaps. */
-const RELEASE_MS = 280
-/** How far past full the exit is driven during the release. */
-const RELEASE_OVERSHOOT = 0.5
+const IDLE_MS = 170
+
+/** The three beats of the turn. */
+const OUT_MS = 130
+const HOLD_MS = 80
+const IN_MS = 300
+/** How long after the plus opens before the halves return to the corners. */
+const RETRACT_Y_MS = 170
+
+/** Decelerating, so a stage arrives rather than slides. */
+const ease = (t: number) => 1 - Math.pow(1 - t, 2.2)
 
 type Dir = 'down' | 'up' | null
 
@@ -51,14 +73,14 @@ export function ScrollAdvance() {
   const router = useRouter()
   const { next, prev } = neighbours(pathname)
 
+  const nextPath = next?.path ?? null
+  const prevPath = prev?.path ?? null
+
   const rootRef = useRef<HTMLDivElement>(null)
   const [enabled, setEnabled] = useState(false)
   const [dir, setDir] = useState<Dir>(null)
 
-  useEffect(() => {
-    installMaterial()
-    setEnabled(true)
-  }, [])
+  useEffect(() => setEnabled(true), [])
 
   useEffect(() => {
     if (next) router.prefetch(next.path)
@@ -73,16 +95,15 @@ export function ScrollAdvance() {
     const docEl = document.documentElement
 
     // Written imperatively, so React's diff never resets these between routes.
-    root.dataset.state = 'idle'
-    root.dataset.active = 'false'
-    docEl.style.setProperty('--page-exit', '0')
+    const arriving = docEl.dataset.turn === 'shut'
+    if (!arriving) {
+      root.dataset.state = 'idle'
+      root.style.setProperty('--kx', '0')
+      root.style.setProperty('--ky', '0')
+      docEl.style.setProperty('--page-shut', '0')
+      delete docEl.dataset.turn
+    }
     setDir(null)
-
-    // Cleared once the incoming page has had time to read it for its arrival
-    // direction. Left set, it would also affect later scroll reveals.
-    const navDirTimer = window.setTimeout(() => {
-      delete docEl.dataset.navDir
-    }, 1600)
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -104,7 +125,7 @@ export function ScrollAdvance() {
       return null
     }
 
-    /** The visible content column, so the panel can span it. */
+    /** The visible content column, so the marks frame it rather than the window. */
     const contentRect = () => {
       const nodes = document.querySelectorAll<HTMLElement>('[data-page-content]')
       for (const n of nodes) {
@@ -115,46 +136,56 @@ export function ScrollAdvance() {
     }
 
     let charge = 0
-    let shown = 0
-    let shownVel = 0
     let activeDir: Dir = null
-    /**
-     * Which direction the resting hint is currently advertising.
-     *
-     * The panel used to be invisible until you were already overscrolling,
-     * which meant the only way to discover the next page was to push past the
-     * bottom by accident. Reaching the edge now shows the strip quietly — the
-     * destination named, the gauge empty — so the gesture is offered before it
-     * has to be guessed. Tracked in a local rather than read back from React
-     * state so the label is only re-rendered when it actually changes.
-     */
     let restingDir: Dir = null
-    /** Last published height, so the custom property is only written on change. */
-    let lastHeight = 0
     let lastInput = 0
     let armed = true
-    let releaseAt = 0
-    let navigated = false
     let frame = 0
-    let last = performance.now()
+    let box = ''
 
     const target = (d: Dir): Page | null => (d === 'down' ? next : d === 'up' ? prev : null)
 
-    const fire = () => {
-      if (!armed || !target(activeDir)) return
-      armed = false
-      releaseAt = performance.now()
-      root.dataset.state = 'firing'
-      sfx.advance()
-      // Read by Settle on the incoming page to choose its arrival direction.
-      docEl.dataset.navDir = activeDir === 'up' ? 'up' : 'down'
+    /** Both axes, eased, with the detent between them. */
+    const publish = () => {
+      const a = Math.min(1, charge / SPLIT)
+      const b = Math.max(0, Math.min(1, (charge - SPLIT - DEAD) / (1 - SPLIT - DEAD)))
+      root.style.setProperty('--ky', ease(a).toFixed(4))
+      root.style.setProperty('--kx', ease(b).toFixed(4))
     }
+
+    const fire = () => {
+      const dest = target(activeDir)
+      if (!armed || !dest) return
+      armed = false
+      root.dataset.state = 'out'
+      docEl.dataset.turn = 'out'
+      docEl.style.setProperty('--page-shut', '1')
+      sfx.advance()
+
+      // Started now, not after the hold. A client navigation takes a couple of
+      // hundred milliseconds of its own, and waiting for the page to finish
+      // shutting before asking for the next one simply adds that to the turn.
+      // The page is already closing, so the swap happens behind a shut door.
+      router.push(dest.path)
+
+      window.setTimeout(() => {
+        // The plus alone, for long enough to be seen.
+        root.dataset.state = 'hold'
+        // 'shut' rather than 'hold': the next route's effect reads this to know
+        // it has arrived mid-turn and must not simply appear.
+        docEl.dataset.turn = 'shut'
+      }, OUT_MS)
+    }
+
+    /**
+     * A wheel that starts inside a panel with its own scrolling belongs to that
+     * panel, not to the page behind it.
+     */
+    const mine = (t: EventTarget | null) =>
+      !(t instanceof Element) || !t.closest('[data-lenis-prevent]')
 
     const addInput = (deltaY: number) => {
       if (!armed || deltaY === 0) return
-      // Presentation mode covers the page and takes the wheel with it. Without
-      // this a scroll inside the deck would advance the record underneath and
-      // you would close the deck onto a different study.
       if (docEl.dataset.modal) return
 
       const at = edge()
@@ -163,32 +194,23 @@ export function ScrollAdvance() {
 
       if (!pushing || !target(pushing)) return
 
-      const now = performance.now()
       if (activeDir !== pushing) {
         activeDir = pushing
         charge = 0
         setDir(pushing)
-        docEl.style.setProperty('--page-exit-dir', pushing === 'down' ? '-1' : '1')
-        // Falls through rather than returning. The event that establishes the
-        // direction is also the first push, and swallowing it — along with the
-        // 140ms dwell that used to follow — was why the gauge sat still
-        // through the first stretch of a scroll against the edge.
       }
 
-      lastInput = now
-      charge = clamp(charge + Math.min(Math.abs(deltaY) / THRESHOLD_PX, MAX_EVENT_SHARE), 0, 1)
+      if (reduce) {
+        fire()
+        return
+      }
+
+      charge = Math.min(1, charge + Math.min(Math.abs(deltaY) / PUSH_PX, MAX_EVENT_SHARE))
+      lastInput = performance.now()
+      root.dataset.state = 'charging'
+      publish()
       if (charge >= 1) fire()
     }
-
-    /**
-     * A wheel that starts inside a panel with its own scrolling — the sidebar,
-     * the chat — belongs to that panel. Lenis already refuses to move the
-     * window for it, but this listener is on the window and would otherwise
-     * keep charging the gauge and eventually navigate the page underneath,
-     * which is a surprising way to leave a page you were not scrolling.
-     */
-    const mine = (target: EventTarget | null) =>
-      !(target instanceof Element) || !target.closest('[data-lenis-prevent]')
 
     const onWheel = (e: WheelEvent) => {
       if (!mine(e.target)) return
@@ -210,77 +232,40 @@ export function ScrollAdvance() {
     }
 
     const loop = (now: number) => {
-      const dt = Math.min((now - last) / 1000, 0.05)
-      last = now
-
-      let exit: number
-
-      if (releaseAt) {
-        // Release beat: accelerate away, then swap the route at the end.
-        const t = clamp((now - releaseAt) / RELEASE_MS, 0, 1)
-        exit = 1 + t * t * RELEASE_OVERSHOOT
-        shown = 1
-        if (t >= 1 && !navigated) {
-          navigated = true
-          const dest = target(activeDir)
-          if (dest) router.push(dest.path)
-        }
-      } else {
-        if (now - lastInput > IDLE_MS && charge > 0) {
-          charge = clamp(charge - DRAIN_PER_S * dt, 0, 1)
-        }
-        if (charge >= 1 && armed) fire()
-
-        if (reduce) shown = charge
-        else [shown, shownVel] = springStep(shown, shownVel, charge, MASS.light)
-        exit = clamp(shown, 0, 1)
-      }
-
-      const p = clamp(shown, 0, 1)
-      root.style.setProperty('--sa', p.toFixed(4))
-      root.dataset.active = p > 0.004 || releaseAt ? 'true' : 'false'
-      docEl.style.setProperty('--page-exit', exit.toFixed(4))
-
-      // Sitting at an edge that has somewhere to go, and not yet charging.
-      const at = releaseAt || p > 0.004 ? null : edge()
-      const rest = at && target(at) ? at : null
-      root.dataset.resting = rest ? 'true' : 'false'
-      if (rest !== restingDir) {
-        restingDir = rest
-        if (rest) setDir(rest)
-      }
-
-      // Span the content column, so the panel is chrome for the content rather
-      // than an overlay floating across it.
+      // Keep the marks on the content column, which moves when either panel
+      // is resized and is not the window.
+      // Corner to corner of the column, with nothing dodging anything else:
+      // the breadcrumb now sits under the frame rather than over it.
       const r = contentRect()
       if (r) {
-        root.style.left = `${Math.round(r.left)}px`
-        root.style.width = `${Math.round(r.width)}px`
+        const key = `${Math.round(r.left)}:${Math.round(r.width)}`
+        if (key !== box) {
+          box = key
+          root.style.left = `${Math.round(r.left)}px`
+          root.style.width = `${Math.round(r.width)}px`
+        }
       }
 
-      /**
-       * Publish the strip's height so the page can stand clear of it.
-       *
-       * It is fixed to the bottom of the content column and now visible at
-       * all times, so anything anchored to the foot of the page sits under
-       * it — on About, the record row landed straight behind this. Measured
-       * rather than assumed, because the height moves with the type scale.
-       */
-      const h = Math.ceil(root.getBoundingClientRect().height)
-      if (h && h !== lastHeight) {
-        lastHeight = h
-        docEl.style.setProperty('--advance-h', `${h}px`)
-      }
+      if (armed) {
+        const at = edge()
+        const hint = at && target(at) ? at : null
+        if (hint !== restingDir) {
+          restingDir = hint
+          if (hint) setDir(hint)
+        }
 
-      // Docking upward, sit *below* the breadcrumb rather than over it — the
-      // breadcrumb is the top of the hierarchy and always stays visible.
-      // Measured rather than hardcoded, since its height varies with the route.
-      if (activeDir === 'up') {
-        const crumb = document.querySelector<HTMLElement>('[data-breadcrumb]')
-        const cr = crumb?.getBoundingClientRect()
-        root.style.top = `${Math.round(cr && cr.height > 0 ? cr.bottom : 0)}px`
-      } else {
-        root.style.top = ''
+        if (charge > 0 && now - lastInput > IDLE_MS) {
+          charge = Math.max(0, charge - DRAIN_PER_S / 60)
+          publish()
+        }
+
+        // Only ever writes the three resting states. The turn's own states are
+        // left alone, or the retraction is overwritten on the next frame.
+        const held = root.dataset.state
+        if (held === 'idle' || held === 'resting' || held === 'charging') {
+          root.dataset.state =
+            charge > 0.01 ? 'charging' : restingDir ? 'resting' : 'idle'
+        }
       }
 
       frame = requestAnimationFrame(loop)
@@ -294,15 +279,54 @@ export function ScrollAdvance() {
 
     return () => {
       cancelAnimationFrame(frame)
-      window.clearTimeout(navDirTimer)
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
       window.removeEventListener('touchend', onTouchEnd)
-      // Never leave the outgoing page stranded mid-transition.
-      docEl.style.setProperty('--page-exit', '0')
+      // Never leave a page shut mid-turn.
+      docEl.style.setProperty('--page-shut', '0')
     }
-  }, [enabled, next, prev, router, pathname])
+    // Depends on the paths rather than the objects: neighbours() builds new
+    // ones every render, which re-ran this effect on every keystroke of state
+    // and reset the turn out from under itself.
+  }, [enabled, nextPath, prevPath, router, pathname])
+
+  /**
+   * Taking the marks apart again, in the order they came together. Runs on
+   * arrival: the plus opens to the halves, and only then do the halves go back
+   * to the corners.
+   */
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root || !enabled) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const docEl = document.documentElement
+    if (docEl.dataset.turn !== 'shut') return
+
+    // Open the page out of the seam the plus is sitting on.
+    docEl.dataset.turn = 'in'
+    docEl.style.setProperty('--page-shut', '0')
+
+    root.dataset.state = 'in'
+    root.dataset.back = 'x'
+    root.style.setProperty('--kx', '0')
+
+    const y = window.setTimeout(() => {
+      root.dataset.back = 'y'
+      root.style.setProperty('--ky', '0')
+    }, RETRACT_Y_MS)
+
+    const done = window.setTimeout(() => {
+      root.removeAttribute('data-back')
+      root.dataset.state = 'idle'
+      delete docEl.dataset.turn
+    }, IN_MS + RETRACT_Y_MS)
+
+    return () => {
+      window.clearTimeout(y)
+      window.clearTimeout(done)
+    }
+  }, [pathname, enabled])
 
   if (!next && !prev) return null
 
@@ -312,38 +336,19 @@ export function ScrollAdvance() {
   const href = destination?.path ?? '/'
 
   return (
-    <div
-      ref={rootRef}
-      className="scroll-advance"
-      data-active="false"
-      data-resting="false"
-      data-state="idle"
-      data-dir={dir ?? 'down'}
-    >
-      <Link href={href} className="scroll-advance-hit">
+    <div ref={rootRef} className="turn" data-state="idle" data-dir={dir ?? 'down'}>
+      {/* Only drawn while the two halves are apart. It is what says they are
+          aimed at each other rather than merely sitting on the same line. */}
+      <span className="turn-rail" aria-hidden="true" />
+
+      <span className="turn-cnr turn-tl" aria-hidden="true" />
+      <span className="turn-cnr turn-tr" aria-hidden="true" />
+      <span className="turn-cnr turn-bl" aria-hidden="true" />
+      <span className="turn-cnr turn-br" aria-hidden="true" />
+
+      <Link href={href} data-sfx="tick" className="turn-label">
         <span className="sr-only">Continue to {label}</span>
-
-        <span className="scroll-advance-action" aria-hidden="true">
-          {dir === 'up' ? 'Back' : 'Continue'}
-        </span>
-
-        {/* Linear gauge: an explicit start mark, an explicit finish mark, and a
-            head travelling between them. Mirrored when charging upward so the
-            fill always runs toward the destination. */}
-        <span className="scroll-advance-bar" aria-hidden="true">
-          <span className="scroll-advance-cap scroll-advance-cap-start" />
-          <span className="scroll-advance-track" />
-          <span className="scroll-advance-fill" />
-          <span className="scroll-advance-head">
-            <span className="scroll-advance-head-h" />
-            <span className="scroll-advance-head-v" />
-          </span>
-          <span className="scroll-advance-cap scroll-advance-cap-end" />
-        </span>
-
-        <span className="scroll-advance-target" aria-hidden="true">
-          {label}
-        </span>
+        <span aria-hidden="true">{label}</span>
       </Link>
     </div>
   )
