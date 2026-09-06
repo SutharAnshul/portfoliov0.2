@@ -30,15 +30,18 @@ export function WorkTile({ study }: { study: CaseStudy }) {
       data-sfx="tick"
       className="work-tile group"
     >
-      <CornerMarks />
-
+      {/* The marks bracket the picture, not the picture plus its caption. The
+          well clips its own overflow, so they sit on a wrapper outside it. */}
       {study.thumbnail && (
-        <div className="well" style={{ aspectRatio: '4 / 3' }}>
-          <img
-            src={study.thumbnail}
-            alt={study.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-          />
+        <div className="work-shot">
+          <CornerMarks />
+          <div className="well" style={{ aspectRatio: '4 / 3' }}>
+            <img
+              src={study.thumbnail}
+              alt={study.title}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            />
+          </div>
         </div>
       )}
 

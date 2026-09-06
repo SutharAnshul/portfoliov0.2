@@ -9,19 +9,14 @@ import { useEffect, useRef, useState } from 'react'
  * even the hairline the plate is drawn with. They sit on the centre line of
  * the space the frame will occupy, one at each end, and everything else grows
  * out from between them — the plate, its border and the picture together —
- * blooming open, overshooting a hair and settling. Scroll back and the whole
- * frame collapses into the marks again.
+ * blooming open and settling. It happens once: a frame that has switched on
+ * stays on, because a picture that shuts again every time it leaves the screen
+ * turns reading a case study into watching a light flicker.
  *
- * Reversible on purpose. The reveal it replaces fired once and disconnected
- * its observer, so scrolling back up past a frame found it already on and
- * there was nothing to see a second time.
- *
- * The trigger is the frame's own bottom edge arriving in the viewport, so a
- * frame switches on at the moment it is wholly on screen and never while it
- * is still half cut off by the fold. That is watched with a sentinel on that
- * edge rather than by observing the frame, because an observer on the element
- * reports its top edge crossing, which is a different moment entirely and
- * roughly 490px too early.
+ * The trigger is half the frame being on screen. That is watched as a sentinel
+ * on the frame's own halfway line crossing the fold, rather than as a ratio of
+ * the element, because a threshold of 0.5 can never be met by a frame taller
+ * than the viewport and would leave it dark for its whole length.
  *
  * Fails open twice over. Nothing renders as off: the attribute is absent until
  * the observer has actually reported, so the server's HTML, a client with JS
@@ -29,11 +24,11 @@ import { useEffect, useRef, useState } from 'react'
  * picture rather than a hairline waiting on a script.
  */
 export function Tube({ children }: { children: React.ReactNode }) {
-  const foot = useRef<HTMLSpanElement>(null)
+  const half = useRef<HTMLSpanElement>(null)
   const [state, setState] = useState<'idle' | 'on' | 'off'>('idle')
 
   useEffect(() => {
-    const el = foot.current
+    const el = half.current
     if (!el) return
     if (
       typeof IntersectionObserver === 'undefined' ||
@@ -43,10 +38,19 @@ export function Tube({ children }: { children: React.ReactNode }) {
     }
 
     const observer = new IntersectionObserver(
-      ([entry]) => setState(entry.isIntersecting ? 'on' : 'off'),
-      // On the moment the bottom edge is inside the viewport, off again once
-      // it has left — either back down past the fold or up off the top.
-      { threshold: 0, rootMargin: '0px 0px -2% 0px' },
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          // Reported for every frame the moment it is observed, which is what
+          // shuts the ones below the fold before they are ever seen.
+          setState('off')
+          return
+        }
+        observer.disconnect()
+        setState('on')
+      },
+      // No margin: the switch is the halfway line entering the viewport, which
+      // is exactly the moment half the frame is showing.
+      { threshold: 0, rootMargin: '0px' },
     )
     observer.observe(el)
     return () => observer.disconnect()
@@ -54,7 +58,7 @@ export function Tube({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="tube" data-tube={state === 'idle' ? undefined : state}>
-      <span ref={foot} className="tube-foot" aria-hidden="true" />
+      <span ref={half} className="tube-half" aria-hidden="true" />
       {children}
     </div>
   )
