@@ -1331,54 +1331,75 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 /* ── The tube ──────────────────────────────────────────────────────
-   A frame arrives the way a mark does. Off, the picture is squashed to a
-   bright line across the middle of its plate — scaled rather than hidden, so
-   what you see is the picture's own light collapsed into one strip, which is
-   what a tube actually does. On, it blooms open, overshoots a hair and
-   settles, and the marks travel out to the corners with it.
+   A frame arrives the way a mark does, and off it is nothing at all: no
+   picture, no plate, not even the hairline the plate is drawn with. What is
+   left on screen is the two marks, met on the centre line of the space the
+   frame will fill, one at each end of it. Everything grows out from between
+   them — plate, border and picture as one object — blooms open, overshoots a
+   hair and settles, with the picture running hot as it opens and cooling as
+   it lands.
 
-   Only the transform and the filter move, so the plate keeps its height
-   throughout and nothing below it shifts while you scroll. */
+   Scaling the plate rather than hiding it is what makes this cost nothing:
+   transforms do not affect layout, so the frame holds its full height the
+   whole time and nothing below it shifts while you scroll. */
 .tube {
   position: relative;
 }
 
-/* The line the observer actually watches: the plate's own centre, which is
-   where the collapsed picture sits. Watching the frame's edge instead fires
-   the switch while this line is still below the fold. */
-.tube-centre {
+/* The edge the observer watches — the bottom of the frame. */
+.tube-foot {
   position: absolute;
-  top: 50%;
   left: 0;
+  bottom: 0;
   width: 100%;
   height: 1px;
   pointer-events: none;
 }
 
-[data-tube] .plate img {
+/* Specificity, not style: .shot[data-slide] .plate also sets `transition`,
+   and a shorthand re-declaration drops every longhand it does not mention. At
+   (0,1,1) this rule lost to it and the frame snapped open with no animation at
+   all. Matching through .shot puts it at (0,2,2), and the border-color it was
+   competing with rides along here. */
+[data-tube] .shot .plate {
   transform: scaleY(var(--tube-y, 1));
   transform-origin: 50% 50%;
-  filter: brightness(var(--tube-b, 1));
-  transition: transform 420ms cubic-bezier(0.16, 1.32, 0.4, 1) 60ms,
-    filter 400ms ease 60ms;
+  opacity: var(--tube-o, 1);
+  transition: transform 460ms cubic-bezier(0.16, 1.3, 0.4, 1) 40ms,
+    opacity 90ms ease 40ms,
+    border-color 160ms ease;
 }
 
-/* Switching off is quicker than switching on, and has no overshoot: the
-   picture drops to the line and that is the end of it. */
+[data-tube] .plate img {
+  filter: brightness(var(--tube-b, 1));
+  transition: filter 460ms ease 40ms;
+}
+
+/* Switching off is quicker and has no overshoot: the frame drops shut and
+   that is the end of it. */
+[data-tube='off'] .shot .plate {
+  --tube-y: 0;
+  --tube-o: 0;
+  transition: transform 160ms cubic-bezier(0.5, 0, 0.85, 0.3),
+    opacity 110ms ease 40ms,
+    border-color 160ms ease;
+}
+
 [data-tube='off'] .plate img {
-  --tube-y: 0.01;
-  --tube-b: 2.8;
-  transition: transform 150ms cubic-bezier(0.5, 0, 0.85, 0.3),
-    filter 150ms ease;
+  --tube-b: 2.4;
+  transition: filter 120ms ease;
 }
 
 [data-tube='off'] .shot > .marks {
   --edge: 50%;
 }
 
+/* The marks travel out on the same curve and the same beat as the frame, so
+   the four of them and the picture read as one movement rather than as a
+   reveal with decoration around it. */
 [data-tube='on'] .shot > .marks .mark {
-  transition: top 420ms cubic-bezier(0.16, 1.32, 0.4, 1) 60ms,
-    bottom 420ms cubic-bezier(0.16, 1.32, 0.4, 1) 60ms;
+  transition: top 460ms cubic-bezier(0.16, 1.3, 0.4, 1) 40ms,
+    bottom 460ms cubic-bezier(0.16, 1.3, 0.4, 1) 40ms;
 }
 
 [data-tube='on'] .shot > .marks .mark::before,
@@ -1505,7 +1526,8 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      anyone who has asked for less of it there is nothing left to play. */
   .marks { --edge: 0%; }
   .player { --pedge: 0%; }
-  [data-tube] .plate img { transform: none; filter: none; transition: none; }
+  [data-tube] .shot .plate,
+  [data-tube] .plate img { transform: none; filter: none; opacity: 1; transition: none; }
   .marks,
   .mark,
   .mark::before,
@@ -2041,6 +2063,11 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   border: 1px solid var(--card-line);
   border-radius: var(--r);
   background: var(--card-fill);
+  /* Declared here, at the lowest specificity in play, because the tube's own
+     transition is a shorthand and a shorthand drops every longhand it does not
+     name. Both rules previously sat at (0,3,0) and the later one silently took
+     the whole property. */
+  transition: border-color 160ms ease;
 }
 
 .plate img {
@@ -2975,10 +3002,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    and keep their own cursor, because they are there to be used. */
 .shot[data-slide] {
   cursor: zoom-in;
-}
-
-.shot[data-slide] .plate {
-  transition: border-color 160ms ease;
 }
 
 .shot[data-slide]:hover .plate {

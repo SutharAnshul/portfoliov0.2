@@ -5,23 +5,23 @@ import { useEffect, useRef, useState } from 'react'
 /**
  * A frame that switches on when you scroll to it.
  *
- * Off, the picture is squashed to a bright line across the middle of the plate
- * and the four corner marks have met on that same line. Bring the middle of
- * the frame up the screen and the set comes on: the line blooms open into the
- * picture, overshoots a hair, and settles, while the marks travel out to the
- * corners. Scroll back and it collapses to the line before going dark.
+ * Off, there is nothing there but the two marks: no picture, no plate, not
+ * even the hairline the plate is drawn with. They sit on the centre line of
+ * the space the frame will occupy, one at each end, and everything else grows
+ * out from between them — the plate, its border and the picture together —
+ * blooming open, overshooting a hair and settling. Scroll back and the whole
+ * frame collapses into the marks again.
  *
  * Reversible on purpose. The reveal it replaces fired once and disconnected
  * its observer, so scrolling back up past a frame found it already on and
  * there was nothing to see a second time.
  *
- * What is watched is a sentinel across the plate's centre line, not the frame
- * itself, and the reason is the whole effect. A frame is around 490px tall; if
- * you trigger on its top edge entering a band, the switch fires while its
- * centre — where the bright line actually is — is still below the fold, so the
- * line is never once seen. Watching the centre instead gives roughly a third
- * of a screen of scrolling where the frame is nothing but that line, which is
- * the part worth having.
+ * The trigger is the frame's own bottom edge arriving in the viewport, so a
+ * frame switches on at the moment it is wholly on screen and never while it
+ * is still half cut off by the fold. That is watched with a sentinel on that
+ * edge rather than by observing the frame, because an observer on the element
+ * reports its top edge crossing, which is a different moment entirely and
+ * roughly 490px too early.
  *
  * Fails open twice over. Nothing renders as off: the attribute is absent until
  * the observer has actually reported, so the server's HTML, a client with JS
@@ -29,11 +29,11 @@ import { useEffect, useRef, useState } from 'react'
  * picture rather than a hairline waiting on a script.
  */
 export function Tube({ children }: { children: React.ReactNode }) {
-  const centre = useRef<HTMLSpanElement>(null)
+  const foot = useRef<HTMLSpanElement>(null)
   const [state, setState] = useState<'idle' | 'on' | 'off'>('idle')
 
   useEffect(() => {
-    const el = centre.current
+    const el = foot.current
     if (!el) return
     if (
       typeof IntersectionObserver === 'undefined' ||
@@ -44,9 +44,9 @@ export function Tube({ children }: { children: React.ReactNode }) {
 
     const observer = new IntersectionObserver(
       ([entry]) => setState(entry.isIntersecting ? 'on' : 'off'),
-      // On once the centre line is above the lower third of the screen, off
-      // again as it leaves out of the top.
-      { threshold: 0, rootMargin: '-8% 0px -30% 0px' },
+      // On the moment the bottom edge is inside the viewport, off again once
+      // it has left — either back down past the fold or up off the top.
+      { threshold: 0, rootMargin: '0px 0px -2% 0px' },
     )
     observer.observe(el)
     return () => observer.disconnect()
@@ -54,7 +54,7 @@ export function Tube({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="tube" data-tube={state === 'idle' ? undefined : state}>
-      <span ref={centre} className="tube-centre" aria-hidden="true" />
+      <span ref={foot} className="tube-foot" aria-hidden="true" />
       {children}
     </div>
   )
