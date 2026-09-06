@@ -30,7 +30,7 @@ export default function WorkPage() {
             only need telling apart. */}
         <div
           className="grid grid-cols-1 md:grid-cols-2"
-          style={{ columnGap: 'var(--s6)', rowGap: 'var(--s8)', marginTop: 'var(--s6)' }}
+          style={{ columnGap: 'var(--s6)', rowGap: 'var(--s7)', marginTop: 'var(--s6)' }}
         >
           {caseStudies.map((study, index) => (
             <Settle key={study.slug} boot mass="medium" delay={120 + index * 90}>

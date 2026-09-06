@@ -180,11 +180,24 @@ export function ScrollAdvance() {
       if (charge >= 1) fire()
     }
 
-    const onWheel = (e: WheelEvent) => addInput(e.deltaY)
+    /**
+     * A wheel that starts inside a panel with its own scrolling — the sidebar,
+     * the chat — belongs to that panel. Lenis already refuses to move the
+     * window for it, but this listener is on the window and would otherwise
+     * keep charging the gauge and eventually navigate the page underneath,
+     * which is a surprising way to leave a page you were not scrolling.
+     */
+    const mine = (target: EventTarget | null) =>
+      !(target instanceof Element) || !target.closest('[data-lenis-prevent]')
+
+    const onWheel = (e: WheelEvent) => {
+      if (!mine(e.target)) return
+      addInput(e.deltaY)
+    }
 
     let touchY: number | null = null
     const onTouchStart = (e: TouchEvent) => {
-      touchY = e.touches[0]?.clientY ?? null
+      touchY = mine(e.target) ? (e.touches[0]?.clientY ?? null) : null
     }
     const onTouchMove = (e: TouchEvent) => {
       const y = e.touches[0]?.clientY
