@@ -140,7 +140,9 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
         {children}
       </main>
 
-      {/* Nav divider - line with pill grip, sits above both panels so nothing clips it */}
+      {/* Nav divider. A hairline and nothing else: the col-resize pointer is
+          what says the edge moves, so a drawn grip only added an object to
+          look at. Sits above both panels so nothing clips it. */}
       <div
         onPointerDown={startNavResize}
         style={{ left: navWidth }}
@@ -149,13 +151,12 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
         aria-orientation="vertical"
         aria-label="Resize navigation"
       >
-        <div className="h-full w-px bg-foreground/20 transition-colors group-hover:bg-foreground/40" />
-        <div className="absolute h-8 w-1.5 rounded-[var(--r-sm)] bg-muted-foreground transition-colors group-hover:bg-foreground" />
+        <div className="nav-edge" />
       </div>
 
       {chatOpen && (
         <>
-          {/* Chat divider - line with pill grip */}
+          {/* Chat divider, same treatment. */}
           <div
             onPointerDown={startChatResize}
             style={{ right: chatWidth }}
@@ -164,8 +165,7 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
             aria-orientation="vertical"
             aria-label="Resize chat"
           >
-            <div className="h-full w-px bg-foreground/20 transition-colors group-hover:bg-foreground/40" />
-            <div className="absolute h-8 w-1.5 rounded-[var(--r-sm)] bg-muted-foreground transition-colors group-hover:bg-foreground" />
+            <div className="nav-edge" />
           </div>
 
         </>

@@ -1418,6 +1418,69 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   animation: mark-strike 520ms ease-out;
 }
 
+/* ─── The sidebar, in three bands ─────────────────────────────────────────
+   The whole column used to scroll, so on any window shorter than the content
+   a bar sat down the side of the name, the bio and the sections — none of
+   which will ever grow. Only one thing here can: the list of case studies.
+
+   So the shell no longer scrolls at all. The identity, the sections and the
+   heading over the list are fixed, the transport is pinned to the bottom, and
+   the list between them takes whatever height is left and scrolls only when
+   it actually runs out. */
+/* Auto, not hidden. On a window too short for the fixed chrome plus a usable
+   list, something has to give, and the answer is the whole column scrolling
+   the way it used to rather than the transport being clipped off the bottom
+   where it cannot be reached. On any ordinary window nothing here scrolls. */
+.nav-shell {
+  overflow-y: auto;
+}
+
+.nav-fixed {
+  flex: none;
+  padding: var(--s5) var(--s5) 0;
+}
+
+.nav-studies {
+  /* min-height: 0 is what lets a flex child shrink below its content and
+     scroll. Without it the list keeps its full height, pushes the transport
+     off the bottom, and nothing scrolls anywhere. */
+  flex: 1 1 auto;
+  /* A floor of roughly one card plus its padding, so the list cannot be
+     squeezed to a sliver and stop being a list. The fixed chrome and the
+     transport come to 588px, so this keeps a 700px window — an ordinary
+     laptop — on the fast path with the list scrolling and nothing else;
+     the shell only takes over below about 690. */
+  min-height: 96px;
+  overflow-y: auto;
+  padding: var(--s3) var(--s5);
+  /* The bar is drawn only while you are in the list, and only when the list
+     has somewhere to go. Firefox reads these two; the pseudo-elements below
+     say the same thing to Chromium and Safari. */
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 300ms ease;
+}
+
+.nav-studies:hover,
+.nav-studies:focus-within {
+  scrollbar-color: color-mix(in srgb, var(--foreground) 26%, transparent) transparent;
+}
+
+.nav-studies::-webkit-scrollbar-thumb {
+  background: transparent;
+  transition: background-color 300ms ease;
+}
+
+.nav-studies:hover::-webkit-scrollbar-thumb,
+.nav-studies:focus-within::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--foreground) 26%, transparent);
+  background-clip: padding-box;
+}
+
+.nav-foot {
+  flex: none;
+  padding: 0 var(--s5) var(--s5);
+}
+
 /* ─── Nav items ───────────────────────────────────────────────────────── */
 
 .nav-item {
@@ -2720,6 +2783,26 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   text-wrap: pretty;
 }
 
+/* ─── The resize divider ──────────────────────────────────────────────────
+   No grip. A pill sitting halfway down a hairline is a control drawn for a
+   gesture the cursor already announces — col-resize is the one pointer shape
+   everybody reads as "this edge moves" — and it left a stray object floating
+   in the margin of every page. The line itself takes the hover instead: it
+   brightens and gains a hair of width, which is enough to say the edge is
+   live once the pointer has already told you what it does. */
+.nav-edge {
+  background: color-mix(in srgb, var(--foreground) 18%, transparent);
+  transition: background-color 160ms ease, width 160ms ease;
+  width: 1px;
+  height: 100%;
+}
+
+.group:hover > .nav-edge,
+.group:active > .nav-edge {
+  background: color-mix(in srgb, var(--foreground) 55%, transparent);
+  width: 2px;
+}
+
 /* ─── Scrollbars ──────────────────────────────────────────────────────────
    The native bar is a wide light-grey slab that reads as a piece of the
    operating system dropped onto the page — most visible in the sidebar, which
@@ -2802,6 +2885,54 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    two short lines rather than paragraphs. The row carrying the institution
    mark takes proportionally more: an 18px mark on a 13px line overflows its
    line box, and deriving it keeps the two in step when the token moves. */
+/* One entry: the mark hanging in its own column, the date and the role
+   stacked beside it on a single left edge. Previously the date sat above and
+   the role was pushed right by an inline arrow, so the two halves of one fact
+   started at different places and a wrapped role lined up with neither. */
+.entry {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--s3);
+  align-items: start;
+}
+
+.entry-body {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+/* ⊢ — the right-hand half of the plus the corner marks come from. */
+.entry-mark {
+  position: relative;
+  width: 5px;
+  height: 12px;
+  /* Sits on the date's cap height rather than its line box top. */
+  margin-top: 4px;
+  color: color-mix(in srgb, var(--foreground) 38%, transparent);
+}
+
+.entry-mark::before,
+.entry-mark::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+}
+
+.entry-mark::before {
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 100%;
+}
+
+.entry-mark::after {
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+}
+
 .record-line {
   line-height: var(--lh-record);
 }

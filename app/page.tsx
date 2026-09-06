@@ -59,17 +59,22 @@ function Entry({
   apart?: boolean
 }) {
   return (
-    <div className={apart ? 'record-apart' : undefined}>
-      <div className="t-meta">{period}</div>
-      {/* Class, not an inline style: an inline line-height outranks the token
-          the tuner drives, so this list was the one place on the page where
-          the leading slider appeared to do nothing. */}
-      <div className="t-body record-line" data-mark={mark ? 'true' : undefined}>
-        ↳{' '}
-        {mark && (
-          <LogoMark src="/images/iitg.png" alt="Indian Institute of Technology Guwahati" />
-        )}
-        {detail}
+    <div className={`entry${apart ? ' record-apart' : ''}`}>
+      {/* The same right angle the corner marks are cut from, drawn rather than
+          typed: a glyph would depend on the monospace having it, and this one
+          scales with the row and takes its colour from the text. */}
+      <span className="entry-mark" aria-hidden="true" />
+      <div className="entry-body">
+        <div className="t-meta">{period}</div>
+        {/* Class, not an inline style: an inline line-height outranks the token
+            the tuner drives, so this list was the one place on the page where
+            the leading slider appeared to do nothing. */}
+        <div className="t-body record-line" data-mark={mark ? 'true' : undefined}>
+          {mark && (
+            <LogoMark src="/images/iitg.png" alt="Indian Institute of Technology Guwahati" />
+          )}
+          {detail}
+        </div>
       </div>
     </div>
   )

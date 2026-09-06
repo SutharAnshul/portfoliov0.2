@@ -76,9 +76,12 @@ export function SideNav({ width }: SideNavProps) {
     <aside
       style={width ? { width } : undefined}
       data-lenis-prevent
-      className="fixed left-0 top-0 z-40 flex h-screen flex-col overflow-y-auto bg-sidebar text-sidebar-foreground"
+      className="nav-shell fixed left-0 top-0 z-40 flex h-screen flex-col bg-sidebar text-sidebar-foreground"
     >
-      <div className="flex-1" style={{ padding: 'var(--s5)' }}>
+      {/* Everything above the case studies is fixed. It is a known, finite
+          amount of chrome — a name, a line about him, a CV link, four contacts
+          and two sections — and none of it grows. */}
+      <div className="nav-fixed">
         {/* Identity */}
         <div className="flex items-start justify-between gap-3">
           <h1 className="t-name">Anshul Suthar</h1>
@@ -149,10 +152,16 @@ export function SideNav({ width }: SideNavProps) {
           })}
         </nav>
 
-        {/* Case studies */}
+        {/* The heading belongs to the fixed block: it labels the list, so it
+            should still be there when the list has been scrolled. */}
         <div style={{ marginTop: 'var(--s6)' }}>
           <span className="t-label">Selected case studies</span>
-          <div className="stack" style={{ marginTop: 'var(--s3)' }}>
+        </div>
+      </div>
+
+      {/* The one part that can grow, and so the one part that scrolls. */}
+      <div className="nav-studies">
+        <div className="stack">
             {caseStudies.map((study, i) => {
               const active = pathname === `/work/${study.slug}` && !viaWork
               return (
@@ -179,11 +188,10 @@ export function SideNav({ width }: SideNavProps) {
                 </Link>
               )
             })}
-          </div>
         </div>
       </div>
 
-      <div style={{ padding: '0 var(--s5) var(--s5)' }}>
+      <div className="nav-foot">
         <SoundControl />
       </div>
     </aside>
