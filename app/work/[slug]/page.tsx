@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Settle } from '@/components/Settle'
 import { CornerMarks } from '@/components/CornerMarks'
 import { Presenter } from '@/components/Presenter'
+import { Tube } from '@/components/Tube'
 
 /**
  * A case study as a catalogue record.
@@ -203,8 +204,10 @@ export default async function CaseStudyPage({ params }: Props) {
             className="stack"
             style={{ marginTop: 'var(--s6)', ['--gap' as string]: 'var(--s6)' } as React.CSSProperties}
           >
+            {/* The frames do not settle in like the prose does — they switch
+                on, which is a reveal you can also run backwards. */}
             {screens.map((shot, i) => (
-              <Settle key={shot.key} mass="medium" delay={40}>
+              <Tube key={shot.key}>
                 <figure
                   className="shot relative"
                   data-slide={'src' in shot ? slideOf.get(shot.key) : undefined}
@@ -234,7 +237,7 @@ export default async function CaseStudyPage({ params }: Props) {
                     </span>
                   </div>
                 </figure>
-              </Settle>
+              </Tube>
             ))}
             </div>
           </Presenter>

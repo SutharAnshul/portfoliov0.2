@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { setNavOrigin, useNavOrigin } from '@/lib/nav-origin'
 import { caseStudies } from '@/lib/case-studies'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { SoundControl } from '@/components/SoundControl'
@@ -61,6 +62,16 @@ export function SideNav({ width }: SideNavProps) {
   const isActive = (path: string) =>
     path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(path + '/')
 
+  /**
+   * On a case study, exactly one thing is lit, and which one depends on the
+   * door the reader came through. Arriving from the Work index they are still
+   * in Work; picking the project from this list means the project is where
+   * they are. Lighting both, which is what the plain route test does, answers
+   * a question nobody asked.
+   */
+  const origin = useNavOrigin()
+  const viaWork = pathname.startsWith('/work/') && origin === 'work'
+
   return (
     <aside
       style={width ? { width } : undefined}
@@ -115,7 +126,7 @@ export function SideNav({ width }: SideNavProps) {
         <nav className="stack" style={{ marginTop: 'var(--s6)' }} aria-label="Sections">
           {NAV.filter((item) => !('hidden' in item && item.hidden)).map((item) => {
             const I = ICONS[item.icon]
-            const active = isActive(item.href)
+            const active = item.href === '/work' ? pathname === '/work' || viaWork : isActive(item.href)
             return (
               <Link
                 key={item.href}
@@ -143,11 +154,12 @@ export function SideNav({ width }: SideNavProps) {
           <span className="t-label">Selected case studies</span>
           <div className="stack" style={{ marginTop: 'var(--s3)' }}>
             {caseStudies.map((study, i) => {
-              const active = pathname === `/work/${study.slug}`
+              const active = pathname === `/work/${study.slug}` && !viaWork
               return (
                 <Link
                   key={study.slug}
                   href={`/work/${study.slug}`}
+                  onClick={() => setNavOrigin('nav')}
                   data-sfx="tick"
                   data-active={active}
                   className="card-link study-link relative"
