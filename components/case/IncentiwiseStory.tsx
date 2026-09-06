@@ -20,10 +20,14 @@ import { Settle } from '@/components/Settle'
  * cut out of one. The deck offsets, stacks and overlaps deliberately — the
  * login panel with its two reset states down the right, the three appreciation
  * cards running off both edges — and cropping each rectangle out separately
- * would throw that away. So each crop is bounded by everything on the slide
- * that is not the ground, plus an even margin of the ground itself. That is
- * also why these images sit seamlessly inside the iteration bands: the band is
- * painted the same colour the slide used.
+ * would throw that away.
+ *
+ * The crops are tight, and the breathing room around each one is painted here
+ * instead, on a frame filled with the colour that slide used. Padding is the
+ * page's job: a margin baked into the picture lands at a different size on
+ * every image, because they scale by different amounts to fit one column,
+ * whereas a frame gives them all the identical gap in the same unit as the
+ * space around everything else.
  *
  * The writing is new throughout. Only the pictures are the deck's.
  */
@@ -156,25 +160,42 @@ function Iteration({
 
 const SRC = (name: string) => `/images/incentiwise/story/${name}.png`
 
-function Shot({ src, alt, cap }: { src: string; alt: string; cap?: string }) {
+/**
+ * A screen on its frame. `ground` names the slide's own background where it
+ * is not the usual near-black, so the frame and the picture stay one material.
+ */
+function Shot({
+  src,
+  alt,
+  cap,
+  ground,
+}: {
+  src: string
+  alt: string
+  cap?: string
+  ground?: string
+}) {
   return (
     <figure className="shot">
-      <img src={SRC(src)} alt={alt} loading="lazy" />
+      <div className="frame" style={ground ? ({ '--ground': ground } as React.CSSProperties) : undefined}>
+        <img src={SRC(src)} alt={alt} loading="lazy" />
+      </div>
       {cap && <figcaption className="cap">{cap}</figcaption>}
     </figure>
   )
 }
 
 /**
- * A diagram taken whole from the deck, at the full width of the column. Even
- * there it cannot show eleven features across three roles at the size it was
- * drawn, so it carries a link to the file — the one honest answer to a picture
- * of type that has been scaled past reading.
+ * A diagram from the deck. Even across the whole column it cannot show eleven
+ * features by three roles at the size it was drawn, so it carries a link to
+ * the file — the one honest answer to a picture of type scaled past reading.
  */
 function Diagram({ src, alt, cap }: { src: string; alt: string; cap: string }) {
   return (
-    <figure className="shot shot-wide">
-      <img src={SRC(src)} alt={alt} loading="lazy" />
+    <figure className="shot">
+      <div className="frame">
+        <img src={SRC(src)} alt={alt} loading="lazy" />
+      </div>
       <figcaption className="cap">
         {cap}{' '}
         <a href={SRC(src)} target="_blank" rel="noreferrer" className="full">
@@ -205,12 +226,11 @@ export function IncentiwiseStory() {
       </Beat>
 
       <Settle mass="medium">
-        <figure className="cover">
-          <img
-            src={SRC('cover')}
-            alt="The Incentiwise feed, organisation and badges screens, shown in perspective"
-          />
-        </figure>
+        <Shot
+          src="cover"
+          ground="#0b1a24"
+          alt="The Incentiwise feed, organisation and badges screens, shown in perspective"
+        />
       </Settle>
 
       {/* ── Who is on it ───────────────────────────────────────────── */}
@@ -222,24 +242,22 @@ export function IncentiwiseStory() {
             <img src={SRC('p-admin')} alt="" className="face" loading="lazy" />
             <Pill role="admin" />
             <p>
-              Owns the programme. Funds the pool, builds the badges, brings people in, and signs off
-              what the leads ask for.
+              Owns the programme. Funds the pool, builds the badges, and signs off what the leads
+              ask for.
             </p>
           </div>
           <div className="who-card">
             <img src={SRC('p-dept')} alt="" className="face" loading="lazy" />
             <Pill role="lead">Dept. head</Pill>
             <p>
-              Approves budget requests coming up from the leads, and answers for the culture of
-              everything underneath.
+              Approves what the leads ask for, and answers for the culture underneath.
             </p>
           </div>
           <div className="who-card">
             <img src={SRC('p-lead')} alt="" className="face" loading="lazy" />
             <Pill role="lead">Team lead</Pill>
             <p>
-              Recognises their own team against a quarterly budget, and asks for more when it runs
-              dry.
+              Recognises their own team against a quarterly budget. Asks for more when it runs dry.
             </p>
           </div>
           <div className="who-card">
@@ -460,6 +478,7 @@ export function IncentiwiseStory() {
         <p className="say say-mid">One more, using the product itself.</p>
         <Shot
           src="thanks"
+          ground="#222831"
           alt="An appreciation card addressed to Recruiters, tagged patient and supportive, reading thank you for this opportunity, worth one million points"
         />
       </Beat>
