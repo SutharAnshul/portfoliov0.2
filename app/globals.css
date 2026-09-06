@@ -484,18 +484,17 @@ html {
 
 /* A caption row: label left, description centre, year right — set in tabular
    figures so columns align down the page. */
+/* Name and discipline ranged left, year hard right, so the years form a clean
+   column down the page. Two columns now the description has gone — and the
+   space above it is --s5 rather than --s3 because the marks stand 14px proud
+   of the picture's bottom edge and were landing in the middle of the title. */
 .caption-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--s4);
-  align-items: start;
-  padding-top: var(--s3);
+  align-items: baseline;
+  padding-top: var(--s5);
   font-variant-numeric: tabular-nums;
-}
-
-@media (max-width: 640px) {
-  .caption-row { grid-template-columns: minmax(0, 1fr) auto; }
-  .caption-row > :nth-child(2) { grid-column: 1 / -1; }
 }
 
 
@@ -1313,14 +1312,19 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   position: relative;
 }
 
+/* Standing, not hidden. Every thumbnail keeps its marks met in the middle at
+   a weight you read as furniture rather than as a signal — so the grid always
+   shows where its pictures are, and hovering is the picture opening rather
+   than something appearing out of nothing. */
 .work-shot > .marks {
   inset: -5px;
   --arm: 9px;
+  opacity: 0.26;
 }
 
 .work-tile:hover .work-shot > .marks,
 .work-tile:focus-visible .work-shot > .marks {
-  opacity: 0.9;
+  opacity: 0.95;
   --edge: 0%;
   transition: opacity 50ms ease;
 }

@@ -25,9 +25,12 @@ export default function WorkPage() {
         </Settle>
         <hr className="rule" />
 
+        {/* Rows are given more room than columns: a caption sitting under one
+            picture must not crowd the picture below it, where two side by side
+            only need telling apart. */}
         <div
           className="grid grid-cols-1 md:grid-cols-2"
-          style={{ gap: 'var(--s5)', marginTop: 'var(--s5)' }}
+          style={{ columnGap: 'var(--s6)', rowGap: 'var(--s8)', marginTop: 'var(--s6)' }}
         >
           {caseStudies.map((study, index) => (
             <Settle key={study.slug} boot mass="medium" delay={120 + index * 90}>

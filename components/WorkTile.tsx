@@ -45,12 +45,14 @@ export function WorkTile({ study }: { study: CaseStudy }) {
         </div>
       )}
 
+      {/* Title, discipline and year. The description that used to sit here is
+          the same sentence the case study opens with, so on the index it was
+          asking to be read twice and making every tile a different height. */}
       <div className="caption-row">
         <div className="min-w-0">
           <div className="t-title truncate">{study.title}</div>
           <div className="t-meta truncate">{study.category}</div>
         </div>
-        <p className="t-meta">{study.description}</p>
         <span className="t-meta">{study.year}</span>
       </div>
     </Link>
