@@ -976,19 +976,22 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 /* Corner marks on the transport. Structural: they mark the bounding box and
    read as the fixings holding the faceplate on. Same quarter-of-a-cross as
-   everywhere else, and the same movement behind it — drawn in while the
-   transport is quiet, seated on the corners once it is running. */
+   everywhere else, and the same switch-on — collapsed to a line while the
+   transport is quiet, the picture open once it is running. Which is the one
+   place on the site where a CRT warming up is not a metaphor at all. */
 .player {
-  --screw-gather: 4px;
-  --screw-arm: 7px;
+  --pedge: 50%;
+  --parm: 7px;
 }
 
 .player-screw {
   position: absolute;
-  width: var(--screw-arm);
-  height: var(--screw-arm);
-  opacity: 0.5;
-  transition: opacity 260ms ease, transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  width: var(--parm);
+  height: var(--parm);
+  opacity: 0.42;
+  transition: opacity 150ms ease 110ms,
+    top 130ms cubic-bezier(0.5, 0, 0.85, 0.3),
+    bottom 130ms cubic-bezier(0.5, 0, 0.85, 0.3);
 }
 
 .player-screw::before,
@@ -997,48 +1000,57 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   position: absolute;
   background: var(--foreground);
 }
-.player-screw::before { width: var(--screw-arm); height: 1px; }
-.player-screw::after { width: 1px; height: var(--screw-arm); }
+.player-screw::before { width: var(--parm); height: 1px; }
+.player-screw::after { width: 1px; height: var(--parm); }
 
 .player-screw-tl {
   left: -2px;
-  top: -2px;
-  transform: translate(calc(-100% + var(--screw-gather)), calc(-100% + var(--screw-gather)));
+  top: var(--pedge);
+  transform: translate(-100%, -100%);
 }
 .player-screw-tl::before,
 .player-screw-tl::after { right: 0; bottom: 0; }
 
 .player-screw-tr {
   right: -2px;
-  top: -2px;
-  transform: translate(calc(100% - var(--screw-gather)), calc(-100% + var(--screw-gather)));
+  top: var(--pedge);
+  transform: translate(100%, -100%);
 }
 .player-screw-tr::before,
 .player-screw-tr::after { left: 0; bottom: 0; }
 
 .player-screw-bl {
   left: -2px;
-  bottom: -2px;
-  transform: translate(calc(-100% + var(--screw-gather)), calc(100% - var(--screw-gather)));
+  bottom: var(--pedge);
+  transform: translate(-100%, 100%);
 }
 .player-screw-bl::before,
 .player-screw-bl::after { right: 0; top: 0; }
 
 .player-screw-br {
   right: -2px;
-  bottom: -2px;
-  transform: translate(calc(100% - var(--screw-gather)), calc(100% - var(--screw-gather)));
+  bottom: var(--pedge);
+  transform: translate(100%, 100%);
 }
 .player-screw-br::before,
 .player-screw-br::after { left: 0; top: 0; }
 
 .player[data-on='true'] {
-  --screw-gather: 0px;
+  --pedge: 0%;
 }
 
 .player[data-on='true'] .player-screw {
   opacity: 0.9;
+  transition: opacity 50ms ease,
+    top 360ms cubic-bezier(0.16, 1.35, 0.4, 1) 60ms,
+    bottom 360ms cubic-bezier(0.16, 1.35, 0.4, 1) 60ms;
 }
+
+.player[data-on='true'] .player-screw::before,
+.player[data-on='true'] .player-screw::after {
+  animation: mark-strike 480ms ease-out;
+}
+
 
 
 .player-row {
@@ -1169,37 +1181,38 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    transport. Replaces border-weight changes, which were too quiet to read
    against a monochrome card. */
 .marks {
-  /* How far each mark has drawn in toward the middle. At rest they are
-     gathered; as the thing they mark is chosen they travel out and seat on
-     its corners. */
-  --gather: 5px;
+  /* Where the top and bottom pairs sit. 50% puts all four vertices on the
+     element's centre line, where they merge into one bright bar; 0 opens them
+     out onto the corners. Only the vertical axis ever collapses, which is why
+     none of this needs to know the element's size — a percentage does it. */
+  --edge: 50%;
   --arm: 7px;
+  --glow: 0 0 0 rgba(250, 250, 250, 0);
 
   position: absolute;
   inset: -2px;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 260ms ease;
+
+  /* Switching off: the picture collapses to the line first and only then goes
+     dark. The delay on the fade is the whole effect — without it you get a
+     dissolve, and the half everyone actually remembers about a CRT is the
+     collapse. */
+  transition: opacity 150ms ease 130ms;
 }
 
-/* One quarter of the cross these used to be.
-   The right angle sits ON the corner it marks and both arms point away from
-   the element — which is the only orientation where the four can tile. Slide
-   them together and the two left arms lie on each other, the two right arms
-   likewise, the ups and the downs the same, and what is left standing in the
-   middle is the plus they were cut from. The two halves pass through ⊣ and ⊢
-   on the way.
-
-   That is also the movement. Hidden, they are drawn in toward that meeting
-   point; shown, they disperse and seat on the corners. Five pixels of travel
-   is enough for the eye to read the direction, and the direction is the whole
-   story — a nav list that flings its marks 130px to the middle on every hover
-   is a nav list nobody can skim. */
+/* One quarter of the cross these used to be. The right angle sits ON the
+   corner it marks and both arms point away, which is the only orientation
+   where the four tile: bring them together and the two left arms lie on each
+   other, the rights likewise, the ups and the downs the same, and the plus
+   they were cut from is what stands in the middle. Collapse just the vertical
+   and you stop half way, at a ⊣ and a ⊢ facing each other. */
 .mark {
   position: absolute;
   width: var(--arm);
   height: var(--arm);
-  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: top 130ms cubic-bezier(0.5, 0, 0.85, 0.3),
+    bottom 130ms cubic-bezier(0.5, 0, 0.85, 0.3);
 }
 
 .mark::before,
@@ -1207,64 +1220,78 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   content: '';
   position: absolute;
   background: var(--foreground);
+  box-shadow: var(--glow);
+  transition: box-shadow 130ms ease;
 }
 
 .mark::before { width: var(--arm); height: 1px; }
 .mark::after { width: 1px; height: var(--arm); }
 
 /* Each box is pushed a full width and height clear of its corner, which puts
-   its inner vertex exactly on that corner; the arms then run outward from it.
-   The gather is subtracted from that push, so the marks draw inward without
-   any second transform to compose. */
+   its inner vertex exactly on that corner and lets the arms run outward. */
 .mark-tl {
   left: 0;
-  top: 0;
-  transform: translate(calc(-100% + var(--gather)), calc(-100% + var(--gather)));
+  top: var(--edge);
+  transform: translate(-100%, -100%);
 }
 .mark-tl::before,
 .mark-tl::after { right: 0; bottom: 0; }
 
 .mark-tr {
   right: 0;
-  top: 0;
-  transform: translate(calc(100% - var(--gather)), calc(-100% + var(--gather)));
+  top: var(--edge);
+  transform: translate(100%, -100%);
 }
 .mark-tr::before,
 .mark-tr::after { left: 0; bottom: 0; }
 
 .mark-bl {
   left: 0;
-  bottom: 0;
-  transform: translate(calc(-100% + var(--gather)), calc(100% - var(--gather)));
+  bottom: var(--edge);
+  transform: translate(-100%, 100%);
 }
 .mark-bl::before,
 .mark-bl::after { right: 0; top: 0; }
 
 .mark-br {
   right: 0;
-  bottom: 0;
-  transform: translate(calc(100% - var(--gather)), calc(100% - var(--gather)));
+  bottom: var(--edge);
+  transform: translate(100%, 100%);
 }
 .mark-br::before,
 .mark-br::after { left: 0; top: 0; }
 
-/* Shown when the host is selected, or previewed faintly on hover. Hover takes
-   them most of the way out and selection seats them, so the two states differ
-   in position as well as in weight — you can see a card is being considered
-   rather than chosen. */
+/* Hovering shows the line the four make where they meet — a real stage of the
+   figure rather than a dimmer copy of the end of it. */
+.card-link:hover > .marks,
+.nav-item:hover > .marks {
+  opacity: 0.34;
+  --glow: 0 0 2px rgba(250, 250, 250, 0.5);
+}
+
+/* Switching on. The fade is instant and the picture blooms out of the line,
+   overshooting a little before it settles. */
 [data-active='true'] > .marks {
   opacity: 0.9;
-  --gather: 0px;
+  --edge: 0%;
+  transition: opacity 50ms ease;
 }
 
-.card-link:hover > .marks {
-  opacity: 0.35;
-  --gather: 2px;
+[data-active='true'] > .marks .mark {
+  transition: top 360ms cubic-bezier(0.16, 1.35, 0.4, 1) 60ms,
+    bottom 360ms cubic-bezier(0.16, 1.35, 0.4, 1) 60ms;
 }
 
-/* Hovering the one already chosen should not walk its marks back in. */
-.card-link[data-active='true']:hover > .marks {
-  --gather: 0px;
+/* The strike: bright at the instant of switch-on, gone by the time the picture
+   has finished opening. */
+[data-active='true'] > .marks .mark::before,
+[data-active='true'] > .marks .mark::after {
+  animation: mark-strike 480ms ease-out;
+}
+
+@keyframes mark-strike {
+  from { box-shadow: 0 0 7px rgba(250, 250, 250, 0.9); }
+  to { box-shadow: 0 0 0 rgba(250, 250, 250, 0); }
 }
 
 /* ─── Nav items ───────────────────────────────────────────────────────── */
@@ -1381,9 +1408,16 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   [class^='mech'],
   .mech-select { transition: none; }
   .nav-item:hover .nav-plate::after { animation: none; }
+  /* No collapse, no bloom, no strike — the marks are simply open and lit.
+     The CRT is the one idea on the site that is entirely motion, so for
+     anyone who has asked for less of it there is nothing left to play. */
+  .marks { --edge: 0%; }
+  .player { --pedge: 0%; }
   .marks,
   .mark,
-  .player-screw { transition: none; }
+  .mark::before,
+  .mark::after,
+  .player-screw { transition: none; animation: none; }
 }
 
 /* Quiet inline link — serif italic, underlined, small. Used for asides that
@@ -2114,12 +2148,9 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   color: var(--foreground);
 }
 
-/* Corner crosses mark the active section, exactly as on desktop. */
-.m-rail-item .marks {
-  opacity: 0;
-  transition: opacity var(--dur-light, 300ms) var(--ease-light, ease-out);
-}
-
+/* Corner marks show the active section, exactly as on desktop — including the
+   switch-on, so the opacity timing is left to the shared rule rather than
+   redeclared here as a plain dissolve. */
 .m-rail-item[data-active='true'] .marks {
   opacity: 1;
 }
@@ -2231,17 +2262,20 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .shot > .marks {
   opacity: 1;
   inset: -4px;
-  /* A frame is always the subject, so its marks are always seated. Longer
-     arms than the 7px used on controls, because these frames are an order of
+  /* A frame is always the subject, so its picture is always on. Longer arms
+     than the 7px used on controls, because these frames are an order of
      magnitude bigger and 7px would read as specks. */
-  --gather: 0px;
+  --edge: 0%;
   --arm: 10px;
 }
 
-/* A frame that opens the deck gathers its brackets a little as you press it,
-   which is the same figure closing that a nav item plays in reverse. */
+/* No collapse on a frame. The travel is half the frame's height — 250px on a
+   big plate — and firing that in 130ms under the thumb reads as a glitch
+   rather than a gesture. Pressing dims the picture instead, which is all a
+   press has to say. */
 .shot[data-slide]:active > .marks {
-  --gather: 3px;
+  opacity: 0.5;
+  transition: opacity 90ms ease;
 }
 
 /* ─── Mechanisms on a phone ───────────────────────────────────────────────
