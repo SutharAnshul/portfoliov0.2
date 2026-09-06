@@ -17,10 +17,24 @@ import { createPortal } from 'react-dom'
  * keeps its HTML and a still frame becomes a way in at that exact slide.
  * Live-prototype frames carry no index and are left alone to be used.
  *
- * Every affordance is stated rather than implied. The way in says "Present",
- * the way out says "Esc", the keys are named along the bottom, and the rail
- * shows both where you are and how much is left. A deck that needs explaining
- * is a deck nobody finishes.
+ * The way in says "Present". After that the screen belongs to the slide, and
+ * two things are allowed to sit on top of it: a rail along the bottom saying
+ * how far through you are, and a cross to leave by. Nothing appears on hover,
+ * nothing appears on the way to the next slide, and nothing waits to fade —
+ * there is no third state to discover, because there is nothing else there.
+ *
+ * The rail says it without saying a number. "14 / 24" is a fact you have to
+ * read; a row of dashes is a proportion you can take in without looking away
+ * from the slide, which is the only reason to put anything there at all.
+ *
+ * The cross is present and faint rather than hidden and revealed: reachable
+ * the instant you want it, invisible until then, and fully drawn only when the
+ * pointer is actually on it. A control that has to be summoned is a control
+ * people assume does not exist.
+ *
+ * Every key still works the whole time — arrows, space, page keys, Home and
+ * End, Escape and F — as does clicking the slide to advance and swiping on a
+ * phone. They are simply not advertised on every frame.
  */
 
 export interface Slide {
@@ -28,10 +42,8 @@ export interface Slide {
   alt: string
 }
 
-/** How long the chrome stays up after the last input. */
-const IDLE_MS = 2600
-
-const pad = (n: number) => String(n).padStart(2, '0')
+/** How long the one line about getting out stays up. */
+const HINT_MS = 3600
 
 export function Presenter({
   title,
@@ -51,7 +63,7 @@ export function Presenter({
   const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
   const [i, setI] = useState(0)
-  const [idle, setIdle] = useState(false)
+  const [hint, setHint] = useState(false)
   const overlay = useRef<HTMLDivElement>(null)
   const opener = useRef<HTMLElement | null>(null)
 
@@ -62,7 +74,10 @@ export function Presenter({
       opener.current = document.activeElement as HTMLElement | null
       setI(Math.min(Math.max(at, 0), slides.length - 1))
       setOpen(true)
-      setIdle(false)
+      setHint(true)
+      // Opening is a click, so this is a user gesture and the request is
+      // allowed. Best-effort: refused, the overlay still fills the viewport.
+      document.documentElement.requestFullscreen?.().catch(() => {})
     },
     [slides.length],
   )
@@ -145,26 +160,26 @@ export function Presenter({
     }
   }, [open])
 
-  // ── The chrome gets out of the way ──────────────────────────────
-  // Anything that is not the slide fades once you stop asking for it, and
-  // comes straight back on the next movement or keystroke.
+  // ── The one line, and then silence ──────────────────────────────
+  useEffect(() => {
+    if (!open || !hint) return
+    const t = window.setTimeout(() => setHint(false), HINT_MS)
+    return () => window.clearTimeout(t)
+  }, [open, hint])
+
+  // ── Leaving fullscreen leaves the deck ──────────────────────────
+  // Escape is taken by the browser while fullscreen is on, so the keydown
+  // handler never sees it. Without this the first Escape would drop out of
+  // fullscreen and appear to do nothing, and it would take a second one to
+  // actually close — which is not what the line on screen promised.
   useEffect(() => {
     if (!open) return
-    let t: number
-    const wake = () => {
-      setIdle(false)
-      clearTimeout(t)
-      t = window.setTimeout(() => setIdle(true), IDLE_MS)
+    const onFs = () => {
+      if (!document.fullscreenElement) hide()
     }
-    wake()
-    window.addEventListener('pointermove', wake)
-    window.addEventListener('keydown', wake)
-    return () => {
-      clearTimeout(t)
-      window.removeEventListener('pointermove', wake)
-      window.removeEventListener('keydown', wake)
-    }
-  }, [open])
+    document.addEventListener('fullscreenchange', onFs)
+    return () => document.removeEventListener('fullscreenchange', onFs)
+  }, [open, hide])
 
   // ── Swipe ───────────────────────────────────────────────────────
   const touch = useRef<{ x: number; y: number } | null>(null)
@@ -182,7 +197,6 @@ export function Presenter({
   }
 
   const at = slides[i]
-  const first = i === 0
   const last = i === slides.length - 1
 
   return (
@@ -214,7 +228,7 @@ export function Presenter({
         createPortal(
           <div
             ref={overlay}
-            className={`deck cursor-native${idle ? ' deck-idle' : ''}`}
+            className="deck cursor-native"
             role="dialog"
             aria-modal="true"
             aria-label={`${title}, presentation`}
@@ -222,12 +236,8 @@ export function Presenter({
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
-            {/* Where you are, and the way out. */}
+            {/* The way out. That is all this row carries. */}
             <header className="deck-bar">
-              <span className="deck-name t-label">{title}</span>
-              <span className="deck-count t-label">
-                {pad(i + 1)} <span className="deck-of">/ {pad(slides.length)}</span>
-              </span>
               <button type="button" className="deck-x" onClick={hide} aria-label="Close, back to the page">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                   <path d="M18 6L6 18M6 6l12 12" />
@@ -249,57 +259,31 @@ export function Presenter({
                 ))}
             </div>
 
-            <button
-              type="button"
-              className="deck-step deck-prev"
-              onClick={() => go(-1)}
-              disabled={first}
-              aria-label="Previous slide"
-            >
-              ←
-            </button>
-            <button
-              type="button"
-              className="deck-step deck-next"
-              onClick={() => go(1)}
-              disabled={last}
-              aria-label="Next slide"
-            >
-              →
-            </button>
-
-            <footer className="deck-foot">
-              {/* One segment a slide: where you are, how far is left, and a
-                  way to jump without stepping through everything between. */}
-              <div className="deck-rail">
-                {slides.map((s, n) => (
-                  <button
-                    key={s.src}
-                    type="button"
-                    className={`deck-tick${n === i ? ' is-at' : ''}${n < i ? ' is-past' : ''}`}
-                    onClick={() => setI(n)}
-                    aria-label={`Slide ${n + 1}`}
-                    aria-current={n === i ? 'true' : undefined}
-                  />
-                ))}
-              </div>
-              {/* A phone has no arrow keys and no Esc, so it is told what it
-                  does have. Both are rendered and CSS picks; a media query is
-                  the only thing here that knows about the device. */}
-              <p className="deck-keys deck-keys-fine t-meta">
-                <kbd>←</kbd>
-                <kbd>→</kbd> move
-                <span className="deck-sep">·</span>
-                <kbd>F</kbd> fullscreen
-                <span className="deck-sep">·</span>
-                <kbd>Esc</kbd> close
-              </p>
-              <p className="deck-keys deck-keys-touch t-meta">
-                Swipe or tap to move
-                <span className="deck-sep">·</span>
-                <kbd>×</kbd> to close
-              </p>
+            {/* One dash a slide: how far through, and a way to jump without
+                stepping through everything in between. */}
+            <footer className="deck-rail">
+              {slides.map((s, n) => (
+                <button
+                  key={s.src}
+                  type="button"
+                  className={`deck-tick${n === i ? ' is-at' : ''}${n < i ? ' is-past' : ''}`}
+                  onClick={() => setI(n)}
+                  aria-label={`Slide ${n + 1}`}
+                  aria-current={n === i ? 'true' : undefined}
+                />
+              ))}
             </footer>
+
+            {/* Said once, on the way in, and then it goes. A phone is told
+                about the control it actually has. */}
+            {hint && (
+              <p className="deck-hint t-meta" role="status">
+                <span className="deck-hint-fine">
+                  Press <kbd>Esc</kbd> to exit fullscreen
+                </span>
+                <span className="deck-hint-touch">Tap × to exit</span>
+              </p>
+            )}
           </div>,
           document.body,
         )}

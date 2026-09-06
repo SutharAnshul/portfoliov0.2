@@ -29,6 +29,18 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
   // full-height sheet, so opening it by default means the site loads with its
   // own content hidden behind a chat nobody asked for yet.
   const [chatOpen, setChatOpen] = useState(false)
+
+  /**
+   * Mr. Toast, parked.
+   *
+   * Nothing of his has been removed — the drawer, the route, the cat, the
+   * suggestions and every style they use are all still here, and this one
+   * constant is the whole switch. He is out of the way until he is worth
+   * having out.
+   */
+  const TOAST = false
+  const chatShown = TOAST && chatOpen
+  const openChat = TOAST ? () => setChatOpen(true) : undefined
   const [isResizing, setIsResizing] = useState(false)
 
   useEffect(() => {
@@ -105,7 +117,7 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
   const edgeTransition = isResizing
     ? 'none'
     : 'left var(--dur-light, 380ms) var(--ease-light, cubic-bezier(0.22, 1, 0.36, 1)), right var(--dur-light, 380ms) var(--ease-light, cubic-bezier(0.22, 1, 0.36, 1))'
-  const rightEdge = chatOpen ? chatWidth : 0
+  const rightEdge = chatShown ? chatWidth : 0
 
   if (bare) return <>{children}</>
 
@@ -124,8 +136,8 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
         left={navWidth}
         right={rightEdge}
         transition={edgeTransition}
-        chatOpen={chatOpen}
-        onOpenChat={() => setChatOpen(true)}
+        chatOpen={chatShown}
+        onOpenChat={openChat}
       />
 
       <main
@@ -154,7 +166,7 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
         <div className="nav-edge" />
       </div>
 
-      {chatOpen && (
+      {chatShown && (
         <>
           {/* Chat divider, same treatment. */}
           <div
@@ -177,13 +189,13 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
         was display:none on a phone — present in the DOM, measuring 0x0, and
         opening nothing when you tapped him.
       */}
-      {chatOpen && (
+      {chatShown && (
         <ChatDrawer context={context} width={chatWidth} onClose={() => setChatOpen(false)} />
       )}
 
       {/* Mobile Layout */}
       <div className="md:hidden flex flex-col h-screen bg-background">
-        <MobileChrome onOpenChat={() => setChatOpen(true)} />
+        <MobileChrome onOpenChat={openChat} />
         <div data-scroll-root data-page-content className="flex-1 overflow-y-auto">
           {children}
         </div>

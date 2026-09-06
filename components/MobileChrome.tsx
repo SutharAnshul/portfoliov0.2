@@ -181,10 +181,13 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
           )
         })}
 
+        {/* Only when there is something to open. */}
+        {onOpenChat && (
         <button onClick={onOpenChat} data-sfx="tick" className="m-rail-item m-rail-cat" aria-label="Ask Mr. Toast">
           <CatMark size={26} />
           <span className="t-label">Toast</span>
         </button>
+        )}
       </nav>
     </>
   )
