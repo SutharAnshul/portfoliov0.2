@@ -54,7 +54,8 @@ export const caseStudies: CaseStudy[] = [
       { type: 'image', image: '/images/incentiwise/deck/20.png', imageAlt: 'Incentiwise — iteration — the new card, with a searchable multi-select of recipients' },
       { type: 'image', image: '/images/incentiwise/deck/21.png', imageAlt: 'Incentiwise — iteration, not shipped — the old card with no visible points balance' },
       { type: 'image', image: '/images/incentiwise/deck/22.png', imageAlt: 'Incentiwise — the new appreciation card' },
-      { type: 'image', image: '/images/incentiwise/deck/23.png', imageAlt: 'Incentiwise — an appreciation addressed to recruiters' },
+      { type: 'image', image: '/images/incentiwise/deck/23.png', imageAlt: 'Incentiwise — testimonials from HR leads who ran the programme' },
+      { type: 'image', image: '/images/incentiwise/deck/24.png', imageAlt: 'Incentiwise — an appreciation addressed to recruiters' },
     ],
   },
   {
