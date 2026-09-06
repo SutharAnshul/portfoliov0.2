@@ -974,30 +974,72 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   font-variant-numeric: tabular-nums;
 }
 
-/* Corner screws. Structural: they mark the bounding box and read as the
-   fixings holding the faceplate on, echoing the crosshair cursor. */
+/* Corner marks on the transport. Structural: they mark the bounding box and
+   read as the fixings holding the faceplate on. Same quarter-of-a-cross as
+   everywhere else, and the same movement behind it — drawn in while the
+   transport is quiet, seated on the corners once it is running. */
+.player {
+  --screw-gather: 4px;
+  --screw-arm: 7px;
+}
+
 .player-screw {
   position: absolute;
-  width: 7px;
-  height: 7px;
+  width: var(--screw-arm);
+  height: var(--screw-arm);
   opacity: 0.5;
-  transition: opacity 260ms ease;
+  transition: opacity 260ms ease, transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .player-screw::before,
 .player-screw::after {
   content: '';
   position: absolute;
   background: var(--foreground);
 }
-.player-screw::before { left: 0; top: 3px; width: 7px; height: 1px; }
-.player-screw::after { left: 3px; top: 0; width: 1px; height: 7px; }
+.player-screw::before { width: var(--screw-arm); height: 1px; }
+.player-screw::after { width: 1px; height: var(--screw-arm); }
 
-.player-screw-tl { left: -4px; top: -4px; }
-.player-screw-tr { right: -4px; top: -4px; }
-.player-screw-bl { left: -4px; bottom: -4px; }
-.player-screw-br { right: -4px; bottom: -4px; }
+.player-screw-tl {
+  left: -2px;
+  top: -2px;
+  transform: translate(calc(-100% + var(--screw-gather)), calc(-100% + var(--screw-gather)));
+}
+.player-screw-tl::before,
+.player-screw-tl::after { right: 0; bottom: 0; }
 
-.player[data-on='true'] .player-screw { opacity: 0.9; }
+.player-screw-tr {
+  right: -2px;
+  top: -2px;
+  transform: translate(calc(100% - var(--screw-gather)), calc(-100% + var(--screw-gather)));
+}
+.player-screw-tr::before,
+.player-screw-tr::after { left: 0; bottom: 0; }
+
+.player-screw-bl {
+  left: -2px;
+  bottom: -2px;
+  transform: translate(calc(-100% + var(--screw-gather)), calc(100% - var(--screw-gather)));
+}
+.player-screw-bl::before,
+.player-screw-bl::after { right: 0; top: 0; }
+
+.player-screw-br {
+  right: -2px;
+  bottom: -2px;
+  transform: translate(calc(100% - var(--screw-gather)), calc(100% - var(--screw-gather)));
+}
+.player-screw-br::before,
+.player-screw-br::after { left: 0; top: 0; }
+
+.player[data-on='true'] {
+  --screw-gather: 0px;
+}
+
+.player[data-on='true'] .player-screw {
+  opacity: 0.9;
+}
+
 
 .player-row {
   display: flex;
@@ -1127,18 +1169,37 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    transport. Replaces border-weight changes, which were too quiet to read
    against a monochrome card. */
 .marks {
+  /* How far each mark has drawn in toward the middle. At rest they are
+     gathered; as the thing they mark is chosen they travel out and seat on
+     its corners. */
+  --gather: 5px;
+  --arm: 7px;
+
   position: absolute;
-  inset: -4px;
+  inset: -2px;
   pointer-events: none;
   opacity: 0;
-  transform: scale(1.04);
-  transition: opacity 260ms ease, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 260ms ease;
 }
 
+/* One quarter of the cross these used to be.
+   The right angle sits ON the corner it marks and both arms point away from
+   the element — which is the only orientation where the four can tile. Slide
+   them together and the two left arms lie on each other, the two right arms
+   likewise, the ups and the downs the same, and what is left standing in the
+   middle is the plus they were cut from. The two halves pass through ⊣ and ⊢
+   on the way.
+
+   That is also the movement. Hidden, they are drawn in toward that meeting
+   point; shown, they disperse and seat on the corners. Five pixels of travel
+   is enough for the eye to read the direction, and the direction is the whole
+   story — a nav list that flings its marks 130px to the middle on every hover
+   is a nav list nobody can skim. */
 .mark {
   position: absolute;
-  width: 7px;
-  height: 7px;
+  width: var(--arm);
+  height: var(--arm);
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mark::before,
@@ -1147,23 +1208,63 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   position: absolute;
   background: var(--foreground);
 }
-.mark::before { left: 0; top: 3px; width: 7px; height: 1px; }
-.mark::after { left: 3px; top: 0; width: 1px; height: 7px; }
 
-.mark-tl { left: 0; top: 0; }
-.mark-tr { right: 0; top: 0; }
-.mark-bl { left: 0; bottom: 0; }
-.mark-br { right: 0; bottom: 0; }
+.mark::before { width: var(--arm); height: 1px; }
+.mark::after { width: 1px; height: var(--arm); }
 
-/* Shown when the host is selected, or previewed faintly on hover */
+/* Each box is pushed a full width and height clear of its corner, which puts
+   its inner vertex exactly on that corner; the arms then run outward from it.
+   The gather is subtracted from that push, so the marks draw inward without
+   any second transform to compose. */
+.mark-tl {
+  left: 0;
+  top: 0;
+  transform: translate(calc(-100% + var(--gather)), calc(-100% + var(--gather)));
+}
+.mark-tl::before,
+.mark-tl::after { right: 0; bottom: 0; }
+
+.mark-tr {
+  right: 0;
+  top: 0;
+  transform: translate(calc(100% - var(--gather)), calc(-100% + var(--gather)));
+}
+.mark-tr::before,
+.mark-tr::after { left: 0; bottom: 0; }
+
+.mark-bl {
+  left: 0;
+  bottom: 0;
+  transform: translate(calc(-100% + var(--gather)), calc(100% - var(--gather)));
+}
+.mark-bl::before,
+.mark-bl::after { right: 0; top: 0; }
+
+.mark-br {
+  right: 0;
+  bottom: 0;
+  transform: translate(calc(100% - var(--gather)), calc(100% - var(--gather)));
+}
+.mark-br::before,
+.mark-br::after { left: 0; top: 0; }
+
+/* Shown when the host is selected, or previewed faintly on hover. Hover takes
+   them most of the way out and selection seats them, so the two states differ
+   in position as well as in weight — you can see a card is being considered
+   rather than chosen. */
 [data-active='true'] > .marks {
   opacity: 0.9;
-  transform: scale(1);
+  --gather: 0px;
 }
 
 .card-link:hover > .marks {
   opacity: 0.35;
-  transform: scale(1);
+  --gather: 2px;
+}
+
+/* Hovering the one already chosen should not walk its marks back in. */
+.card-link[data-active='true']:hover > .marks {
+  --gather: 0px;
 }
 
 /* ─── Nav items ───────────────────────────────────────────────────────── */
@@ -1280,7 +1381,9 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   [class^='mech'],
   .mech-select { transition: none; }
   .nav-item:hover .nav-plate::after { animation: none; }
-  .marks { transition: none; }
+  .marks,
+  .mark,
+  .player-screw { transition: none; }
 }
 
 /* Quiet inline link — serif italic, underlined, small. Used for asides that
@@ -2127,27 +2230,18 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 .shot > .marks {
   opacity: 1;
-  transform: none;
-  inset: -6px;
+  inset: -4px;
+  /* A frame is always the subject, so its marks are always seated. Longer
+     arms than the 7px used on controls, because these frames are an order of
+     magnitude bigger and 7px would read as specks. */
+  --gather: 0px;
+  --arm: 10px;
 }
 
-.shot > .marks .mark {
-  width: 9px;
-  height: 9px;
-}
-
-.shot > .marks .mark::before {
-  left: 0;
-  top: 4px;
-  width: 9px;
-  height: 1px;
-}
-
-.shot > .marks .mark::after {
-  left: 4px;
-  top: 0;
-  width: 1px;
-  height: 9px;
+/* A frame that opens the deck gathers its brackets a little as you press it,
+   which is the same figure closing that a nav item plays in reverse. */
+.shot[data-slide]:active > .marks {
+  --gather: 3px;
 }
 
 /* ─── Mechanisms on a phone ───────────────────────────────────────────────
