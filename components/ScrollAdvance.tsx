@@ -152,6 +152,10 @@ export function ScrollAdvance() {
 
     const addInput = (deltaY: number) => {
       if (!armed || deltaY === 0) return
+      // Presentation mode covers the page and takes the wheel with it. Without
+      // this a scroll inside the deck would advance the record underneath and
+      // you would close the deck onto a different study.
+      if (docEl.dataset.modal) return
 
       const at = edge()
       const pushing: Dir =

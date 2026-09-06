@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Settle } from '@/components/Settle'
 import { CornerMarks } from '@/components/CornerMarks'
+import { Presenter } from '@/components/Presenter'
 
 /**
  * A case study as a catalogue record.
@@ -67,6 +68,17 @@ export default async function CaseStudyPage({ params }: Props) {
           }
         : { key: s.image!, src: s.image!, alt: s.imageAlt ?? caseStudy.title },
     )
+
+  /** Only the stills can be presented; a running prototype is not a slide. */
+  const stills = screens.filter((s): s is { key: string; src: string; alt: string } => 'src' in s)
+  const slides = stills.map((s) => ({ src: s.src, alt: s.alt }))
+
+  /**
+   * Which slide a given frame is. Not the same as its position in the record
+   * once a live prototype sits among the stills, so it is counted rather than
+   * assumed.
+   */
+  const slideOf = new Map(stills.map((s, n) => [s.key, n]))
 
   const hasLive = screens.some((s) => 'embed' in s)
   const allLive = screens.length > 0 && screens.every((s) => 'embed' in s)
@@ -170,20 +182,14 @@ export default async function CaseStudyPage({ params }: Props) {
 
         {/* ── The screens ───────────────────────────────────────── */}
         <div style={{ marginTop: 'var(--s8)' }}>
-          <div
-            className="flex items-baseline justify-between"
-            style={{ paddingBottom: 'var(--s3)' }}
+          {/* A record made only of a running prototype has no "screens" to
+              count, so it says what it actually is. */}
+          <Presenter
+            title={caseStudy.title}
+            label={allLive ? 'Prototype' : hasLive ? 'Prototype & system' : 'Screens'}
+            count={allLive ? 'Interactive' : `${pad(screens.length)} frames`}
+            slides={slides}
           >
-            {/* A record made only of a running prototype has no "screens" to
-                count, so it says what it actually is. */}
-            <span className="t-label">
-              {allLive ? 'Prototype' : hasLive ? 'Prototype & system' : 'Screens'}
-            </span>
-            <span className="t-label">
-              {allLive ? 'Interactive' : `${pad(screens.length)} frames`}
-            </span>
-          </div>
-          <hr className="rule" />
 
           {/* --s8, not --s5. The corner marks stand 6px proud of each plate,
               so a 24px gap left only 12px of real air between neighbouring
@@ -199,7 +205,10 @@ export default async function CaseStudyPage({ params }: Props) {
           >
             {screens.map((shot, i) => (
               <Settle key={shot.key} mass="medium" delay={40}>
-                <figure className="shot relative">
+                <figure
+                  className="shot relative"
+                  data-slide={'src' in shot ? slideOf.get(shot.key) : undefined}
+                >
                   <CornerMarks />
                   <div className="plate">
                     {'embed' in shot ? (
@@ -227,7 +236,8 @@ export default async function CaseStudyPage({ params }: Props) {
                 </figure>
               </Settle>
             ))}
-          </div>
+            </div>
+          </Presenter>
         </div>
 
         {/* Where the record ends, and what follows it. */}

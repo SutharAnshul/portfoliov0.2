@@ -2708,3 +2708,339 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   opacity: 0.3;
   cursor: default;
 }
+
+/* ─── Presentation mode ───────────────────────────────────────────────────
+   The same frames the page already shows, one at a time and filling the
+   viewport, driven by the arrow keys.
+
+   The rule the whole thing is built on: say what the keys are. A viewer that
+   only reveals its controls on hover is a viewer most people step through
+   twice and abandon, so the keys are named along the bottom, the counter is
+   always where the eye lands first, and the way out is drawn as an ×. Once
+   you have started moving, all of it fades — because at that point you have
+   read it, and a slide deserves the whole screen. */
+
+/* ── The way in ────────────────────────────────────────────────────
+   Sits beside the frame count, where a reader is already looking to find out
+   how much of this there is. Styled as the nav styles its buttons: a hairline
+   that fills in on hover, nothing that moves. */
+.screens-meta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s4);
+}
+
+.present-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+  border-radius: 2px;
+  background: transparent;
+  color: color-mix(in oklab, var(--foreground) 72%, transparent);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+
+.present-open:hover,
+.present-open:focus-visible {
+  background: color-mix(in oklab, var(--foreground) 10%, transparent);
+  border-color: color-mix(in oklab, var(--foreground) 38%, transparent);
+  color: var(--foreground);
+}
+
+/* A still frame is a way in at itself. The prototype frames carry no index
+   and keep their own cursor, because they are there to be used. */
+.shot[data-slide] {
+  cursor: zoom-in;
+}
+
+.shot[data-slide] .plate {
+  transition: border-color 160ms ease;
+}
+
+.shot[data-slide]:hover .plate {
+  border-color: color-mix(in oklab, var(--foreground) 34%, transparent);
+}
+
+/* ── The deck ──────────────────────────────────────────────────────
+   Header, stage, footer. The stage takes whatever is left, which is what
+   keeps a slide centred without knowing anything about its proportions. */
+.deck {
+  position: fixed;
+  inset: 0;
+  /* One above the custom cursor, which also sits at 9999 and would otherwise
+     paint its ring over a slide. Hidden behind the deck it stays out of the
+     way, and .cursor-native hands the pointer back to the browser. */
+  z-index: 10000;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: #08090a;
+  outline: none;
+  overscroll-behavior: contain;
+}
+
+.deck-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding: var(--s4) var(--s5);
+  transition: opacity 260ms ease;
+}
+
+.deck-name {
+  color: color-mix(in oklab, #fff 60%, transparent);
+}
+
+/* The counter is the one piece of chrome that answers "how much is left",
+   so the number you are on is bright and the total is not. */
+.deck-count {
+  margin-left: auto;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.deck-of {
+  color: color-mix(in oklab, #fff 42%, transparent);
+}
+
+.deck-x {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid color-mix(in oklab, #fff 20%, transparent);
+  border-radius: 2px;
+  background: transparent;
+  color: color-mix(in oklab, #fff 70%, transparent);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+
+.deck-x:hover,
+.deck-x:focus-visible {
+  background: color-mix(in oklab, #fff 12%, transparent);
+  border-color: color-mix(in oklab, #fff 40%, transparent);
+  color: #fff;
+}
+
+/* ── The slide ─────────────────────────────────────────────────────
+   Contained rather than covered: these are 16:9 slides and cropping one to
+   fill a 4:3 window would cut the thing being presented. */
+.deck-stage {
+  display: grid;
+  place-items: center;
+  padding: 0 var(--s7);
+  min-height: 0;
+  cursor: pointer;
+}
+
+.deck-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+/* Neighbours, fetched so a keypress never waits on the network. */
+.deck-warm {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Stepping ──────────────────────────────────────────────────────
+   Big targets at the edges for anyone using a mouse, which is also where a
+   thumb lands on a tablet. */
+.deck-step {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 64px;
+  border: 1px solid color-mix(in oklab, #fff 16%, transparent);
+  border-radius: 2px;
+  background: color-mix(in oklab, #000 55%, transparent);
+  color: color-mix(in oklab, #fff 76%, transparent);
+  font-family: var(--family-ui);
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 260ms ease, background 140ms ease, color 140ms ease;
+}
+
+.deck-prev { left: var(--s4); }
+.deck-next { right: var(--s4); }
+
+.deck-step:hover:not(:disabled),
+.deck-step:focus-visible {
+  background: color-mix(in oklab, #fff 14%, transparent);
+  color: #fff;
+}
+
+/* At either end the control stays put and stops working, rather than
+   disappearing and shifting everything beside it. */
+.deck-step:disabled {
+  opacity: 0.22;
+  cursor: default;
+}
+
+/* ── The foot ──────────────────────────────────────────────────────
+   Where you are, and how to move. */
+.deck-foot {
+  display: grid;
+  gap: var(--s3);
+  padding: var(--s4) var(--s5) var(--s5);
+  transition: opacity 260ms ease;
+}
+
+/* One segment a slide. Long decks compress the segments rather than scroll
+   them, so the rail is always the whole thing at a glance. */
+.deck-rail {
+  display: flex;
+  gap: 3px;
+  align-items: stretch;
+  height: 3px;
+}
+
+.deck-tick {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 1px;
+  background: color-mix(in oklab, #fff 14%, transparent);
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.deck-tick.is-past {
+  background: color-mix(in oklab, #fff 34%, transparent);
+}
+
+.deck-tick.is-at {
+  background: #fff;
+}
+
+.deck-tick:hover {
+  background: color-mix(in oklab, #fff 62%, transparent);
+}
+
+/* A hit area taller than the 3px it draws, so the rail can be aimed at.
+   Anchored to the tick, not the rail — anchored to the rail every segment's
+   target spans the whole width and only the last one is ever hit. */
+.deck-tick {
+  position: relative;
+}
+
+.deck-tick::after {
+  content: '';
+  position: absolute;
+  inset: -9px 0;
+}
+
+.deck-keys {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: color-mix(in oklab, #fff 46%, transparent);
+}
+
+.deck-keys kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border: 1px solid color-mix(in oklab, #fff 22%, transparent);
+  border-radius: 3px;
+  background: color-mix(in oklab, #fff 6%, transparent);
+  color: color-mix(in oklab, #fff 78%, transparent);
+  font-family: var(--family-ui);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.deck-sep {
+  margin-inline: 6px;
+  color: color-mix(in oklab, #fff 24%, transparent);
+}
+
+/* ── Getting out of the way ────────────────────────────────────────
+   Everything that is not the slide fades once you stop asking for it. It
+   comes back on the next movement or keystroke, and it never stops being
+   clickable — a control you can still hit but cannot see is better than one
+   that moves out from under the pointer. */
+.deck-idle .deck-bar,
+.deck-idle .deck-foot,
+.deck-idle .deck-step {
+  opacity: 0;
+}
+
+.deck-idle .deck-stage {
+  cursor: none;
+}
+
+/* Focus must survive the fade, or keyboard users lose the control they are on. */
+.deck-idle :focus-visible {
+  opacity: 1;
+}
+
+/* Which hint is shown is the one thing here that asks about the device: a
+   pointer you can hover has a keyboard behind it, and a touch screen does not. */
+.deck-keys-touch {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .deck-keys-fine {
+    display: none;
+  }
+
+  .deck-keys-touch {
+    display: flex;
+  }
+}
+
+@media (max-width: 767px) {
+  /* A landscape slide on a portrait phone is limited by its own proportions
+     long before it is limited by the stage, so the stage gives up its side
+     padding rather than shrink the thing being presented. */
+  .deck-stage {
+    padding: 0;
+  }
+
+  /* On a phone the edges belong to the swipe. */
+  .deck-step {
+    display: none;
+  }
+
+  .deck-bar {
+    padding: var(--s3) var(--s4);
+  }
+
+  .deck-foot {
+    padding: var(--s3) var(--s4) var(--s4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deck-bar,
+  .deck-foot,
+  .deck-step,
+  .deck-tick,
+  .present-open,
+  .deck-x {
+    transition: none;
+  }
+}
