@@ -1039,33 +1039,84 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   50% { height: 12px; }
 }
 
-/* Display window. The title pans only when it overflows — measured in JS,
-   never assumed, so short titles sit still instead of drifting for no reason. */
+/* ── The display ───────────────────────────────────────────────────────
+   A backlit LCD module, and everything about it follows from the fact that a
+   liquid crystal panel does not emit light. The lamp behind it does; the
+   segments only block it. So the panel is the brightest thing on the module
+   and the text is the darkest — inverted from every other surface here, and
+   that inversion is the whole of why it reads as an LCD.
+
+   Two elements. The window is the lit panel and the bezel around it; the glass
+   inside is what clips and fades the moving title. They were one element until
+   the lamp went in, and the edge fade is a mask — a mask on the window would
+   have faded the lamp out at both ends along with the text. */
 .player-window {
+  --lcd: 140 174 86;
   position: relative;
+  margin-top: var(--s3);
+  padding: 5px var(--s2);
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  border-radius: var(--r-sm);
+
+  /* The lamp: a strip along the bottom edge, plus a soft pool in the middle,
+     over the panel's own colour. Two gradients rather than one because an edge
+     lamp alone leaves the top flat and a pool alone has no source. */
+  /* Turned up. The falloff is still there — a lamp with no falloff is the
+     tell — but the dimmest corner now sits well clear of the ground rather
+     than fading into it, so the title is legible across the whole panel
+     instead of only over the middle of the lamp. */
+  background:
+    radial-gradient(
+      130% 165% at 50% 76%,
+      rgb(var(--lcd) / 0.92) 0%,
+      rgb(var(--lcd) / 0.70) 48%,
+      rgb(var(--lcd) / 0.48) 100%
+    ),
+    linear-gradient(
+      to top,
+      rgb(var(--lcd) / 0.34) 0%,
+      rgb(var(--lcd) / 0.16) 60%,
+      rgb(var(--lcd) / 0.08) 100%
+    ),
+    #18200e;
+
+  /* Recessed, and throwing a little light onto the faceplate around it. A
+     module is a part set into the panel, not an area printed on it. */
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.5),
+    0 0 14px rgb(var(--lcd) / 0.22);
+}
+
+/* Brighter when it is running. The lamp does not go out when the music stops —
+   the unit is still powered — it just has less reason to be looked at. */
+.player[data-on='true'] .player-window {
+  --lcd: 162 200 100;
+}
+
+/* The clipping box. The fade is here and only here, so it softens the title
+   without touching the lamp. */
+.player-glass {
   display: flex;
   gap: var(--s6);
   overflow: hidden;
-  margin-top: var(--s3);
-  padding: 5px var(--s2);
-  border: 1px solid var(--card-line);
-  border-radius: var(--r-sm);
-  background: color-mix(in srgb, var(--background) 60%, transparent);
   white-space: nowrap;
   mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 10px), transparent);
 }
 
+/* Dark text on a lit ground. Not black: a segment does not block all of the
+   lamp, and a little of the backlight always comes through the crystal, which
+   is why LCD text at rest looks washed rather than solid. */
 .player-track {
   flex: none;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+  color: rgba(8, 13, 4, 0.74);
 }
 
 .player[data-on='true'] .player-track {
-  color: var(--foreground);
+  color: rgba(6, 11, 3, 0.92);
 }
 
 .player-window[data-pan='true'] .player-track {
@@ -1136,9 +1187,13 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .mark::after {
   content: '';
   position: absolute;
-  background: var(--foreground);
+  /* A knob rather than a literal, so anywhere that wants coloured marks sets
+     one property on the container instead of reaching into both arms of all
+     four boxes. Defaults to the foreground, which is what every mark on the
+     site was before the rail asked for pink. */
+  background: var(--ink, var(--foreground));
   box-shadow: var(--glow);
-  transition: box-shadow 130ms ease;
+  transition: box-shadow 130ms ease, background-color 130ms ease;
 }
 
 .mark::before { width: var(--arm); height: 1px; }
@@ -1377,7 +1432,48 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      has somewhere to go. Firefox reads these two; the pseudo-elements below
      say the same thing to Chromium and Safari. */
   scrollbar-color: transparent transparent;
-  transition: scrollbar-color 300ms ease;
+
+  /* The fades at the two ends. Zero by default, so the mask is a hard stop at
+     0% and 100% and takes nothing away; the data attributes below give the
+     end that has somewhere to go its length back.
+
+     Transitioned, because the fade appearing the instant the list is touched
+     is a state change the reader did not make — easing it in lets it read as
+     part of the same movement as the scroll. */
+  --fade-top: 0px;
+  --fade-bottom: 0px;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--fade-top),
+    #000 calc(100% - var(--fade-bottom)),
+    transparent 100%
+  );
+  transition: scrollbar-color 300ms ease, --fade-top 220ms ease, --fade-bottom 220ms ease;
+}
+
+/* Deeper than the top fade. The bottom edge runs into the transport, so the
+   content has further to travel before it is out of the way of something. */
+.nav-studies[data-over-top='true'] {
+  --fade-top: 28px;
+}
+
+.nav-studies[data-over-bottom='true'] {
+  --fade-bottom: 56px;
+}
+
+/* Registered so the two lengths can be interpolated. An unregistered custom
+   property is a string to the animation engine and jumps between values. */
+@property --fade-top {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fade-bottom {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
 }
 
 .nav-studies:hover,
@@ -2398,139 +2494,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 /* The rail rises with the rest of the site rather than fading in, so that the
    opening reads as the page coming up under the mark rather than as a bar
    switching on. Scrubbed, like everything else in the reveal. */
-.m-rail[data-settled='false'] {
-  pointer-events: none;
-}
-
-.m-rail {
-  position: fixed;
-  inset: auto 0 0 0;
-  z-index: 60;
-  transform: translateY(calc(100% * (1 - var(--reveal, 0))));
-  opacity: var(--reveal, 0);
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  /* Real space between the items, and real space at the ends. At 2px and 8px
-     the columns met each other and the bar's edges, so the four corner marks
-     were the only thing standing in for a boundary — and they were drawn round
-     a box the full width of the column, which put them a long way from the
-     glyph they belonged to. */
-  gap: var(--s3);
-  /* The vertical padding has to clear the marks, not the item. A mark sits 2px
-     outside the box on `inset` and then its 7px arms are translated a further
-     full width clear of the corner, so the ink reaches 9px past the item on
-     every side — against 8px of padding, which put the top pair through the
-     rail's own border. Twelve leaves three clear. */
-  padding: var(--s3) var(--s4) calc(env(safe-area-inset-bottom, 0px) + var(--s3));
-  background: color-mix(in srgb, var(--background) 90%, transparent);
-  backdrop-filter: blur(14px);
-  border-top: 1px solid var(--card-line);
-}
-
-/* The item is its content plus its padding, centred in the column — not the
-   whole column. The corner marks are drawn on the item's own box, so a box
-   stretched to a 120px column put them level with the bar's far edges and
-   nowhere near the icon they were marking. Sized to its content, the marks land
-   where the eye expects them: just outside the glyph and its label.
-
-   The padding is what keeps the tap target honest. Shrinking the box would
-   otherwise shrink the thing you have to hit, so the width the item loses to
-   the column it takes back as padding — 20px a side puts the target at about
-   66px wide against the 44px minimum. */
-.m-rail-item {
-  position: relative;
-  display: grid;
-  justify-self: center;
-  justify-items: center;
-  /* Centred in a fixed box rather than sat on padding. The glyph and its label
-     come to 44px; in 64 that leaves ten clear above and below, which is the
-     air the top of the button was short of. A fixed height also makes the
-     marks' travel a known number — see RAIL_HALF below. */
-  align-content: center;
-  gap: 4px;
-  height: 64px;
-  /* Narrower than the 20px it was: the button only needs to be wide enough to
-     hold its label and to be hit, and the marks read better close in. */
-  padding: 0 12px;
-  border-radius: var(--r-sm);
-  color: color-mix(in srgb, var(--foreground) 52%, transparent);
-  transition: color var(--dur-light, 300ms) var(--ease-light, ease-out);
-}
-
-.m-rail-item[data-active='true'] {
-  color: var(--foreground);
-}
-
-/* The rail's marks are always on, and they travel by transform.
-   ────────────────────────────────────────────────────────────────────────
-   Two changes, and the second is why the press stopped stuttering.
-
-   They no longer start invisible. At rest the four sit gathered on the centre
-   line, which is the ⊣ ⊢ pair — the same half-collapsed figure the case-study
-   frames rest at — so an untapped button still reads as a button. Selecting it
-   opens them out to the corners.
-
-   And the travel is a transform rather than `top` and `bottom`. Those are
-   layout properties, so only the main thread can advance them — and this press
-   is the one on the site that coincides with a route change. A first visit to
-   a route was measured stalling the main thread for 116ms while React rendered
-   the new page, and the marks were trying to walk through it. On a transform
-   the compositor carries them and the stall goes unnoticed: worst frame across
-   the same tap went from 116.8ms to 16.8ms.
-
-   The catch is that a percentage translate resolves against the element's own
-   height, not its parent's, so the half-height has to be a number — which is
-   what the fixed 64px on .m-rail-item buys. The marks box is inset -2px on
-   each side, so it is 68 tall and half of it is 34. Change that height and
-   this must change with it. */
-.m-rail-item > .marks {
-  opacity: 0.3;
-}
-
-.m-rail-item[data-active='true'] > .marks {
-  opacity: 0.9;
-}
-
-.m-rail-item > .marks .mark {
-  transition: transform var(--switch-off);
-}
-
-.m-rail-item > .marks .mark-tl,
-.m-rail-item > .marks .mark-tr {
-  top: 0;
-}
-
-.m-rail-item > .marks .mark-bl,
-.m-rail-item > .marks .mark-br {
-  bottom: 0;
-}
-
-/* Gathered: each pushed back to the centre line by half the box. */
-.m-rail-item > .marks .mark-tl { transform: translate(-100%, -100%) translateY(34px); }
-.m-rail-item > .marks .mark-tr { transform: translate(100%, -100%) translateY(34px); }
-.m-rail-item > .marks .mark-bl { transform: translate(-100%, 100%) translateY(-34px); }
-.m-rail-item > .marks .mark-br { transform: translate(100%, 100%) translateY(-34px); }
-
-/* Open: on the corners, where the base rules would have put them. */
-.m-rail-item[data-active='true'] > .marks .mark {
-  transition: transform var(--switch);
-}
-.m-rail-item[data-active='true'] > .marks .mark-tl { transform: translate(-100%, -100%); }
-.m-rail-item[data-active='true'] > .marks .mark-tr { transform: translate(100%, -100%); }
-.m-rail-item[data-active='true'] > .marks .mark-bl { transform: translate(-100%, 100%); }
-.m-rail-item[data-active='true'] > .marks .mark-br { transform: translate(100%, 100%); }
-
-/* Corner marks show the active section, exactly as on desktop — including the
-   switch-on, so the opacity timing is left to the shared rule rather than
-   redeclared here as a plain dissolve. */
-.m-rail-item[data-active='true'] .marks {
-  opacity: 1;
-}
-
-.m-rail-cat {
-  color: color-mix(in srgb, var(--foreground) 70%, transparent);
-}
 
 /* Content clears both bars, using their measured heights — see MobileChrome.
    The fallbacks are only for the first paint before the effect runs. The extra
@@ -2539,7 +2502,10 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 @media (max-width: 767px) {
   [data-page-content] {
     padding-top: calc(var(--masthead-h, 64px) + var(--s4));
-    padding-bottom: calc(var(--rail-h, 74px) + var(--s4));
+    /* Only the safe area at the foot now. The rail that used to be reserved
+       for down here is gone, and holding 74px open for it would be the page
+       standing clear of nothing. */
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s6));
   }
 
   /* The opening's own scroll distance, above the page.
@@ -2700,34 +2666,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   transition: opacity 90ms ease;
 }
 
-/* ─── Mechanisms on a phone ───────────────────────────────────────────────
-   The nav glyphs are working mechanisms: the aperture stops down at rest and
-   opens as you arrive, the contact sheet draws its chinagraph select on, the
-   bolt turns a hex flat. All of that is scoped to .nav-item and driven by
-   hover — neither of which exists on a phone, so in the mobile rail every one
-   of them sat frozen in its unresolved rest pose: the aperture skewed 14° and
-   oversized, the chinagraph at opacity 0 and never drawn, the bolt untouched.
-   They read as broken drawings rather than as mechanisms at rest.
-
-   Here they simply sit resolved. Selection is carried by the corner marks and
-   the colour change, neither of which needs a pointer. */
-
-.m-rail-item .mech-blades {
-  transform: rotate(-16deg) scale(0.82);
-}
-
-.m-rail-item .mech-select {
-  stroke-dashoffset: 0;
-  opacity: 1;
-}
-
-.m-rail-item .mech-bolt {
-  transform: rotate(30deg);
-}
-
-.m-rail-item .mech-slot {
-  transform: rotate(90deg);
-}
 /* The greeting, on its own line above the statement and set in the same face
    and size — it is the first sentence of the quotation, not a heading over
    it, so it should not out-shout what follows. */
@@ -3812,43 +3750,133 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      statement   the reading face, at a reading size. The one piece of running
                  prose here, and the only thing read sentence by sentence. */
 
+/* Settle's element, which would otherwise shrink-wrap the stage and break
+   the height chain between the page and the 1fr row inside it. */
+.about-settle {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .stage {
   display: grid;
   /* The portrait takes the larger share: it is the thing you look at, and the
      column beside it is the thing you read. */
-  grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+  grid-template-columns: minmax(0, 1.19fr) minmax(300px, 1fr);
+  /* Three rows: the two headings, the substance, and the two sign-offs.
+
+     None of them is 1fr, and align-content does the distributing instead. A
+     1fr middle row would take all the slack and hand it to the content, which
+     then sits at whichever end of it the items are aligned to — the slack ends
+     up inside the row rather than around it. space-between leaves the rows at
+     their own heights and puts equal air above and below the middle one, so
+     the substance is centred between the headings and the sign-offs however
+     tall the window is, and the sign-offs still sit on the floor. */
+  grid-template-rows: auto auto auto;
+  align-content: space-between;
   column-gap: var(--s7, 48px);
-  row-gap: var(--s6);
-  /* Stretch, not start: both columns take the row's height, which is what
-     makes them end level. */
+  row-gap: var(--s7, 48px);
+  /* The page is a flex column on desktop; taking its slack is what gives the
+     1fr row something to be a fraction of. */
+  flex: 1;
   align-items: stretch;
 }
 
-/* The picture is the whole of the left column and fills whatever height the
-   row settles on. Deliberately no aspect-ratio: a ratio would set its height
-   from its own width and leave the text column hanging off the bottom, which
-   is approximately equal rather than equal. The shader crops rather than
-   stretches, so the layout is free to choose the proportion. */
+/* The picture is the whole of the left column. It keeps a landscape shape of
+   its own rather than stretching to the column's height: the tube is a piece
+   of equipment, and equipment has a proportion. Centred, because the record
+   beside it starts at the top of the same row, and the two have to start
+   together: a picture floated to the middle of a taller column reads as having
+   drifted off the line the rest of the page is drawn on. */
 .stage-signal {
+  grid-column: 1;
+  grid-row: 2;
   display: flex;
+  /* Hugging the picture, not filling the row. Stretched, the piece kept a
+     couple of hundred pixels of empty box below the tube — invisible until it
+     was pointed at, at which point the corner marks drew a container around a
+     picture and a stretch of nothing, and the hover reached far below the only
+     thing there is to hover. The piece is the picture. */
+  align-self: start;
 }
 
 /* The right column, spread to the same height. space-between is what fills it:
    the name sits at the top, the statement at the foot, and the record takes
    the middle however long it runs. */
+/* Top of the row, and a fixed distance between the record and the statement
+   rather than space-between. Spreading them would tie that distance to
+   whatever height was left over after the picture, which means the gap between
+   two paragraphs would change with the size of the window — and on a tall
+   screen it flings the statement to the floor, a long way below the picture it
+   is supposed to sit beside. Twice the row gap: enough that the record and the
+   statement read as two things, since on this page nothing else says so. */
 .stage-side {
+  grid-column: 2;
+  grid-row: 2;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: var(--s5);
+  justify-content: flex-start;
+  gap: calc(var(--s7, 48px) * 2);
   min-width: 0;
 }
 
-/* The identity, heading the column. Padded to the same inset as the pieces
-   beside it so the three left edges line up — it is not a piece itself, so it
-   does not get that padding for free. */
+/* ── The margins: headings and sign-offs ──────────────────────────────── */
+/* Four small blocks, one at each corner of the content. All are padded to the
+   same inset as the pieces they sit above and below, so four left edges run
+   straight down each column — none of them is a piece, so none gets that
+   padding for free.
+
+   The identity is deliberately not a piece either: dimming the name while
+   pointing at the record would be the page hiding whose record it is. */
+.stage-slug,
+.stage-id,
+.stage-end,
+.stage-more {
+  padding: 0 var(--s3);
+}
+
+.stage-slug {
+  grid-column: 1;
+  grid-row: 1;
+}
+
 .stage-id {
-  padding: 2px var(--s3);
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.stage-end {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.stage-more {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+/* The slug and the two sign-offs are one voice — the page talking about itself
+   in the margins. One fixed size rather than a clamp: they are annotation, and
+   annotation that grows with the column starts competing with the thing it is
+   annotating. At a fifth of the foreground they are nearer the ground than the
+   content, which is what lets them sit at the corners without being read as
+   part of it. */
+.stage-slug,
+.stage-end,
+.stage-more {
+  margin: 0;
+  font-family: var(--family-ui);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  color: color-mix(in srgb, var(--foreground) 20%, transparent);
+}
+
+.stage-end,
+.stage-more {
+  align-self: end;
 }
 
 /* ── A piece ──────────────────────────────────────────────────────────── */
@@ -3866,16 +3894,16 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 /* The site's own marks: gathered on the centre line at rest, open at the
-   corners when the piece has the attention. The accent is the pink, because
-   every other "this one" on this site is drawn in it. */
+   corners when the piece has the attention.
+
+   White, like every other mark here. These were pink, which spent the accent
+   on a hover state — and hover is the most transient thing on the page. The
+   pink is for what stays true when nobody is pointing at anything: the
+   selected work, "Open to work", the name mark's wavefront. Spending it on
+   whatever the cursor is over devalues it everywhere it means something. */
 .piece[data-state='tuned'] > .marks {
   opacity: 0.9;
   --edge: 0%;
-}
-
-.piece[data-state='tuned'] > .marks .mark::before,
-.piece[data-state='tuned'] > .marks .mark::after {
-  background: var(--brand);
 }
 
 /* The one bit of chrome left, and the only place a joke lives. Quiet at rest
@@ -3896,10 +3924,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 /* ── The portrait ─────────────────────────────────────────────────────── */
 .stage-shot {
-  flex: 1;
-  /* A floor so that a short record cannot squash the picture into a letterbox.
-     Above it, the text column decides. */
-  min-height: 420px;
+  width: 100%;
+  /* Landscape, and the tube's own proportion rather than the column's, so the
+     crop is a decision instead of a leftover. cover trims top and bottom;
+     focusY puts the trim below the eyes. */
+  aspect-ratio: 3 / 2;
+  max-height: 100%;
 }
 
 .stage-name {
@@ -3908,7 +3938,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   /* Against the container, not the viewport — the column this sits in can be
      under 800px with the chat panel open, and the name has to come down with
      it rather than with the window. */
-  font-size: clamp(26px, 4.4cqw, 42px);
+  font-size: 32px;
   font-weight: 400;
   line-height: 1;
   /* Tronica is already generously spaced by its own advance; at this size the
@@ -3917,19 +3947,27 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   color: var(--foreground);
 }
 
+/* Three facts, spaced apart rather than punctuated. The middle dots this
+   replaces were doing a job a gap does better: a separator you can see is one
+   more mark competing with the three things it separates, and at this size
+   they read as belonging to the words. Wrapping is allowed, because the third
+   fact is the one that must not be cut off. */
 .stage-role {
-  margin: var(--s3) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em var(--s5);
+  margin: 12px 0 0;
   font-family: var(--family-ui);
-  font-size: 12.5px;
-  letter-spacing: 0.05em;
-  color: color-mix(in srgb, var(--foreground) 62%, transparent);
+  font-size: 13.5px;
+  letter-spacing: 0.03em;
+  color: color-mix(in srgb, var(--foreground) 58%, transparent);
 }
 
-/* The separators sit back, so the three facts read as three rather than as one
-   run-on line. */
-.stage-role span {
-  margin: 0 0.5em;
-  color: color-mix(in srgb, var(--foreground) 26%, transparent);
+/* The one fact that is an offer rather than a description, so it takes the
+   site's pink — the same pink that marks every other live thing here. */
+.stage-role em {
+  font-style: normal;
+  color: var(--brand);
 }
 
 /* ── The record ───────────────────────────────────────────────────────── */
@@ -3941,10 +3979,19 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   gap: var(--s3);
 }
 
+/* Three columns that shrink to their content, and the slack pushed to the
+   end. The 1fr used to sit under the organisation, which expanded that column
+   to the full width of the panel and left the role stranded at the far side of
+   it — a gap that grew with the window and varied by more than a hundred
+   pixels from the longest name to the shortest.
+
+   Putting the 1fr last instead lines the roles up on their own left edge,
+   immediately after the widest organisation. Three straight columns, and the
+   only whitespace inside a row is what the names themselves require. */
 .record-row {
   display: grid;
-  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
-  gap: var(--s3);
+  grid-template-columns: auto auto auto minmax(0, 1fr);
+  gap: var(--s3) var(--s4);
   align-items: baseline;
 }
 
@@ -3968,11 +4015,14 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 /* The role is the least of the three and set in the reading face, which at
-   this size reads quieter beside the mono than a smaller mono would. */
+   this size reads quieter beside the mono than a smaller mono would.
+
+   Ranged left now, not right. Right was aligning it to the panel rather than
+   to the entry it describes, which is what put it a screen's width from its
+   own organisation. */
 .record-role {
   font-family: var(--family-read);
   font-size: 11.5px;
-  text-align: right;
   white-space: nowrap;
   color: color-mix(in srgb, var(--foreground) 46%, transparent);
 }
@@ -3981,10 +4031,10 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .statement {
   margin: 0;
   /* Long enough to read in, short enough not to lose the line. */
-  max-width: 40ch;
+  max-width: 34ch;
   font-family: var(--family-read);
-  font-size: 17px;
-  line-height: 1.62;
+  font-size: 19px;
+  line-height: 1.55;
   color: color-mix(in srgb, var(--foreground) 84%, transparent);
   text-wrap: pretty;
 }
@@ -3998,30 +4048,78 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 /* Container, not viewport: the sidebar and the chat panel both take width the
    window knows nothing about. */
 @container about (max-width: 860px) {
+  /* One column, so the rows collapse into a plain reading order: slug, name,
+     picture, record, statement, sign-off. "more to explore" goes with them —
+     it was the right half of a two-column joke, and on a page with one column
+     there is nothing for it to be the right half of. */
   .stage {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
     row-gap: var(--s6);
+    flex: 0 1 auto;
+  }
+
+  .stage-slug,
+  .stage-id,
+  .stage-signal,
+  .stage-side,
+  .stage-end {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .stage-more {
+    display: none;
   }
 
   /* Stacked, the two are no longer side by side, so there is no height to
      match and nothing to spread against. */
   .stage-side {
     justify-content: flex-start;
+    gap: var(--s6);
   }
 
   .stage-shot {
-    min-height: 320px;
-    max-height: 60vh;
+    max-width: 560px;
   }
 }
 
 @container about (max-width: 520px) {
   .record-row {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto auto minmax(0, 1fr);
   }
 
   /* The date moves above its row rather than being squeezed beside it. */
   .record-span {
     grid-column: 1 / -1;
   }
+}
+
+/* ── The About page's second half, on a phone ──────────────────────────
+   The work index runs on under the About stage in the same scroll, because a
+   phone has no rail to move between the two with any more. See app/page.tsx
+   for why the desktop keeps them as separate routes.
+
+   The rule at the top is the only thing marking the join. Anything heavier —
+   a band, a filled section, a second masthead — would say these are two
+   documents, and the whole point of putting them in one scroll is that on a
+   phone they are one. */
+.about-continues {
+  display: block;
+  padding: var(--s6) var(--s6) var(--s8);
+}
+
+/* No rule, and no sign-off above it.
+   ──────────────────────────────────────────────────────────────────────
+   Both were drawn for a page that ends here, and on a phone it does not —
+   the work runs straight on underneath. A line across the join says these are
+   two documents; "end of file" over a section that is plainly not the end
+   says something that is not true. Between them they turned one scroll back
+   into two pages with a border between them.
+
+   Scoped to the scroll root, which is the mobile tree and the only place the
+   continuation is ever mounted. A width query would have caught a narrow
+   desktop window too, where the page really does end at that line. */
+[data-scroll-root] .stage-end {
+  display: none;
 }

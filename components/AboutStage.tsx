@@ -32,6 +32,16 @@ import { CornerMarks } from '@/components/CornerMarks'
  * Pointing at a piece still dims the other two. It is the last of the wall's
  * behaviour worth keeping: with no boxes, it is the only thing that says where
  * one piece ends and the next begins.
+ *
+ * Around that sits a frame of four small blocks, one at each corner: the slug
+ * and the identity across the top, "end of file" and "more to explore" across
+ * the foot. They are the page annotating itself, and they are what stops three
+ * floating pieces reading as content that has come loose — a page with corners
+ * has a shape even when nothing in it is boxed.
+ *
+ * None of the four is a Piece. They head and close the columns rather than
+ * belonging to them, and dimming the name while someone points at the record
+ * would be the page hiding whose record it is.
  */
 
 type Tuned = string | null
@@ -93,6 +103,21 @@ export function AboutStage() {
 
   return (
     <div className="stage">
+      {/* The header row. Two labels at the same height, one over each column:
+          the left names the page, the right names the person. They are the
+          only thing tying the two columns together at the top, since neither
+          has a frame to line up against. */}
+      <p className="stage-slug">//about me//</p>
+
+      <header className="stage-id">
+        <h1 className="stage-name">Anshul Suthar</h1>
+        <p className="stage-role">
+          <span>product designer</span>
+          <span>India</span>
+          <em>Open to work</em>
+        </p>
+      </header>
+
       <Piece id="signal" state={stateOf('signal')} className="stage-signal" onTune={tune}>
         {/* The only element here with a real edge, and the only thing that
             moves by itself. Three stills on a boomerang — left profile, front,
@@ -134,13 +159,6 @@ export function AboutStage() {
           while pointing at the record would be the page hiding whose record it
           is. */}
       <div className="stage-side">
-        <header className="stage-id">
-          <h1 className="stage-name">Anshul Suthar</h1>
-          <p className="stage-role">
-            Product Designer <span>·</span> India <span>·</span> Open to work
-          </p>
-        </header>
-
         <Piece
           id="record"
           state={stateOf('record')}
@@ -173,6 +191,12 @@ export function AboutStage() {
           </p>
         </Piece>
       </div>
+
+      {/* The footer row, and the page's only joke about what it is. Set at the
+          slug's size rather than a caption's: they are the two ends of the
+          same line, and reading as a pair is the whole of the effect. */}
+      <p className="stage-end">end of file</p>
+      <p className="stage-more">more to explore</p>
     </div>
   )
 }

@@ -138,16 +138,22 @@ export function SoundControl() {
         </span>
       </div>
 
-      {/* Display */}
-      <div ref={windowRef} className="player-window" data-pan={overflow}>
-        <span ref={trackRef} className="player-track">
-          {label}
-        </span>
-        {overflow && (
-          <span className="player-track" aria-hidden="true">
+      {/* Display. Two elements, not one: the window is the lit panel and the
+          glass inside it is what clips and fades the moving title. They were
+          the same element until the panel got a backlight — the edge fade is a
+          mask, and a mask on the window would have faded the lamp out at both
+          ends along with the text it is there to soften. */}
+      <div className="player-window" data-pan={overflow}>
+        <div ref={windowRef} className="player-glass">
+          <span ref={trackRef} className="player-track">
             {label}
           </span>
-        )}
+          {overflow && (
+            <span className="player-track" aria-hidden="true">
+              {label}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="player-foot">

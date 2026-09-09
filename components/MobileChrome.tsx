@@ -1,13 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { SoundControl } from '@/components/SoundControl'
-import { CornerMarks } from '@/components/CornerMarks'
-import {
-  CatMark,
-} from '@/components/Icons'
 import { PixelIcon } from '@/components/PixelIcon'
 import { NameMark } from '@/components/NameMark'
 
@@ -28,21 +23,15 @@ import { NameMark } from '@/components/NameMark'
  *           of the way of. It used to be the menu's own button, which meant the
  *           one thing on the page with his name on it could not be looked at
  *           without also being a control.
- *   bottom  where. A fixed rail in the thumb zone carrying the same three
- *           mechanisms as desktop and the same corner-mark selection, plus
- *           Mr. Toast on the end.
+ * There is no bottom rail any more. It held two destinations, and the work
+ * index now runs on under the About page in the same scroll — so its two
+ * buttons had become a control for moving between two halves of one document,
+ * bought with 74 fixed pixels of every screen. The scroll does that job, and
+ * the breadcrumb is what gets you back out of a case study.
  *
- * Nothing here is a new idea — it is the same information architecture with
- * the reach corrected. A tab strip at the top of a phone is the one thing a
- * thumb cannot comfortably hit, which is why that is what this replaces.
+ * Which leaves the phone with one piece of chrome instead of two, and the
+ * whole lower half of the screen given back to the page.
  */
-
-/** Withheld from the rail, same as on desktop — see the note in SideNav. */
-const NAV = [
-  { href: '/', title: 'About', icon: 'about' },
-  { href: '/work', title: 'Work', icon: 'work' },
-  { href: '/garage', title: 'Garage', icon: 'garage', hidden: true },
-] as const
 
 const CONTACT = [
   { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', icon: 'mail' },
@@ -55,33 +44,33 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const mastheadRef = useRef<HTMLElement>(null)
-  const railRef = useRef<HTMLElement>(null)
 
   /**
-   * Publish the real height of both bars.
+   * Publish the masthead's real height.
    *
-   * These were hardcoded, and the numbers were guesses that held only on the
-   * viewport they were written against. On a phone with a safe-area inset the
+   * It was hardcoded, and the number was a guess that held only on the
+   * viewport it was written against. On a phone with a safe-area inset the
    * masthead is taller than the guess, so the first line of every page tucked
-   * up underneath it. Measured, they cannot drift — and ResizeObserver catches
+   * up underneath it. Measured, it cannot drift — and ResizeObserver catches
    * rotation, dynamic type, and the address bar collapsing.
+   *
+   * One bar now, not two. The rail that used to be measured alongside it is
+   * gone, and so is the padding the page held open for it.
    */
   useEffect(() => {
-    const bars = [
-      [mastheadRef.current, '--masthead-h'],
-      [railRef.current, '--rail-h'],
-    ] as const
+    const el = mastheadRef.current
+    if (!el) return
 
     const measure = () => {
-      for (const [el, prop] of bars) {
-        if (el) document.documentElement.style.setProperty(prop, `${Math.ceil(el.getBoundingClientRect().height)}px`)
-      }
-
+      document.documentElement.style.setProperty(
+        '--masthead-h',
+        `${Math.ceil(el.getBoundingClientRect().height)}px`,
+      )
     }
 
     measure()
     const ro = new ResizeObserver(measure)
-    for (const [el] of bars) if (el) ro.observe(el)
+    ro.observe(el)
     window.addEventListener('orientationchange', measure)
     return () => {
       ro.disconnect()
@@ -315,34 +304,6 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
         <button className="m-scrim" aria-label="Close" onClick={() => setOpen(false)} />
       )}
 
-      {/* ── Where ───────────────────────────────────────────────────── */}
-      <nav ref={railRef} className="m-rail" data-settled={settled} aria-label="Sections">
-        {NAV.filter((n) => !('hidden' in n && n.hidden)).map(({ href, title, icon }) => {
-          const active = isActive(href)
-          return (
-            <Link
-              key={href}
-              href={href}
-              data-sfx="tick"
-              data-active={active}
-              className="m-rail-item"
-              aria-current={active ? 'page' : undefined}
-            >
-              <CornerMarks />
-              <PixelIcon name={icon} size={26} />
-              <span className="t-label">{title}</span>
-            </Link>
-          )
-        })}
-
-        {/* Only when there is something to open. */}
-        {onOpenChat && (
-        <button onClick={onOpenChat} data-sfx="tick" className="m-rail-item m-rail-cat" aria-label="Ask Mr. Toast">
-          <CatMark size={26} />
-          <span className="t-label">Toast</span>
-        </button>
-        )}
-      </nav>
     </>
   )
 }

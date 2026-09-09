@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { setNavOrigin, useNavOrigin } from '@/lib/nav-origin'
@@ -46,6 +47,44 @@ const CONTACT = [
 
 export function SideNav({ width }: SideNavProps) {
   const pathname = usePathname()
+
+  /**
+   * Which ends of the case-study list have something past them.
+   *
+   * Measured on scroll and on resize, and re-measured when the browser tells
+   * us the box changed — a fade that is always on would claim there is more
+   * to see at an end that has nothing past it, and the point of the fade is
+   * that it is a truthful signal about the list's extent.
+   */
+  const studiesRef = useRef<HTMLDivElement>(null)
+  const [over, setOver] = useState({ top: false, bottom: false })
+
+  useEffect(() => {
+    const el = studiesRef.current
+    if (!el) return
+
+    const check = () => {
+      /* A pixel of slack at each end. Sub-pixel layout and fractional device
+         ratios routinely leave scrollTop at 0.4 or the remainder at 0.6, and
+         without the tolerance the fade flickers on at rest. */
+      const top = el.scrollTop > 1
+      const bottom = el.scrollTop + el.clientHeight < el.scrollHeight - 1
+      setOver((cur) => (cur.top === top && cur.bottom === bottom ? cur : { top, bottom }))
+    }
+
+    check()
+    el.addEventListener('scroll', check, { passive: true })
+    const ro = new ResizeObserver(check)
+    ro.observe(el)
+    /* The list's own content can change height without the box doing so — the
+       rail is resizable, and a card can rewrap from two lines to one. */
+    for (const kid of Array.from(el.children)) ro.observe(kid)
+
+    return () => {
+      el.removeEventListener('scroll', check)
+      ro.disconnect()
+    }
+  }, [])
   const isActive = (path: string) =>
     path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(path + '/')
 
@@ -142,8 +181,15 @@ export function SideNav({ width }: SideNavProps) {
         </div>
       </div>
 
-      {/* The one part that can grow, and so the one part that scrolls. */}
-      <div className="nav-studies">
+      {/* The one part that can grow, and so the one part that scrolls. The
+          two data attributes drive the fades at its ends — see the effect
+          above for why they are measured rather than always on. */}
+      <div
+        ref={studiesRef}
+        className="nav-studies"
+        data-over-top={over.top}
+        data-over-bottom={over.bottom}
+      >
         <div className="stack">
             {caseStudies.map((study, i) => {
               const active = pathname === `/work/${study.slug}` && !viaWork

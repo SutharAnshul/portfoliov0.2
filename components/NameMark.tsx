@@ -5,10 +5,15 @@ import { createElement, useEffect, useRef, useState } from 'react'
 /**
  * The name, as a field of cells that periodically resolve out of solid blocks.
  *
- * Two words of six characters happens to be the whole idea: ANSHUL over
- * SUTHAR is a rectangle, so the blocked state is a clean 6×2 field rather
+ * Two words of six characters happens to be the whole idea: Anshul over
+ * Suthar is a rectangle, so the blocked state is a clean 6×2 field rather
  * than a ragged one, and every cell is exactly one monospace character wide
  * whether it is holding a letter or a block.
+ *
+ * Set as it is written rather than in capitals. The grid does not care — the
+ * face is monospace, so a lowercase advance is the same 1ch as an uppercase
+ * one, and neither word has a descender to fall out of the cell. What changes
+ * is the reading: capitals made it a logotype, and it is a name.
  *
  * The band sweeps left to right in both directions — once to uncover the
  * name, once to cover it again — with the leading cell carrying colour. That
@@ -49,7 +54,7 @@ import { createElement, useEffect, useRef, useState } from 'react'
  * interrupted on, and never against a field still in motion underneath it.
  */
 
-const ROWS = ['ANSHUL', 'SUTHAR'] as const
+const ROWS = ['Anshul', 'Suthar'] as const
 const N = ROWS[0].length
 
 /** The beats of one cycle, in ms. */
