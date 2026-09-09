@@ -1,0 +1,278 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MUSIC PLAYER LAB
+   ═══════════════════════════════════════════════════════════════════════════
+   Scoped to this route and imported by its page, so nothing here can reach the
+   site. A lab is for deciding between things, not for growing a second
+   stylesheet the real pages have to live with.
+
+   The panels borrow the site's tokens rather than redefining them — the point
+   of the exercise is to see whether each direction sits in this language, and
+   a prototype in its own palette answers a different question. */
+
+.pl-page {
+  padding: var(--s6);
+  max-width: 1400px;
+}
+
+.pl-head {
+  max-width: 68ch;
+  margin-bottom: var(--s7);
+}
+
+.pl-head h1 {
+  margin: 0 0 var(--s4);
+  font-family: var(--family-ui);
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.pl-head p {
+  margin: 0 0 var(--s4);
+  font-family: var(--family-read);
+  font-size: 15px;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--foreground) 72%, transparent);
+}
+
+/* The constraint that shapes all four, marked so it is not read as preamble. */
+.pl-warn {
+  border-left: 1px solid color-mix(in srgb, var(--brand) 60%, transparent);
+  padding-left: var(--s4);
+}
+
+.pl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--s7);
+}
+
+.pl-panel {
+  min-width: 0;
+}
+
+.pl-title {
+  margin: 0 0 var(--s4);
+  font-family: var(--family-ui);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+}
+
+/* One height for all four, so the comparison is between the directions and not
+   between how much room each one took. */
+.pl-stage {
+  position: relative;
+  height: 260px;
+  display: grid;
+  place-items: stretch;
+  background: #050505;
+  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  /* Clipped. A panel that spills is a panel whose size is a suggestion, and
+     the whole point of one fixed height is that the four are comparable. */
+  overflow: hidden;
+}
+
+.pl-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Transport ────────────────────────────────────────────────────────── */
+.pl-transport {
+  display: flex;
+  gap: var(--s3);
+  align-items: center;
+  margin-top: var(--s4);
+}
+
+.pl-btn,
+.pl-select {
+  font-family: var(--family-ui);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  padding: 7px 12px;
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid color-mix(in srgb, var(--foreground) 22%, transparent);
+  cursor: pointer;
+}
+
+.pl-btn[data-on='true'] {
+  border-color: color-mix(in srgb, var(--brand) 70%, transparent);
+  color: var(--brand);
+}
+
+/* ── Notes ────────────────────────────────────────────────────────────── */
+.pl-blurb {
+  margin: var(--s4) 0 var(--s4);
+  font-family: var(--family-read);
+  font-size: 14px;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--foreground) 78%, transparent);
+}
+
+.pl-meta {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px var(--s4);
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.pl-meta dt {
+  font-family: var(--family-ui);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 34%, transparent);
+  padding-top: 2px;
+}
+
+.pl-meta dd {
+  margin: 0;
+  font-family: var(--family-read);
+  color: color-mix(in srgb, var(--foreground) 62%, transparent);
+}
+
+/* ═══ B · Deck ══════════════════════════════════════════════════════════ */
+.pl-deck {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--s5);
+  padding: var(--s5);
+  align-content: center;
+}
+
+.pl-reels {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--s4);
+}
+
+/* Pixel reels: a square with a square hub, and the spokes cut out of it by a
+   conic gradient with hard stops rather than drawn as elements. Hard stops
+   because the whole language here is blocks, and an antialiased spoke would be
+   the one smooth edge on the panel. */
+.pl-reel {
+  width: 56px;
+  height: 56px;
+  border: 2px solid color-mix(in srgb, var(--foreground) 34%, transparent);
+  background:
+    conic-gradient(
+      from var(--spin, 0deg),
+      color-mix(in srgb, var(--foreground) 26%, transparent) 0deg 18deg,
+      transparent 18deg 90deg,
+      color-mix(in srgb, var(--foreground) 26%, transparent) 90deg 108deg,
+      transparent 108deg 180deg,
+      color-mix(in srgb, var(--foreground) 26%, transparent) 180deg 198deg,
+      transparent 198deg 270deg,
+      color-mix(in srgb, var(--foreground) 26%, transparent) 270deg 288deg,
+      transparent 288deg 360deg
+    );
+}
+
+/* The tape between them. Flat, because a loop cartridge's tape does not wind
+   from one reel to the other — it comes off the middle of the pack and goes
+   back on the outside, which is exactly why it has no beginning to scrub to. */
+.pl-tape {
+  height: 2px;
+  background: color-mix(in srgb, var(--foreground) 18%, transparent);
+}
+
+.pl-deck[data-on='false'] .pl-reel {
+  opacity: 0.4;
+}
+
+/* The bezel the panel sits behind. An LCD module is a recessed part, not a
+   printed area — the inset shadow is what stops it reading as a coloured
+   rectangle painted on the faceplate. */
+.pl-window {
+  height: 46px;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55), 0 0 12px rgba(96, 150, 62, 0.16);
+}
+
+/* ═══ C · Signal path ═══════════════════════════════════════════════════ */
+.pl-path {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.pl-path-labels {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  padding: 0 0 var(--s4);
+  font-family: var(--family-ui);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  color: color-mix(in srgb, var(--foreground) 40%, transparent);
+}
+
+/* ═══ D · Cartridge shelf ═══════════════════════════════════════════════ */
+.pl-shelf {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 6px;
+  padding: 10px;
+  min-height: 0;
+}
+
+.pl-cart {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 4px;
+  padding: 5px;
+  min-height: 0;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.pl-cart:hover {
+  border-color: color-mix(in srgb, var(--foreground) 30%, transparent);
+}
+
+/* Inserted, not merely selected: it sits a little proud of the shelf. */
+.pl-cart[data-active='true'] {
+  border-color: color-mix(in srgb, var(--brand) 65%, transparent);
+  transform: translateY(-3px);
+}
+
+/* Square, and sized by the row rather than by the width, so six of them fit
+   the stage instead of setting its height. */
+.pl-cart-label {
+  aspect-ratio: 1;
+  height: 100%;
+  width: auto;
+  margin: 0 auto;
+  min-height: 0;
+}
+
+.pl-cart-name {
+  font-family: var(--family-ui);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--foreground);
+}
+
+/* The one-line description is in the panel notes already; on the shelf it was
+   three lines of 10px prose under a 90px label, which is a caption competing
+   with the thing it captions. */
+.pl-cart-note {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .pl-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

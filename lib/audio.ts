@@ -46,6 +46,19 @@ const SFX_LEVEL = 0.09
 
 let ctx: AudioContext | null = null
 let master: GainNode | null = null
+let analyserNode: AnalyserNode | null = null
+
+/**
+ * The tap on the master bus, or null before the first sound.
+ *
+ * Null is the honest answer rather than an inconvenience: the context does not
+ * exist until a gesture creates it, and a visualiser that gets handed a silent
+ * analyser has no way to tell "not started" from "playing silence". Callers
+ * poll for it and draw a resting state until it appears.
+ */
+export function analyser(): AnalyserNode | null {
+  return analyserNode
+}
 let ambientBus: GainNode | null = null
 let sfxBus: GainNode | null = null
 let noiseBuffer: AudioBuffer | null = null
@@ -100,6 +113,22 @@ function ensureContext() {
   comp.threshold.value = -24
   comp.ratio.value = 6
   master.connect(comp).connect(ctx.destination)
+
+  /* A tap for anything that wants to draw the sound. It hangs off the end of
+     the chain as a leaf — an AnalyserNode passes its input through untouched
+     and analyses whatever reaches it, so it does not have to be in the path to
+     the speakers and nothing downstream of it exists to be coloured.
+     Post-compressor on purpose: what is drawn should be what is heard, and the
+     compressor is between the mix and the ear.
+
+     2048 gives ~11ms of waveform at 48k, which is a few cycles of anything in
+     this material — enough for a scope trace to hold still rather than crawl.
+     The smoothing is for the spectrum only; the time-domain data is never
+     smoothed by it. */
+  analyserNode = ctx.createAnalyser()
+  analyserNode.fftSize = 2048
+  analyserNode.smoothingTimeConstant = 0.7
+  comp.connect(analyserNode)
 
   ambientBus = ctx.createGain()
   ambientBus.gain.value = AMBIENT_LEVEL
