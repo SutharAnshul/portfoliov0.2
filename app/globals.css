@@ -2417,7 +2417,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      a box the full width of the column, which put them a long way from the
      glyph they belonged to. */
   gap: var(--s3);
-  padding: var(--s2) var(--s4) calc(env(safe-area-inset-bottom, 0px) + var(--s2));
+  /* The vertical padding has to clear the marks, not the item. A mark sits 2px
+     outside the box on `inset` and then its 7px arms are translated a further
+     full width clear of the corner, so the ink reaches 9px past the item on
+     every side — against 8px of padding, which put the top pair through the
+     rail's own border. Twelve leaves three clear. */
+  padding: var(--s3) var(--s4) calc(env(safe-area-inset-bottom, 0px) + var(--s3));
   background: color-mix(in srgb, var(--background) 90%, transparent);
   backdrop-filter: blur(14px);
   border-top: 1px solid var(--card-line);
@@ -2438,18 +2443,83 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   display: grid;
   justify-self: center;
   justify-items: center;
-  gap: 3px;
-  padding: 9px 20px 7px;
+  /* Centred in a fixed box rather than sat on padding. The glyph and its label
+     come to 44px; in 64 that leaves ten clear above and below, which is the
+     air the top of the button was short of. A fixed height also makes the
+     marks' travel a known number — see RAIL_HALF below. */
+  align-content: center;
+  gap: 4px;
+  height: 64px;
+  /* Narrower than the 20px it was: the button only needs to be wide enough to
+     hold its label and to be hit, and the marks read better close in. */
+  padding: 0 12px;
   border-radius: var(--r-sm);
   color: color-mix(in srgb, var(--foreground) 52%, transparent);
   transition: color var(--dur-light, 300ms) var(--ease-light, ease-out);
-  /* A comfortable tap target regardless of how small the glyph is. */
-  min-height: 52px;
 }
 
 .m-rail-item[data-active='true'] {
   color: var(--foreground);
 }
+
+/* The rail's marks are always on, and they travel by transform.
+   ────────────────────────────────────────────────────────────────────────
+   Two changes, and the second is why the press stopped stuttering.
+
+   They no longer start invisible. At rest the four sit gathered on the centre
+   line, which is the ⊣ ⊢ pair — the same half-collapsed figure the case-study
+   frames rest at — so an untapped button still reads as a button. Selecting it
+   opens them out to the corners.
+
+   And the travel is a transform rather than `top` and `bottom`. Those are
+   layout properties, so only the main thread can advance them — and this press
+   is the one on the site that coincides with a route change. A first visit to
+   a route was measured stalling the main thread for 116ms while React rendered
+   the new page, and the marks were trying to walk through it. On a transform
+   the compositor carries them and the stall goes unnoticed: worst frame across
+   the same tap went from 116.8ms to 16.8ms.
+
+   The catch is that a percentage translate resolves against the element's own
+   height, not its parent's, so the half-height has to be a number — which is
+   what the fixed 64px on .m-rail-item buys. The marks box is inset -2px on
+   each side, so it is 68 tall and half of it is 34. Change that height and
+   this must change with it. */
+.m-rail-item > .marks {
+  opacity: 0.3;
+}
+
+.m-rail-item[data-active='true'] > .marks {
+  opacity: 0.9;
+}
+
+.m-rail-item > .marks .mark {
+  transition: transform var(--switch-off);
+}
+
+.m-rail-item > .marks .mark-tl,
+.m-rail-item > .marks .mark-tr {
+  top: 0;
+}
+
+.m-rail-item > .marks .mark-bl,
+.m-rail-item > .marks .mark-br {
+  bottom: 0;
+}
+
+/* Gathered: each pushed back to the centre line by half the box. */
+.m-rail-item > .marks .mark-tl { transform: translate(-100%, -100%) translateY(34px); }
+.m-rail-item > .marks .mark-tr { transform: translate(100%, -100%) translateY(34px); }
+.m-rail-item > .marks .mark-bl { transform: translate(-100%, 100%) translateY(-34px); }
+.m-rail-item > .marks .mark-br { transform: translate(100%, 100%) translateY(-34px); }
+
+/* Open: on the corners, where the base rules would have put them. */
+.m-rail-item[data-active='true'] > .marks .mark {
+  transition: transform var(--switch);
+}
+.m-rail-item[data-active='true'] > .marks .mark-tl { transform: translate(-100%, -100%); }
+.m-rail-item[data-active='true'] > .marks .mark-tr { transform: translate(100%, -100%); }
+.m-rail-item[data-active='true'] > .marks .mark-bl { transform: translate(-100%, 100%); }
+.m-rail-item[data-active='true'] > .marks .mark-br { transform: translate(100%, 100%); }
 
 /* Corner marks show the active section, exactly as on desktop — including the
    switch-on, so the opacity timing is left to the shared rule rather than

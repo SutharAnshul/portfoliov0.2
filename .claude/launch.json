@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["--yes", "pnpm@10", "dev"],
       "port": 3000
+    },
+    {
+      "name": "portfolio-prod",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "pnpm@10", "start", "-p", "3001"],
+      "port": 3001
     }
   ]
 }
