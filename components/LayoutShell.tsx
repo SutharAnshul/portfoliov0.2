@@ -197,7 +197,10 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
       <div className="md:hidden flex flex-col h-screen bg-background">
         <MobileChrome onOpenChat={openChat} />
         <div data-scroll-root data-page-content className="flex-1 overflow-y-auto">
-          {children}
+          {/* A handle for the opening: the page rises from the bottom of the
+              screen as the mark settles into the masthead, and it needs an
+              element of its own to be moved by. See .m-page in globals.css. */}
+          <div className="m-page">{children}</div>
         </div>
       </div>
     </>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { createElement, useEffect, useRef, useState } from 'react'
 
 /**
  * The name, as a field of cells that periodically resolve out of solid blocks.
@@ -112,7 +112,30 @@ function cellsAt(t: number): Cell[] {
 
 const field = (t: number) => ROWS.map((_, r) => cellsAt(t - r * LAG))
 
-export function NameMark() {
+export function NameMark({
+  as = 'h1',
+  interactive = true,
+  className = '',
+}: {
+  /**
+   * The element to render. The rail wants the page's `h1`; the phone masthead
+   * puts the mark inside a button, and a heading is not phrasing content — it
+   * cannot legally go there, and browsers will move it out of the button if it
+   * does.
+   */
+  as?: 'h1' | 'span'
+  /**
+   * Whether each box is its own hit area.
+   *
+   * Off for touch. Reading the name by moving across it is a pointer idea —
+   * there is nothing to move across with a finger, `pointerenter` fires on tap
+   * and then never leaves, so the first box touched would freeze the cycle and
+   * stay frozen. Worse inside the masthead button, where twelve child hit areas
+   * sit on top of the one thing the user is actually trying to press.
+   */
+  interactive?: boolean
+  className?: string
+} = {}) {
   // Server and first paint show the name outright. Anything else would put a
   // block of colour where the name goes for one frame on every cold load.
   const [rows, setRows] = useState<Cell[][]>(() => ROWS.map(() => Array(N).fill('on')))
@@ -231,33 +254,42 @@ export function NameMark() {
     return () => cancelAnimationFrame(frame)
   }, [])
 
-  return (
-    <h1 className="sig">
-      <span className="sr-only">Anshul Suthar</span>
-      <span className="sig-grid" aria-hidden="true">
-        {ROWS.map((word, r) => (
-          <span className="sig-row" key={word}>
-            {[...word].map((ch, i) => (
-              <span
-                className="sig-cell"
-                data-cell={rows[r][i]}
-                key={`${word}-${i}`}
-                onPointerEnter={() => {
-                  hover.current = key(r, i)
-                }}
-                onPointerLeave={() => {
-                  // Guarded: moving between two boxes fires the leave of the
-                  // old one after the enter of the new one, and an unguarded
-                  // clear would blank the box the pointer is now on.
-                  if (hover.current === key(r, i)) hover.current = null
-                }}
-              >
-                {ch}
-              </span>
-            ))}
-          </span>
-        ))}
-      </span>
-    </h1>
+  return createElement(
+    as,
+    { className: `sig ${className}`.trim() },
+    <span className="sr-only">Anshul Suthar</span>,
+    <span className="sig-grid" aria-hidden="true">
+      {ROWS.map((word, r) => (
+        <span className="sig-row" key={word}>
+          {[...word].map((ch, i) => (
+            <span
+              className="sig-cell"
+              data-cell={rows[r][i]}
+              key={`${word}-${i}`}
+              onPointerEnter={
+                interactive
+                  ? () => {
+                      hover.current = key(r, i)
+                    }
+                  : undefined
+              }
+              onPointerLeave={
+                interactive
+                  ? () => {
+                      // Guarded: moving between two boxes fires the leave of
+                      // the old one after the enter of the new one, and an
+                      // unguarded clear would blank the box the pointer is now
+                      // on.
+                      if (hover.current === key(r, i)) hover.current = null
+                    }
+                  : undefined
+              }
+            >
+              {ch}
+            </span>
+          ))}
+        </span>
+      ))}
+    </span>,
   )
 }

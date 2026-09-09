@@ -2146,35 +2146,211 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    content, and the bottom one inside the thumb's arc — which is the whole
    reason navigation moved down here from a tab strip at the top. */
 
+/* The masthead has two states, and the difference between them is the whole
+   idea: at the top of a page the mark is the opening, and once the page has
+   moved it is chrome.
+
+   Both states are the same layout — the mark is always the first flex item and
+   the menu button always the last. Only two properties change, and both are
+   animatable, so the collapse is one continuous movement rather than a jump
+   between two arrangements:
+
+     font-size   on the mark, which is the one variable every part of it
+                 derives from, so the whole thing reflows to the new size and
+                 the bar's height follows on its own. A transform: scale would
+                 have left the bar reserving the small height while the large
+                 mark hung out of it.
+     translateX  to carry it to the middle of the viewport and back.
+
+   The translate is the interesting half. 50% resolves against the mark's own
+   width, which is changing every frame of the font-size transition — so the
+   two animations stay in agreement without being told about each other, and
+   the mark is exactly centred at every point along the way. */
+/* The phone opens on the name and nothing else.
+   ────────────────────────────────────────────────────────────────────────
+   The first screenful is his name in the middle of it, one word telling you
+   what to do, and no other furniture: no bar, no rail, no content. Scrolling
+   both settles the mark into the masthead and brings the site up underneath
+   it, so the two halves of the movement are one gesture.
+
+   The splash is a real screen rather than an overlay — a full-height spacer at
+   the head of the scroller — which means it behaves like a place. It can be
+   scrolled back to, it does not trap anything, and nothing has to be dismissed.
+
+   Both states are the same layout; only three animatable properties change:
+   the masthead's padding, the mark's font-size, and the mark's translate. So
+   the collapse is one continuous movement rather than a jump between two
+   arrangements.
+
+   The translate is the interesting one. Its percentages resolve against the
+   mark's own box, which is changing every frame of the font-size transition —
+   so the two animations stay in agreement without being told about each other,
+   and the mark is exactly centred at every point along the way. */
+/* Scrubbed to the scroll, not switched by it.
+   ────────────────────────────────────────────────────────────────────────
+   This was a threshold: cross 20px and everything transitioned over 420ms.
+   Which is a switch with a fade on it — the reveal happened *near* the
+   gesture rather than *because* of it, and at 20px it fired so early that it
+   read as instant.
+
+   Now one number, --reveal, runs 0 to 1 over the first 45% of a screen of
+   scrolling, and every part of the opening is a function of it: the mark's
+   size and position, the sheet's opacity, the bar's ground, the rail. Nothing
+   has a duration, so nothing can lag the finger or overrun it — drag halfway
+   and it sits halfway; let go and it stops.
+
+   --reveal is written by MobileChrome on an animation frame. The fallback of 0
+   is what the first paint uses, so the opening is composed before any script
+   has run. */
+
 .m-masthead {
   position: fixed;
   inset: 0 0 auto 0;
   z-index: 60;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--s3);
+  /* The mark is out of flow, so the button is the only thing being placed. */
+  justify-content: flex-end;
+  /* One height, always. The mark used to be a flex item, so growing it to
+     34px grew the bar with it — and the bar's height is what the page's top
+     padding is measured from, so the whole page moved as the mark resized.
+     Out of flow, the mark can be any size it likes and the bar cannot feel it. */
   padding: calc(env(safe-area-inset-top, 0px) + var(--s3)) var(--s4) var(--s3);
+}
+
+/* The bar's own surface, on a layer of its own so it can fade in by itself
+   without taking the mark or the button with it. */
+.m-masthead::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: color-mix(in srgb, var(--background) 88%, transparent);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--card-line);
+  opacity: var(--reveal, 0);
 }
 
-.m-name {
+.m-mark {
+  position: absolute;
+  left: var(--s4);
+  top: calc(env(safe-area-inset-top, 0px) + var(--s3));
+  /* The bar's content height, which the menu button sets. Fixing it here is
+     what lets the mark overflow its own box symmetrically while it is large,
+     so its optical centre and its box centre stay the same point. */
+  height: 40px;
   display: inline-flex;
   align-items: center;
-  gap: var(--s2);
   color: var(--foreground);
+  /* From the middle of the screen at 0 to its slot in the bar at 1.
+     50vh, not svh: the shell around this is h-screen, and matching the unit
+     the container is measured in is what keeps the mark on the centre line
+     rather than a browser-chrome's worth above or below it.
+     The 50% is half the mark's own width, which changes as it resizes — so
+     the two halves of the movement stay in agreement without being told
+     about each other. */
+  transform: translate(
+    calc((50vw - var(--s4) - 50%) * (1 - var(--reveal, 0))),
+    calc((50vh - env(safe-area-inset-top, 0px) - var(--s3) - 20px) * (1 - var(--reveal, 0)))
+  );
 }
 
-.m-chev {
-  display: inline-flex;
-  opacity: 0.5;
-  transition: transform var(--dur-light, 320ms) var(--ease-light, ease-out);
+.m-mark .sig {
+  --fs-sig: calc(17px + 17px * (1 - var(--reveal, 0)));
 }
 
-.m-chev[data-open='true'] {
-  transform: rotate(180deg);
+/* "scroll". Fixed to the foot of the screen rather than placed in the flow,
+   because the masthead it lives in is only as tall as its own bar — the hint
+   belongs to the splash, not to the header. */
+.m-hint {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s6));
+  text-align: center;
+  font-family: var(--family-ui);
+  font-size: var(--fs-label);
+  /* The tracking is on a capitalised word, so the trailing space after the
+     last letter has to come back off or the word sits left of centre by half
+     a letter-space. */
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  text-transform: uppercase;
+  pointer-events: none;
+  animation: m-hint-breathe 2.8s ease-in-out infinite;
+  /* Fades with the gesture, like everything else in the opening. */
+  opacity: calc(1 - var(--reveal, 0));
+}
+
+/* The breath is on colour, not opacity, and that is not a preference.
+   A running animation outranks a normal declaration, so an opacity keyframe
+   would have gone on overriding the fade-out above — the hint kept pulsing
+   away at half strength after it was supposed to be gone. Leaving opacity free
+   for the state and putting the pulse on colour lets the two coexist. */
+@keyframes m-hint-breathe {
+  0%,
+  100% {
+    color: color-mix(in srgb, var(--foreground) 28%, transparent);
+  }
+  50% {
+    color: color-mix(in srgb, var(--foreground) 60%, transparent);
+  }
+}
+
+/* The menu button. Two rules that fold into a cross.
+   Absent during the splash: the menu is part of the site, and the site has not
+   arrived yet.
+
+   The 8px gap is the geometry the animation depends on: two 2px rules 8px
+   apart put each one 5px off centre, which is the exact distance each has to
+   travel to meet. Change the gap and the cross stops closing. */
+.m-burger {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  color: var(--foreground);
+  opacity: var(--reveal, 0);
+  /* Only pressable once it is fully there — a button at a tenth of an opacity
+     is a button nobody meant to hit. */
+  pointer-events: none;
+}
+
+.m-masthead[data-settled='true'] .m-burger {
+  pointer-events: auto;
+}
+
+.m-burger i {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: currentColor;
+  transition:
+    transform var(--dur-light, 320ms) var(--ease-light, ease-out),
+    opacity 160ms linear;
+}
+
+/* Each rule travels its own 5px to the centre line and turns through 45° in
+   opposite directions, so they arrive as a cross. Nothing fades: both strokes
+   are present throughout, and the closed state and the open one are the same
+   two objects in different places. */
+.m-burger[data-open='true'] i:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+
+.m-burger[data-open='true'] i:nth-child(2) {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-masthead,
+  .m-mark,
+  .m-mark .sig,
+  .m-burger i {
+    transition: none;
+  }
 }
 
 /* The studio card. Height is animated via grid rather than max-height so it
@@ -2219,10 +2395,19 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   background: color-mix(in srgb, var(--background) 55%, transparent);
 }
 
+/* The rail rises with the rest of the site rather than fading in, so that the
+   opening reads as the page coming up under the mark rather than as a bar
+   switching on. Scrubbed, like everything else in the reveal. */
+.m-rail[data-settled='false'] {
+  pointer-events: none;
+}
+
 .m-rail {
   position: fixed;
   inset: auto 0 0 0;
   z-index: 60;
+  transform: translateY(calc(100% * (1 - var(--reveal, 0))));
+  opacity: var(--reveal, 0);
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
@@ -2267,8 +2452,57 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    flush against it, which reads as clipped even when it is not. */
 @media (max-width: 767px) {
   [data-page-content] {
-    padding-top: calc(var(--masthead-h, 58px) + var(--s4));
+    padding-top: calc(var(--masthead-h, 64px) + var(--s4));
     padding-bottom: calc(var(--rail-h, 74px) + var(--s4));
+  }
+
+  /* The opening's own scroll distance, above the page.
+     ──────────────────────────────────────────────────────────────────────
+     The reveal has to be paid for in scroll, and it cannot be paid for out of
+     the page's — spend the page's scroll on the opening and the page arrives
+     already scrolled past its own first line.
+
+     So the scroller gets a run-up exactly as long as the reveal. At the end of
+     it the page is at its top, under the bar, with nothing consumed. It is the
+     same length as the range MobileChrome divides by, published from there so
+     the two cannot drift; the 45vh is only for the first paint. */
+  [data-scroll-root]::before {
+    content: '';
+    display: block;
+    height: var(--reveal-range, 45vh);
+  }
+
+  /* The page rises from the bottom edge as the mark settles.
+     ──────────────────────────────────────────────────────────────────────
+     There was an opaque sheet here, laid over a page that never moved. Once
+     the page itself arrives from below there is nothing left for a sheet to
+     hide: at rest the page is off the bottom of the screen, the rail is under
+     it, the bar has no ground yet, and what is left on screen is the mark. A
+     cover for an empty screen is a layer composited on every scroll for
+     nothing.
+
+     The lift is what puts the page's top on the bottom edge at rest: a
+     screen, less where the page already sits — its own padding under the bar,
+     and the run-up above it.
+
+     --follow, not --reveal: the page has twice the mark's distance to cover,
+     so on the same fraction it would move at twice the speed. See the note in
+     MobileChrome. */
+  .m-page {
+    --reveal-lift: calc(
+      100vh - var(--masthead-h, 64px) - var(--s4) - var(--reveal-range, 45vh)
+    );
+    transform: translateY(calc((1 - var(--follow, 0)) * var(--reveal-lift)));
+    will-change: transform;
+  }
+
+  /* Off entirely once the opening is over. A transformed ancestor is the
+     containing block for anything fixed inside it, and translateY(0) is still
+     a transform — leaving it on would quietly break position: fixed on every
+     page in the site. */
+  html[data-reveal='done'] .m-page {
+    transform: none;
+    will-change: auto;
   }
 }
 
