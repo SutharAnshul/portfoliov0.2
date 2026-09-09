@@ -211,7 +211,7 @@ export function Presenter({
           {slides.length > 0 && (
             <button type="button" className="present-open t-label" onClick={() => show(0)}>
               Present
-              <span aria-hidden="true">↗</span>
+              <span aria-hidden="true">→</span>
             </button>
           )}
         </span>

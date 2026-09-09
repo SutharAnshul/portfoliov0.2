@@ -89,7 +89,7 @@ export default async function CaseStudyPage({ params }: Props) {
       {/* The bar stays with you the whole way down the record. */}
       <div className="record-bar t-meta">
         <span className="record-no">
-          № {pad(index + 1)} / {pad(caseStudies.length)}
+          # {pad(index + 1)} / {pad(caseStudies.length)}
         </span>
 
         <div className="record-nav">

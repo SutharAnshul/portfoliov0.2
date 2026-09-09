@@ -27,64 +27,6 @@ const base = (size: number) => ({
   'aria-hidden': true,
 })
 
-/** Iris diaphragm — six blades around a circular opening. */
-export function IconAperture({ size = 16, className }: Props) {
-  return (
-    <svg {...base(size)} className={className}>
-      <circle cx="12" cy="12" r="9.2" />
-      <g className="mech-blades">
-        <path d="M13.9 8.4 L18.9 17.1" />
-        <path d="M10.1 8.4 L20.1 8.4" />
-        <path d="M8.2 11.7 L13.2 3" />
-        <path d="M10.1 15.6 L5.1 6.9" />
-        <path d="M13.9 15.6 L3.9 15.6" />
-        <path d="M15.8 12.3 L10.8 21" />
-      </g>
-    </svg>
-  )
-}
-
-/** Contact sheet: six frames, one circled the way a select is marked. */
-export function IconSheet({ size = 16, className }: Props) {
-  return (
-    <svg {...base(size)} className={className}>
-      <rect x="3" y="4.5" width="18" height="15" rx="1" />
-      <path d="M9 4.5v15M15 4.5v15M3 12h18" />
-      <circle className="mech-select" cx="12" cy="8.25" r="2.1" />
-    </svg>
-  )
-}
-
-/** Hex bolt, slotted. */
-export function IconBolt({ size = 16, className }: Props) {
-  return (
-    <svg {...base(size)} className={className}>
-      <path className="mech-bolt" d="M12 2.8 L19 6.9 V15.1 L12 19.2 L5 15.1 V6.9 Z" />
-      <circle cx="12" cy="11" r="3.4" />
-      <path className="mech-slot" d="M12 7.6v6.8" />
-    </svg>
-  )
-}
-
-/** Sun, for the light theme. */
-export function IconSun({ size = 16, className }: Props) {
-  return (
-    <svg {...base(size)} className={className}>
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8" />
-    </svg>
-  )
-}
-
-/** Crescent, for the dark theme. */
-export function IconMoon({ size = 16, className }: Props) {
-  return (
-    <svg {...base(size)} className={className}>
-      <path d="M20.5 14.2A8.6 8.6 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7Z" />
-    </svg>
-  )
-}
-
 // ── Transport ───────────────────────────────────────────────────────────
 
 export function IconPrev({ size = 16, className }: Props) {
@@ -203,61 +145,6 @@ function Tile({
 
 /* Brand colours are the companies' own. Mail and phone are not brands, so they
    keep the tints this site already used for them. */
-export function IconMail({ size, className }: Props) {
-  return (
-    <Tile
-      size={size}
-      className={className}
-      title="Email"
-      bg="#D9603C"
-      inset={5.4}
-      viewBox="0 0 512 512"
-      d="M48 64c-26.5 0-48 21.5-48 48 0 15.1 7.1 29.3 19.2 38.4l208 156c17.1 12.8 40.5 12.8 57.6 0l208-156c12.1-9.1 19.2-23.3 19.2-38.4 0-26.5-21.5-48-48-48L48 64zM0 196L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-188-198.4 148.8c-34.1 25.6-81.1 25.6-115.2 0L0 196z"
-    />
-  )
-}
-
-export function IconPhone({ size, className }: Props) {
-  return (
-    <Tile
-      size={size}
-      className={className}
-      title="Phone"
-      bg="#3C9A5F"
-      inset={5.6}
-      viewBox="0 0 512 512"
-      d="M160.2 25C152.3 6.1 131.7-3.9 112.1 1.4l-5.5 1.5c-64.6 17.6-119.8 80.2-103.7 156.4 37.1 175 174.8 312.7 349.8 349.8 76.3 16.2 138.8-39.1 156.4-103.7l1.5-5.5c5.4-19.7-4.7-40.3-23.5-48.1l-97.3-40.5c-16.5-6.9-35.6-2.1-47 11.8l-38.6 47.2C233.9 335.4 177.3 277 144.8 205.3L189 169.3c13.9-11.3 18.6-30.4 11.8-47L160.2 25z"
-    />
-  )
-}
-
-export function IconLinkedIn({ size, className }: Props) {
-  return (
-    <Tile
-      size={size}
-      className={className}
-      title="LinkedIn"
-      bg="#0A66C2"
-      inset={5.2}
-      viewBox="0 0 448 512"
-      d="M100.3 448l-92.9 0 0-299.1 92.9 0 0 299.1zM53.8 108.1C24.1 108.1 0 83.5 0 53.8 0 39.5 5.7 25.9 15.8 15.8s23.8-15.8 38-15.8 27.9 5.7 38 15.8 15.8 23.8 15.8 38c0 29.7-24.1 54.3-53.8 54.3zM447.9 448l-92.7 0 0-145.6c0-34.7-.7-79.2-48.3-79.2-48.3 0-55.7 37.7-55.7 76.7l0 148.1-92.8 0 0-299.1 89.1 0 0 40.8 1.3 0c12.4-23.5 42.7-48.3 87.9-48.3 94 0 111.3 61.9 111.3 142.3l0 164.3-.1 0z"
-    />
-  )
-}
-
-export function IconBehance({ size, className }: Props) {
-  return (
-    <Tile
-      size={size}
-      className={className}
-      title="Behance"
-      bg="#1769FF"
-      inset={4.4}
-      viewBox="0 0 576 512"
-      d="M232 237.2c31.8-15.2 48.4-38.2 48.4-74 0-70.6-52.6-87.8-113.3-87.8l-167.1 0 0 354.4 171.8 0c64.4 0 124.9-30.9 124.9-102.9 0-44.5-21.1-77.4-64.7-89.7zM77.9 135.9l73.1 0c28.1 0 53.4 7.9 53.4 40.5 0 30.1-19.7 42.2-47.5 42.2l-79 0 0-82.7zm83.3 233.7l-83.3 0 0-97.6 84.9 0c34.3 0 56 14.3 56 50.6 0 35.8-25.9 47-57.6 47zM519.7 128.9l-143.7 0 0-34.9 143.7 0 0 34.9zM576 305.2c0-75.9-44.4-139.2-124.9-139.2-78.2 0-131.3 58.8-131.3 135.8 0 79.9 50.3 134.7 131.3 134.7 61.3 0 101-27.6 120.1-86.3l-62.2 0c-6.7 21.9-34.3 33.5-55.7 33.5-41.3 0-63-24.2-63-65.3l185.1 0c.3-4.2 .6-8.7 .6-13.2zM390.4 274c2.3-33.7 24.7-54.8 58.5-54.8 35.4 0 53.2 20.8 56.2 54.8l-114.7 0z"
-    />
-  )
-}
 
 // ── Marigold ────────────────────────────────────────────────────────────
 
@@ -318,7 +205,6 @@ export function Marigold({ size = 44, className }: { size?: number; className?: 
     </svg>
   )
 }
-
 
 /**
  * Orion. A ginger tabby, sitting.

@@ -4,18 +4,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { setNavOrigin, useNavOrigin } from '@/lib/nav-origin'
 import { caseStudies } from '@/lib/case-studies'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { NameMark } from '@/components/NameMark'
+import { PixelIcon } from '@/components/PixelIcon'
+import { studyIcon } from '@/lib/pixel-icons'
 import { SoundControl } from '@/components/SoundControl'
 import { CornerMarks } from '@/components/CornerMarks'
-import {
-  IconAperture,
-  IconSheet,
-  IconBolt,
-  IconMail,
-  IconPhone,
-  IconLinkedIn,
-  IconBehance,
-} from '@/components/Icons'
 
 /**
  * Selection is marked by four corner crosses, not by border weight — against a
@@ -45,17 +38,11 @@ const NAV = [
 
 /** Contact lives with the CV: both are ways to reach him, not page content. */
 const CONTACT = [
-  { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', Icon: IconMail },
-  { href: 'tel:+916376542708', label: 'Phone', Icon: IconPhone },
-  { href: 'https://linkedin.com/in/sutharanshul', label: 'LinkedIn', Icon: IconLinkedIn },
-  { href: 'https://behance.net/anshulsuthar', label: 'Behance', Icon: IconBehance },
+  { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', icon: 'mail' },
+  { href: 'tel:+916376542708', label: 'Phone', icon: 'phone' },
+  { href: 'https://linkedin.com/in/sutharanshul', label: 'LinkedIn', icon: 'linkedin' },
+  { href: 'https://behance.net/anshulsuthar', label: 'Behance', icon: 'behance' },
 ] as const
-
-const ICONS = {
-  about: IconAperture,
-  work: IconSheet,
-  garage: IconBolt,
-} as const
 
 export function SideNav({ width }: SideNavProps) {
   const pathname = usePathname()
@@ -83,10 +70,7 @@ export function SideNav({ width }: SideNavProps) {
           and two sections — and none of it grows. */}
       <div className="nav-fixed">
         {/* Identity */}
-        <div className="flex items-start justify-between gap-3">
-          <h1 className="t-name">Anshul Suthar</h1>
-          <ThemeToggle />
-        </div>
+        <NameMark />
         <p className="t-body bio" style={{ marginTop: 'var(--s3)' }}>
           {/* Non-breaking: the column is narrow enough that "how things" and
               "work" land on different lines, and the gap between them reads as
@@ -105,11 +89,11 @@ export function SideNav({ width }: SideNavProps) {
           className="link-quiet"
           style={{ marginTop: 'var(--s3)' }}
         >
-          Curriculum vitae ↗
+          Curriculum vitae →
         </a>
 
         <div className="contact-row">
-          {CONTACT.map(({ href, label, Icon }) => (
+          {CONTACT.map(({ href, label, icon }) => (
             <a
               key={label}
               href={href}
@@ -120,7 +104,7 @@ export function SideNav({ width }: SideNavProps) {
               aria-label={label}
               title={label}
             >
-              <Icon size={21} />
+              <PixelIcon name={icon} size={26} />
             </a>
           ))}
         </div>
@@ -128,7 +112,6 @@ export function SideNav({ width }: SideNavProps) {
         {/* Sections */}
         <nav className="stack" style={{ marginTop: 'var(--s6)' }} aria-label="Sections">
           {NAV.filter((item) => !('hidden' in item && item.hidden)).map((item) => {
-            const I = ICONS[item.icon]
             const active = item.href === '/work' ? pathname === '/work' || viaWork : isActive(item.href)
             return (
               <Link
@@ -141,7 +124,7 @@ export function SideNav({ width }: SideNavProps) {
               >
                 <CornerMarks />
                 <span className="nav-plate">
-                  <I size={17} />
+                  <PixelIcon name={item.icon} size={26} />
                 </span>
                 <span className="min-w-0" style={{ display: 'grid', gap: 2 }}>
                   <span className="t-title">{item.title}</span>
@@ -175,11 +158,11 @@ export function SideNav({ width }: SideNavProps) {
                   aria-current={active ? 'page' : undefined}
                 >
                   <CornerMarks />
-                  {/* The index, given the same slot the nav items give their
-                      mechanism. At 11px beside the title it read as a stray
-                      piece of metadata; at plate size it is the item's mark. */}
+                  {/* The index as the study's own mark: its own colour, drawn
+                      rather than set. The accessible name is the title beside
+                      it, so the number is decoration and says so. */}
                   <span className="study-no" aria-hidden="true">
-                    {String(i + 1).padStart(2, '0')}
+                    <PixelIcon name={studyIcon(i + 1)} size={26} />
                   </span>
                   <span className="min-w-0" style={{ display: 'grid', gap: 2 }}>
                     <span className="t-title">{study.title}</span>

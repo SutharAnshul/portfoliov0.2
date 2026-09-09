@@ -1,6 +1,8 @@
 import { Settle } from '@/components/Settle'
+import { CrtScreen } from '@/components/CrtScreen'
 import { LogoMark } from '@/components/LogoMark'
 import { LocalTime } from '@/components/LocalTime'
+import { PixelIcon } from '@/components/PixelIcon'
 
 /**
  * About.
@@ -80,6 +82,36 @@ function Entry({
   )
 }
 
+/** The four ways to reach him, in the sidebar's order and with its marks. */
+const CONTACT = [
+  { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', icon: 'mail' },
+  { href: 'tel:+916376542708', label: 'Phone', icon: 'phone' },
+  { href: 'https://linkedin.com/in/sutharanshul', label: 'LinkedIn', icon: 'linkedin' },
+  { href: 'https://behance.net/anshulsuthar', label: 'Behance', icon: 'behance' },
+] as const
+
+/**
+ * A titled panel.
+ *
+ * The bar across the top is the only new furniture on the page, and it earns
+ * its place by naming two things that used to be unlabelled and adjacent: a
+ * list of dates and a list of details read as one undifferentiated block of
+ * small type. `experience.log` and `profile.status` are set as filenames
+ * rather than as headings — a heading would be the page talking, and this is
+ * the page's chrome talking, which is a quieter register and the one the rest
+ * of the site already uses for breadcrumbs and meta.
+ */
+function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="panel">
+      <div className="panel-bar">
+        <span className="panel-title">{title}</span>
+      </div>
+      <div className="panel-body">{children}</div>
+    </section>
+  )
+}
+
 /** One labelled fact inside the panel row. */
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -99,36 +131,58 @@ export default function Page() {
           at 1500px of window there can be as little as 778px of column. */}
       <div className="about-page">
         {/* ── The opening ─────────────────────────────────────────────
-            Set as a quotation: the marks open and close it, the greeting
-            stands on its own line, and the statement follows underneath.
-            The "About me" label is gone — a quotation that begins "Hey
-            there! I am Anshul" does not need to be told what it is. */}
-        <Settle boot mass="light">
-          <div className="hero-quote" aria-hidden="true">
-            &ldquo;
+            One drawn lockup — the portrait and the words "about Me!" set as a
+            single piece of pixel art — with the statement alongside it.
+
+            The heading lives inside the artwork rather than in markup, so the
+            h1 below it carries the accessible name and the picture is left to
+            be a picture. That is also why the quotation marks have gone: the
+            lockup already announces what this page is, and a quotation mark
+            over a title reading "about Me!" was two openings stacked. */}
+        <div className="about-hero">
+          <Settle boot mass="medium" className="about-lockup">
+            {/* Pixel art, so the shader samples it NEAREST — LINEAR would
+                interpolate every block edge into a gradient and undo the one
+                thing the drawing is about.
+
+                warp is 0 here, alone among the tubes on this site. The artwork
+                runs to the top and bottom edges of its own file — the hair
+                touches row 0 and the shoulder touches row 507 — and barrel
+                curvature bows those edges inward and discards what falls
+                outside, so any warp at all crops the head. Everything else the
+                shader does is the part that matters here: the beam widening
+                into the highlights, the grille, the bloom. */}
+            <CrtScreen
+              src="/images/about-me.png"
+              alt="about Me! — Anshul Suthar, product designer"
+              lines={150}
+              warp={0}
+              mask={0.5}
+              bloomAmount={0.26}
+              shift={1.6}
+              pixelated
+            />
+          </Settle>
+
+          <div className="hero-text">
+            <Settle boot mass="medium" delay={80}>
+              <h1 className="hero-greeting">Hey there! I am Anshul</h1>
+            </Settle>
+
+            <Settle boot mass="light" delay={130}>
+              <p className="hero-statement">
+                I’m interested in how people, products, and systems fit together. I like getting
+                close to a problem, understanding what’s actually happening, and turning that into
+                clear, useful experiences.
+              </p>
+            </Settle>
           </div>
-        </Settle>
-
-        <Settle boot mass="medium" delay={80}>
-          <h1 className="hero-greeting">Hey there! I am Anshul</h1>
-        </Settle>
-
-        <Settle boot mass="light" delay={130}>
-          <p className="hero-statement">
-            I’m interested in how people, products, and systems fit together. I like getting close
-            to a problem, understanding what’s actually happening, and turning that into clear,
-            useful experiences.
-          </p>
-        </Settle>
-
-        <Settle boot mass="light" delay={180}>
-          <div className="hero-quote hero-quote-close" aria-hidden="true">
-            &rdquo;
-          </div>
-        </Settle>
-        {/* ── One band: the record, the face, the address ────────────
-            Three panels on one line, in the order they are wanted: what he
-            has done, who he is, how to reach him.
+        </div>
+        {/* ── One band: the record and the address ───────────────────
+            Two panels on one line, under the opening. The face used to be the
+            middle one; it has gone up beside the statement, which leaves this
+            band as the two things a reader goes looking for rather than the
+            three things the page has.
 
             No heading on the record. Directly under the statement, dates
             against roles is already unmistakably a working history, and a
@@ -140,34 +194,52 @@ export default function Page() {
             so he was co-founding and working while finishing it. */}
         <Settle boot mass="light" delay={140}>
           <div className="about-band">
-            <section className="card record-card">
+            <Panel title="experience.log">
               <div className="record">
                 {RECORD.map((row) => (
                   <Entry key={row.detail} {...row} />
                 ))}
               </div>
-            </section>
+            </Panel>
 
-            <figure className="card fact-photo">
-              <img src="/images/anshul-portrait.jpeg" alt="Anshul Suthar, product designer" />
-            </figure>
+            <Panel title="profile.status">
+              <div className="fact-card">
+                <Fact label="Email">
+                  <a href="mailto:s.anshul@iitg.ac.in" data-sfx="tick" className="fact-mail">
+                    s.anshul@iitg.ac.in
+                  </a>
+                </Fact>
+                <Fact label="Location">
+                  India, <LocalTime />
+                </Fact>
+                {/* Its own fact, not a footnote to the clock. Sitting two pixels
+                    under the time it read as part of it — as though the hour
+                    were somehow the reason he was available. */}
+                <Fact label="Work status">
+                  <span className="status-pill">Open to work</span>
+                </Fact>
 
-            <div className="card fact-card">
-              <Fact label="Email">
-                <a href="mailto:s.anshul@iitg.ac.in" data-sfx="tick" className="fact-mail">
-                  s.anshul@iitg.ac.in
-                </a>
-              </Fact>
-              <Fact label="Location">
-                India, <LocalTime />
-              </Fact>
-              {/* Its own fact, not a footnote to the clock. Sitting two pixels
-                  under the time it read as part of it — as though the hour
-                  were somehow the reason he was available. */}
-              <Fact label="Work status">
-                <span className="status-pill">Open to work</span>
-              </Fact>
-            </div>
+                {/* The same marks as the sidebar, at the foot of the panel that
+                    is already about how to reach him. Drawn from the same set
+                    rather than a second, quieter one — a page with two
+                    iconographies has neither. */}
+                <div className="fact-links">
+                  {CONTACT.map(({ href, label, icon }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target={href.startsWith('http') ? '_blank' : undefined}
+                      rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      data-sfx="tick"
+                      aria-label={label}
+                      title={label}
+                    >
+                      <PixelIcon name={icon} size={26} />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </Panel>
           </div>
         </Settle>
       </div>

@@ -61,49 +61,18 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Light mode: warm paper rather than pure white.
-   Pure white against an almost-white sidebar gave no separation and made the
-   uppercase type feel harsh, so the page carries a slight warm cast and the
-   sidebar sits a clear step deeper. */
-:root {
-  color-scheme: light;
-  --background: oklch(0.978 0.005 90);
-  --foreground: oklch(0.206 0.006 70);
-  --card: oklch(0.992 0.004 90);
-  --card-foreground: oklch(0.206 0.006 70);
-  --popover: oklch(0.992 0.004 90);
-  --popover-foreground: oklch(0.206 0.006 70);
-  --primary: oklch(0.206 0.006 70);
-  --primary-foreground: oklch(0.985 0.004 90);
-  --secondary: oklch(0.941 0.01 88);
-  --secondary-foreground: oklch(0.206 0.006 70);
-  --muted: oklch(0.941 0.01 88);
-  --muted-foreground: oklch(0.52 0.015 80);
-  --accent: oklch(0.925 0.014 86);
-  --accent-foreground: oklch(0.206 0.006 70);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.883 0.018 85);
-  --input: oklch(0.883 0.018 85);
-  --ring: oklch(0.62 0.02 80);
-  /* Media wells / image placeholders — replaces hardcoded bg-neutral-800 */
-  --surface: oklch(0.9 0.016 85);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.941 0.01 88);
-  --sidebar-foreground: oklch(0.206 0.006 70);
-  --sidebar-primary: oklch(0.206 0.006 70);
-  --sidebar-primary-foreground: oklch(0.985 0.004 90);
-  --sidebar-accent: oklch(0.925 0.014 86);
-  --sidebar-accent-foreground: oklch(0.206 0.006 70);
-  --sidebar-border: oklch(0.878 0.018 85);
-  --sidebar-ring: oklch(0.62 0.02 80);
-}
+/* The palette. There is one.
 
-.dark {
+   Three blocks used to live here — a light :root, a .dark class, and a
+   prefers-color-scheme block for the system preference — plus a toggle, plus
+   an inline script to resolve them before first paint. All of it is gone. The
+   site is dark, the way it is designed and the way it is looked at, and a
+   second palette nobody chose is three copies of every colour to keep in step
+   and a whole class of bug that can only happen in the mode you never open.
+
+   No .dark class either: the values sit on :root, so nothing has to be added
+   to the document for the page to be the right colour. */
+:root {
   color-scheme: dark;
   --surface: oklch(0.269 0 0);
   --background: oklch(0.145 0 0);
@@ -124,6 +93,7 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
+  --radius: 0.625rem;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -137,44 +107,6 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    color-scheme: dark;
-    --surface: oklch(0.269 0 0);
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
-  }
 }
 
 @layer base {
@@ -299,13 +231,19 @@
   --fs-meta: 11px;
   --fs-label: 10.5px;
   --fs-num: 2.25rem;
-  --fs-lede: 32px;
+  --fs-lede: clamp(17px, 1.55vw, 21px);
   --fs-cv: 18px;
   --fs-studyno: 14px;
   --fs-value: 14px;
-  --fs-case-title: 5.2rem;
+  --fs-case-title: 3.4rem;
   --fs-case-deck: 1.4rem;
   --fs-prose: 16px;
+  /* Six cells of one tracked advance each. No clamp: the floor is the drag
+     handle's 300px, not the viewport's, and below the breakpoint the sidebar
+     is gone and the phone header carries the name instead. */
+  --fs-sig: 24px;
+  /* The reading size. Clamped inside the 20-24 the face was chosen for. */
+  --fs-read: clamp(20px, 1.35vw, 22px);
 
   /* Leading. Unitless, so it scales with whatever size the token above sets. */
   --lh-display: 1.02;
@@ -313,9 +251,10 @@
   --lh-name: 1.15;
   --lh-body: 1.5;
   --lh-meta: 1.5;
-  --lh-lede: 1.5;
+  --lh-lede: 1.62;
   --lh-prose: 1.75;
-  --lh-case-title: 0.95;
+  --lh-read: 1.62;
+  --lh-case-title: 1.04;
   --lh-record: 1.5;
 
   /* Tracking, in em so it follows the size rather than fighting it. Negative
@@ -323,6 +262,25 @@
   --ls-display: -0.015em;
   --ls-head: -0.005em;
   --ls-name: -0.005em;
+  --ls-lede: -0.008em;
+  /* The drawn height of a block. Short of the em box on purpose: a block as
+     tall as the line box reads as a bar and the row stops looking like type. */
+  --sig-block-h: 0.76em;
+  /* Cut out of every side of every block, so the space between two blocks is
+     always two bleeds — 3px, across and down alike. There is no grid gap on
+     either axis: across, a gap would push the cells off the character pitch;
+     down, a gap plus the block's own inset came to 8.76px against the 3px
+     across, which is the whole reason this is one number now. */
+  --sig-bleed: 1.5px;
+  /* -4%, applied by narrowing the cell. */
+  --sig-track: -0.04em;
+  /* The site's one accent. Anything pink anywhere reads from this: the
+     signature's wavefront, the first study's tile, the CV link on hover. It
+     used to be called --sig-edge and lived with the signature, which is how a
+     second pink would eventually have got added somewhere else. Named --brand
+     and not --accent: the theme already has an --accent, and shadowing it
+     would have quietly repainted every surface that reads from it. */
+  --brand: oklch(0.68 0.2 355);
   --ls-label: 0.18em;
   --ls-title: 0.1em;
   --ls-case-title: -0.015em;
@@ -349,7 +307,9 @@
   /* The two families, overridable at runtime by the tuner. They resolve to
      the next/font variables by default, so production is unchanged. */
   --family-ui: var(--font-ui), ui-monospace, SFMono-Regular, Menlo, monospace;
-  --family-display: var(--font-display), Georgia, serif;
+  /* The reading face. Only ever used above 20px, and only where someone is
+     being asked to read rather than to scan. */
+  --family-read: var(--font-read), ui-sans-serif, system-ui, sans-serif;
 
   /* The switch-on, everywhere it happens: marks, transport screws, work tiles
      and the case-study frames. Fast off the mark and decisive at the end —
@@ -376,11 +336,19 @@ html {
 }
 
 /* ── Type ────────────────────────────────────────────────────────────────
-   Two families doing different jobs. The mono carries data, labels and UI;
-   the serif carries anything that should be *read* rather than scanned. */
+   Two families doing different jobs, and the serif is not one of them any
+   more. Tronica Mono carries everything the interface says — data, labels, the
+   name, the case titles, the statement — and Raleway carries the one thing
+   nobody scans, which is case study prose.
+
+   The italics went with the serif. Tronica Mono ships upright only, and a
+   synthesised oblique slants the glyphs without changing their advance: the
+   even rhythm that is the whole reason to set an interface in mono is the
+   first thing it costs. Where the serif italic was doing work — the CV link,
+   the deck line under a case title — the job passes to size and colour. */
 
 .t-display {
-  font-family: var(--family-display);
+  font-family: var(--family-ui);
   font-size: clamp(2rem, 3.4vw, var(--fs-display));
   line-height: var(--lh-display);
   letter-spacing: var(--ls-display);
@@ -388,18 +356,111 @@ html {
 }
 
 .t-head {
-  font-family: var(--family-display);
-  font-style: italic;
+  font-family: var(--family-ui);
   font-size: var(--fs-head);
   line-height: var(--lh-head);
   letter-spacing: var(--ls-head);
   color: var(--foreground);
 }
 
-/* Identity, not speech: the one place the serif stays upright. */
+/* ── The signature ─────────────────────────────────────────────────────
+   Six cells over six cells, each exactly one character of the mono wide,
+   holding either a letter or a solid block. The block is drawn rather than
+   typed — a filled pseudo-element, not U+2588 — because Tronica Mono has no box
+   drawing in it, and a glyph that falls back to another family would be the
+   one cell in the grid that is the wrong width.
+
+   The letters keep the cell gap in both states, so nothing shifts sideways
+   when a block resolves into a character.
+
+   Called .sig and not .mark: .mark is the corner element, it is declared a
+   few hundred lines further down, and it is absolutely positioned — which is
+   how this h1 came to have no height and print straight through the bio. */
+.sig {
+  font-family: var(--family-ui);
+  font-size: var(--fs-sig);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--foreground);
+  cursor: default;
+}
+
+/* Block-level, not inline-grid. As an inline box the two rows were measured
+   against the line-height of the h1 around them, so a 43px mark sat in a 20px
+   line box and printed straight through the bio underneath it. */
+.sig-grid {
+  display: grid;
+  justify-content: start;
+  gap: 0;
+}
+
+/* No column gap. The gap used to live here, between the cells, which put the
+   blocks on a 26.8px pitch while the characters wanted 23.8px — so the boxes
+   did not line up with the letters they were covering, and every revealed
+   letter carried 3px of tracking the face never asked for. The separation
+   between blocks is now cut out of the block itself, below, and the cells
+   tile at exactly one character each. */
+.sig-row {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 0;
+}
+
+.sig-cell {
+  position: relative;
+  /* One advance, tightened. The cell is the letter-spacing: setting it on the
+     text would only shift the glyph inside a fixed box. */
+  width: calc(1ch + var(--sig-track));
+  /* The block plus its bleed on both sides, so the row pitch is the block
+     pitch and the two rows sit exactly one gap apart. */
+  height: calc(var(--sig-block-h) + 2 * var(--sig-bleed));
+  /* Centred rather than baselined: the cell is now shorter than the line box
+     it would otherwise inherit, and the glyph has to sit in the cell. */
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  text-align: center;
+  /* Cheap on purpose. A cell can change twice a second, and anything that
+     animates the block in would still be animating when the next one lands. */
+  transition: color 90ms linear;
+}
+
+/* A covered cell keeps its letter in the flow and stops painting it, so the
+   grid never reflows as the wipe passes. */
+.sig-cell[data-cell='off'],
+.sig-cell[data-cell='edge'] {
+  color: transparent;
+}
+
+.sig-cell[data-cell='off']::after,
+.sig-cell[data-cell='edge']::after {
+  content: '';
+  position: absolute;
+  /* Taken out of the cell rather than added between cells, so the grid stays
+     on the character pitch — and now on all four sides, so the gap down the
+     rows is the same 3px as the gap across the columns. */
+  inset: var(--sig-bleed);
+  background: currentColor;
+  color: var(--foreground);
+}
+
+/* The leading cell of the wipe. One coloured cell is the whole reason the
+   motion reads as a direction and not as a flicker. */
+.sig-cell[data-cell='edge']::after {
+  color: var(--brand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sig-cell {
+    transition: none;
+  }
+}
+
+/* The name in the phone header. The sidebar has the block signature instead;
+   there is no room for a 6x2 field above a collapsed studio card. */
 .t-name {
-  font-family: var(--family-display);
-  font-style: italic;
+  font-family: var(--family-ui);
   font-size: var(--fs-name);
   line-height: var(--lh-name);
   letter-spacing: var(--ls-name);
@@ -479,11 +540,19 @@ html {
 }
 
 /* A media well: the one place colour is allowed, because it comes from work. */
+/* The thumbnail well. No frame, no fill, and nothing clipping it.
+
+   The screen inside draws its own silhouette now — the tube's corners are
+   transparent and its edges bow — so a bordered rectangle around it read as a
+   box with a curved picture floating loose inside, which is the one thing the
+   shape was drawn to avoid.
+
+   overflow went with it, not just the border. The hover scale pushes the
+   tube's widest points past the box, and a rectangle clipping them flattened
+   the bow at the exact moment you are looking straight at it. There is more
+   than enough grid gap to absorb three percent. */
 .well {
-  border: 1px solid var(--card-line);
-  border-radius: var(--r);
-  overflow: hidden;
-  background: var(--surface);
+  position: relative;
 }
 
 /* Rules and stacks */
@@ -536,40 +605,28 @@ html.lenis body {
 
 /* ─── Crosshair cursor ────────────────────────────────────────────────── */
 
-/* Tuned per theme. `html.dark` (0,1,1) deliberately outranks `:root` (0,1,0).
+/* One palette, like the rest of the page.
 
-   The position markers switch blend mode, not just colour. Difference blending
-   only reads well on dark: white marks invert to solid black on a white page,
-   which looks harsh rather than light. So light mode drops the blend entirely
-   and paints an explicit grey, while dark mode keeps difference for its
-   automatic inversion over imagery. */
+   These were two blocks — a light :root and an html.dark that outranked it —
+   and removing light mode left the .dark class off the document entirely, so
+   the crosshair had quietly been running on the light values: grey #9aa0a8
+   marks with normal blending, on a page that is always dark. The dark values
+   are the ones that were ever meant to show, so they are the only ones here.
+
+   Difference blending is what keeps the marks legible over photographs
+   without knowing anything about them: white inverts to whatever the backdrop
+   is not. */
 :root {
-  --cursor-accent: #6d28d9;
-  --cursor-accent-hot: #7c3aed;
-  --cursor-rest-opacity: 0.75;
-  --cursor-glow-core: 80%;
-  --cursor-glow-bloom: 52%;
-  --cursor-fill: 10%;
-
-  --cursor-blend: normal;
-  --cursor-mark: #9aa0a8;
-  --cursor-guide: rgba(0, 0, 0, 0.13);
-  /* Keeps the grey marks readable when they cross a pale photo */
-  --cursor-mark-shadow: drop-shadow(0 0 1px rgba(0, 0, 0, 0.28));
-}
-
-html.dark {
-  --cursor-accent: #7c5cff;
-  --cursor-accent-hot: #a78bfa;
-  --cursor-rest-opacity: 0.55;
-  --cursor-glow-core: 70%;
-  --cursor-glow-bloom: 45%;
-  --cursor-fill: 14%;
-
   --cursor-blend: difference;
   --cursor-mark: #fff;
-  --cursor-guide: rgba(255, 255, 255, 0.22);
-  --cursor-mark-shadow: none;
+  /* A hairline of pure white on a near-black page is already at full value and
+     still reads dim, because at one pixel there is almost nothing of it to
+     read. Brightness here is area, not colour: the halo puts light around the
+     arms without thickening them, so the mark gains presence and keeps its
+     edge. It sits on the blended layer, so it inverts along with the arms and
+     stays visible over the tube's highlights. */
+  --cursor-mark-shadow: drop-shadow(0 0 3px rgba(255, 255, 255, 0.6))
+    drop-shadow(0 0 7px rgba(255, 255, 255, 0.28));
 }
 
 html.has-custom-cursor,
@@ -604,90 +661,67 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .cursor-layer {
   position: absolute;
   inset: 0;
-}
-
-/* `difference` on dark (auto-inverts over imagery); `normal` on light, where
-   inversion would turn the marks solid black. */
-.cursor-layer-blend {
   mix-blend-mode: var(--cursor-blend);
   filter: var(--cursor-mark-shadow);
 }
 
-/* Normal blend: real colour, real glow */
-.cursor-layer-plain {
-  mix-blend-mode: normal;
-}
+/* The whole cursor: four arms around a hole.
 
-/* Guide rules */
-.cursor-guide {
-  position: absolute;
-  background: var(--cursor-guide);
-  will-change: transform;
-}
-.cursor-guide-h { left: 0; top: 0; width: 100%; height: 1px; }
-.cursor-guide-v { left: 0; top: 0; width: 1px; height: 100%; }
+   The violet ring, its click burst and the full-viewport guide rules have all
+   been taken out. What is left is one mark eighteen pixels across, difference
+   blended so white inverts to whatever the backdrop is not — legible over a
+   hairline, a plate or a photograph without being told which.
 
-/* The "+" — light grey on light, white (inverted) on dark */
+   It is drawn as four separate arms rather than two crossed lines so that the
+   centre can be empty. That hole is the point of it: a solid plus hides the
+   pixel it is pointing at, and this is a portfolio where the thing under the
+   cursor is the thing being looked at. Pressing runs the arms in until they
+   meet, so the click reads as the mark closing on the target rather than as a
+   flash thrown around it — precision instead of emphasis.
+
+   The arms are anchored at their outer ends and grow inward, which keeps the
+   mark's overall size fixed while the gap changes. Growing them outward from
+   the centre would make the cursor breathe on every click. */
 .cursor-core {
   position: absolute;
   left: 0;
   top: 0;
   width: 18px;
   height: 18px;
+  /* Half the gap, i.e. how far each arm's inner end sits from the point. */
+  --cursor-gap: 3.5px;
   will-change: transform;
 }
-.cursor-core-h,
-.cursor-core-v { position: absolute; background: var(--cursor-mark); }
-.cursor-core-h { left: 0; top: 50%; width: 100%; height: 1px; transform: translateY(-50%); }
-.cursor-core-v { left: 50%; top: 0; width: 1px; height: 100%; transform: translateX(-50%); }
 
-/* Ring — transform is driven per-frame by the spring in JS, so only colour and
-   glow are transitioned here. */
-.cursor-ring {
+.cursor-root[data-press='true'] .cursor-core { --cursor-gap: 0px; }
+
+.cursor-arm {
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--cursor-accent);
-  opacity: var(--cursor-rest-opacity);
-  will-change: transform;
-  transition: opacity 200ms ease, border-color 200ms ease,
-              box-shadow 240ms ease, background-color 240ms ease;
+  background: var(--cursor-mark);
+  transition: width 130ms cubic-bezier(0.2, 0.7, 0.2, 1),
+              height 130ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-
-.cursor-ring[data-hover='true'] {
-  opacity: 1;
-  border-color: var(--cursor-accent-hot);
-  background-color: color-mix(in srgb, var(--cursor-accent) var(--cursor-fill), transparent);
-  box-shadow:
-    0 0 12px 0 color-mix(in srgb, var(--cursor-accent) var(--cursor-glow-core), transparent),
-    0 0 34px 4px color-mix(in srgb, var(--cursor-accent) var(--cursor-glow-bloom), transparent),
-    inset 0 0 12px 0 color-mix(in srgb, var(--cursor-accent) 35%, transparent);
+.cursor-arm-t,
+.cursor-arm-b {
+  left: 50%;
+  width: 2px;
+  height: calc(9px - var(--cursor-gap));
+  transform: translateX(-50%);
 }
-
-.cursor-ring[data-press='true'] {
-  border-color: var(--cursor-accent-hot);
-  box-shadow:
-    0 0 18px 2px color-mix(in srgb, var(--cursor-accent-hot) 90%, transparent),
-    0 0 46px 10px color-mix(in srgb, var(--cursor-accent) var(--cursor-glow-bloom), transparent);
+.cursor-arm-l,
+.cursor-arm-r {
+  top: 50%;
+  height: 2px;
+  width: calc(9px - var(--cursor-gap));
+  transform: translateY(-50%);
 }
+.cursor-arm-t { top: 0; }
+.cursor-arm-b { bottom: 0; }
+.cursor-arm-l { left: 0; }
+.cursor-arm-r { right: 0; }
 
-/* Click burst */
-.cursor-burst {
-  position: absolute;
-  width: 34px;
-  height: 34px;
-  margin-left: -17px;
-  margin-top: -17px;
-  border: 1px solid var(--cursor-accent-hot);
-  box-shadow: 0 0 16px 2px color-mix(in srgb, var(--cursor-accent) var(--cursor-glow-bloom), transparent);
-  animation: cursor-burst 560ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes cursor-burst {
-  from { opacity: 0.95; transform: scale(0.4) rotate(0deg); }
-  to { opacity: 0; transform: scale(2.7) rotate(45deg); }
+@media (prefers-reduced-motion: reduce) {
+  .cursor-arm { transition: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1391,51 +1425,24 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   background: var(--card-fill-hover);
 }
 
-/* The icon plate. Square, hairline, and the stage for the mechanism. */
+/* The icon slot. No frame of its own any more — the icon brought one. */
 .nav-plate {
   position: relative;
   flex: none;
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--card-line);
-  border-radius: var(--r);
-  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+  width: 26px;
+  height: 26px;
+  /* No border and no radius. The icon is already a square tile with its own
+     outline, so a bordered plate around it was a box drawn around a box. */
   overflow: hidden;
-  transition: color 260ms ease, border-color 260ms ease;
+  opacity: 0.86;
+  transition: opacity 200ms ease;
 }
 
 .nav-item:hover .nav-plate,
 .nav-item[data-active='true'] .nav-plate {
-  color: var(--foreground);
-  border-color: var(--card-line-strong);
-}
-
-/* A hairline sweeps the plate as you arrive — the loupe passing over */
-.nav-plate::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    100deg,
-    transparent 42%,
-    color-mix(in srgb, var(--foreground) 26%, transparent) 50%,
-    transparent 58%
-  );
-  background-size: 260% 100%;
-  background-position: 130% 0;
-  opacity: 0;
-}
-
-.nav-item:hover .nav-plate::after {
-  animation: plate-sweep 700ms cubic-bezier(0.32, 0, 0.28, 1);
-}
-
-@keyframes plate-sweep {
-  0% { background-position: 130% 0; opacity: 0; }
-  25% { opacity: 1; }
-  100% { background-position: -60% 0; opacity: 0; }
+  opacity: 1;
 }
 
 /* ── Mechanisms ───────────────────────────────────────────────────────── */
@@ -1499,11 +1506,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    should read as a spoken offer rather than a button. */
 .link-quiet {
   display: inline-block;
-  font-family: var(--family-display);
-  font-style: italic;
-  font-size: var(--fs-cv);
-  line-height: 1.3;
-  color: color-mix(in srgb, var(--foreground) 58%, transparent);
+  /* Back in the mono, and at full strength rather than dimmed: it is the one
+     thing in this column somebody actually came to download. */
+  font-family: var(--family-ui);
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--foreground);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
@@ -1512,8 +1520,8 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 .link-quiet:hover {
-  color: var(--foreground);
-  text-decoration-color: color-mix(in srgb, var(--foreground) 65%, transparent);
+  color: var(--brand);
+  text-decoration-color: var(--brand);
 }
 
 /* Contact sits with the CV: both are ways to reach him, not page content. */
@@ -1707,10 +1715,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   display: grid;
   place-items: center;
 }
-
-/* ─── What Orion says ─────────────────────────────────────────────────────
-   The meow lands first, in the serif that carries every other spoken line on
-   the site. The English replaces it a beat later — same message, subtitled. */
 
 /* ─── What Orion says ─────────────────────────────────────────────────────
    Both languages are set in the same monospace family at the same size, and
@@ -1949,11 +1953,17 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   background: var(--card-fill-hover);
 }
 
-/* The one display moment on the page. Roman, not italic — this is a name. */
+/* The one display moment on the page. A name, set in the working face.
+
+   Much smaller than the 5.2rem the serif carried, and it has to be: the mono
+   advances at 0.65em against Garamond's 0.5, so "Incentiwise" at the old size
+   ran past 590px and put the title into the gutter on any column the sidebar
+   had narrowed. It reads no smaller for it — a mono at 54px has more ink in
+   it than a Garamond at 83px. */
 .case-title {
-  font-family: var(--family-display);
+  font-family: var(--family-ui);
   font-weight: 400;
-  font-size: clamp(2.75rem, 7vw, var(--fs-case-title));
+  font-size: clamp(2rem, 5vw, var(--fs-case-title));
   line-height: var(--lh-case-title);
   letter-spacing: var(--ls-case-title);
   color: var(--foreground);
@@ -1961,10 +1971,11 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 /* One line saying what the thing was. Italic, the site's speaking voice. */
 .case-deck {
-  font-family: var(--family-display);
-  font-style: italic;
-  font-size: clamp(1.0625rem, 2vw, var(--fs-case-deck));
-  line-height: 1.4;
+  font-family: var(--family-read);
+  font-weight: 400;
+  font-size: clamp(1.0625rem, 1.7vw, var(--fs-case-deck));
+  line-height: 1.5;
+  letter-spacing: 0.004em;
   color: color-mix(in srgb, var(--foreground) 72%, transparent);
 }
 
@@ -2001,11 +2012,22 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   line-height: 1.6;
 }
 
-/* Reading size, wider leading than the interface text around it. */
+/* The one place on the site that is a read rather than a scan, and the only
+   place that changes face to say so. Raleway at 20px against 14px mono is a
+   large enough step that the eye settles before it has finished reading the
+   first line.
+
+   The measure moves with the face. 62ch was tuned against the mono, where a
+   character is a fixed width; on a proportional face ch is the width of a
+   zero and the same number buys a much longer line, so this is set in ems to
+   land in the same 65-75 character range the mono was already holding. */
 .case-prose {
-  max-width: 62ch;
-  font-size: var(--fs-prose);
-  line-height: var(--lh-prose);
+  max-width: 34em;
+  font-family: var(--family-read);
+  font-size: var(--fs-read);
+  font-weight: 400;
+  line-height: var(--lh-read);
+  letter-spacing: 0.004em;
   color: color-mix(in srgb, var(--foreground) 88%, transparent);
 }
 
@@ -2386,78 +2408,193 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .m-rail-item .mech-slot {
   transform: rotate(90deg);
 }
-/* ─── About ───────────────────────────────────────────────────────────────
-   The opening, after the Gimaev reference: a small label, one large spoken
-   statement, and a row of three panels answering the questions a visitor
-   would otherwise have to read a CV to answer.
-
-   Set in this site's own material rather than the reference's. The statement
-   is the monospace body face spoken louder — not a display serif — because
-   the whole voice of this site is that the ordinary text is the voice. */
-
-/* The quotation marks. Set large and dim in the display face, sitting on the
-   left margin above and below the block — they frame the statement as
-   something said rather than something written about him. Zero line-height
-   so a 3rem glyph does not open a 3rem gap in the flow. */
-.hero-quote {
-  font-family: var(--family-display);
-  font-size: 3rem;
-  /* 0.62, not 0. At zero the box collapses and the glyph paints outside it,
-     which makes the space above unpredictable and can run the mark into the
-     breadcrumb. This keeps the ink inside a box short enough not to open a
-     48px hole in the flow. */
-  line-height: 0.62;
-  color: color-mix(in srgb, var(--foreground) 34%, transparent);
-  user-select: none;
-}
-
-.hero-quote-close {
-  margin-top: var(--s4);
-}
-
 /* The greeting, on its own line above the statement and set in the same face
    and size — it is the first sentence of the quotation, not a heading over
    it, so it should not out-shout what follows. */
 .hero-greeting {
   margin-top: var(--s3);
-  font-family: var(--family-display);
-  font-weight: 500;
-  font-size: clamp(22px, 2.3vw, var(--fs-lede));
+  font-family: var(--family-ui);
+  font-weight: 400;
+  font-size: var(--fs-lede);
   line-height: var(--lh-lede);
-  letter-spacing: 0.002em;
+  letter-spacing: var(--ls-lede);
   color: var(--foreground);
 }
 
 .hero-statement {
   margin-top: var(--s4);
-  /* The serif, upright. It is the one paragraph on the site set in the display
-     face, which is what makes it read as spoken rather than as more interface
-     — and the mono it replaces was gaining weight fast enough at this size to
-     look like a wall. Upright rather than italic, following the rule the name
-     in the sidebar already follows: the serif stands up when it is being a
-     voice rather than a heading. */
-  font-family: var(--family-display);
-  /* 500, not 400. Light type on a dark ground thins optically — the strokes
-     get eaten by the surround — and Garamond is a delicate face to begin
-     with. One step up restores the weight the eye expects without making it
-     look bold. */
-  font-weight: 500;
-  font-size: clamp(22px, 2.3vw, var(--fs-lede));
-  line-height: var(--lh-lede);
-  /* Garamond sets loose and small; the mono's -0.012em would only thin it
-     further, so tracking opens slightly instead of closing. */
-  letter-spacing: 0.002em;
-  color: var(--foreground);
-  /* 46ch is the narrowest measure that sets this statement in four lines, and
-     the breaks do not move at 48 or 50 — balance has already chosen them, so
-     anything wider is box with nothing in it.
+  /* Now in the working face, like everything else that speaks here.
 
-     balance, not pretty. Measured across both modes at four widths, in pixels
-     rather than characters because the face is proportional: balance holds
-     the rag to 17% of the longest line, while pretty and normal wrapping run
-     41–52% by filling greedily and dumping the remainder on the last line. */
-  max-width: 46ch;
+     Two things had to move with it. Weight came back to 400 — the 500 was
+     propping up a delicate serif on a dark ground, and a mono at 500 on the
+     same ground is a wall, which is the exact complaint that sent this to a
+     serif in the first place. And tracking closes instead of opening: the
+     0.002em was holding Garamond apart, where a mono is already spaced by
+     its own advance and only wants the edge taken off. */
+  font-family: var(--family-ui);
+  font-weight: 400;
+  font-size: var(--fs-lede);
+  line-height: var(--lh-lede);
+  letter-spacing: var(--ls-lede);
+  color: var(--foreground);
+  /* In characters, exactly, now that the face is monospaced — 46ch used to
+     mean 46 zero-widths and buy about 56 characters of Garamond. Kept near
+     the same line length rather than the same number, so the statement still
+     breaks in four. */
+  max-width: 52ch;
   text-wrap: balance;
+}
+
+/* ── The CRT ───────────────────────────────────────────────────────────
+   This started life on the opening paragraph, cutting a raster through the
+   letterforms. It has moved to where a screen effect belongs: the two places
+   the page shows a picture. Type on a scanline is a costume; a photograph
+   behind glass is a screen.
+
+   Three things stacked, in the order a real one has them. The raster, a 1px
+   line every three. The hum bar, one soft band drifting down every eight and a
+   half seconds. And the glass — a specular smear in the top left and a
+   vignette closing the corners down.
+
+   About the curvature. Barrel distortion is not reachable in CSS; it needs an
+   SVG displacement map or WebGL. What is here is the perceptual half of it,
+   which at a 4:3 thumbnail is the half that actually reads: an elliptical
+   border-radius for the shape of the glass, and a vignette doing what falling
+   light does at the edge of a curved tube. A real warp of the two or three
+   percent a CRT actually has would be close to invisible at these sizes; the
+   corner falloff is what the eye is reading as "curved". */
+.crt-screen {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* Nothing clipped here. The glow behind is a blurred copy and `filter:
+     blur()` paints well outside its element's box, so any `overflow: hidden`
+     on the way up shears the spill off flat — which is what was happening,
+     invisibly, to all five screens. Nothing else needs the clip: the canvas
+     draws transparent past the tube, the image fills the box exactly, and the
+     fallback is shaped by clip-path, which clips whatever overflow says. */
+  isolation: isolate;
+  /* Filter first, then clip. The picture is warped by a real displacement map
+     and only then cut to the bowed outline, so the raster and the vignette
+     curve with the picture instead of lying flat on top of a curved one.
+     A border-radius used to sit here and it was exactly wrong: a tube's edges
+     bow out and its corners are sharp. */
+  filter: url('#crt-warp');
+  clip-path: url('#crt-bulge');
+}
+
+/* Behind everything, and deliberately weak. A tube in a dark room lights the
+   wall; it does not floodlight it. Saturation is pushed a little because the
+   spill should read as light rather than as a second, softer copy of the
+   picture — the eye forgives a colour cast at this opacity and does not
+   forgive recognising the image twice. */
+.crt-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(22px) saturate(1.5);
+  opacity: 0.34;
+  transform: scale(1.02);
+  pointer-events: none;
+}
+
+.crt-src,
+.crt-canvas {
+  z-index: 1;
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.crt-canvas {
+  opacity: 0;
+}
+
+/* The fallback image needs the same instruction the shader gets: do not
+   interpolate a drawing made of squares. */
+.crt-src[data-pixelated] {
+  image-rendering: pixelated;
+}
+
+/* Only once a context, a program and a texture all exist. Until then the
+   plain image is what is on screen, with the CSS raster over it. */
+.crt-screen[data-gl='on'] .crt-src {
+  opacity: 0;
+}
+.crt-screen[data-gl='on'] .crt-canvas {
+  opacity: 1;
+}
+
+/* The shader does geometry, mask and raster itself, so the CSS layer that was
+   standing in for it steps aside rather than doubling up. */
+.crt-screen[data-gl='on'] {
+  filter: none;
+  clip-path: none;
+}
+.crt-screen[data-gl='on']::before,
+.crt-screen[data-gl='on']::after {
+  display: none;
+}
+
+/* The glass, over the picture and under the raster. */
+.crt-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(130% 100% at 28% 6%, rgba(255, 255, 255, 0.11), transparent 46%),
+    radial-gradient(
+      100% 100% at 50% 50%,
+      transparent 50%,
+      rgba(0, 0, 0, 0.28) 84%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+}
+
+/* The raster and the hum bar. Black rather than the page ground: the ground
+   trick worked for type, where the backdrop was known — over a photograph the
+   backdrop is whatever the photograph is, and only a real darkening reads. */
+.crt-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.34) 0 1px, transparent 1px 3px),
+    linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.16) 45%, transparent);
+  background-size: 100% 3px, 100% 200px;
+  background-repeat: repeat, no-repeat;
+  background-position: 0 0, 0 -200px;
+  animation: crt-roll 8.5s linear infinite;
+}
+
+/* Slow enough to be caught rather than watched. A screen that flickers at you
+   is a costume; one that drifts once every eight seconds is a screen you
+   stopped noticing an hour ago. */
+@keyframes crt-roll {
+  from {
+    background-position: 0 0, 0 -200px;
+  }
+  to {
+    background-position: 0 0, 0 calc(100% + 200px);
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-screen::after {
+    animation: none;
+  }
 }
 
 /* ── One band ──────────────────────────────────────────────────────────
@@ -2475,19 +2612,14 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      characters and past that it only stretches a short list — and the print
      is fixed because its crop is fixed, so the third panel is the only one
      with any business absorbing width. */
-  /* The print is 280 rather than 200. At the smaller size it was the least
-     of the three — shorter than the record beside it — which is the wrong
-     way round for the only photograph on the page. */
-  grid-template-columns: minmax(0, 460px) 280px minmax(215px, 1fr);
+  /* Two panels now that the print has gone up beside the statement. The record
+     keeps its 460 cap — its longest line is 46 characters and past that it only
+     stretches a short list — and the address takes the rest. */
+  grid-template-columns: minmax(0, 460px) minmax(215px, 1fr);
   gap: var(--s4);
   align-items: stretch;
   margin-top: var(--s6);
 }
-
-.record-card {
-  min-width: 0;
-}
-
 .fact-card {
   display: flex;
   flex-direction: column;
@@ -2525,28 +2657,120 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   text-decoration-color: currentColor;
 }
 
-/* The portrait, reduced to one of two. It was the whole left column before;
-   at this size it is a face beside an address rather than a poster. */
-.fact-photo {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+/* ── The opening: the lockup and the statement ─────────────────────────
+   The drawn title carries the weight, so it gets the larger share of the row
+   and the type sits beside it rather than under it.
+
+   `align-items: end` rather than stretch or centre. The lockup's own artwork is
+   bottom-heavy — the shoulders run to the last row of the file while the top
+   right is empty air above the word "about" — so aligning the two blocks on
+   their bottom edges lines the paragraph up with the shoulder line, where a
+   centred paragraph floats against nothing. */
+.about-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 1fr);
+  gap: var(--s6);
+  align-items: end;
 }
 
-/* A fixed 2:3 crop, so the print keeps one shape at every width. It has to
-   hug its own height rather than stretch to the band's — stretching a figure
-   whose image is locked to a ratio just letterboxes the difference. */
-.fact-photo {
-  align-self: start;
+/* The artwork's own proportion, so nothing is cropped and nothing is stretched.
+   890 × 508 is the file; stating it here rather than letting the image set the
+   height is what lets the shader's canvas size itself before the picture has
+   loaded, which is the difference between the row settling once and the row
+   jumping when the asset arrives. */
+.about-lockup {
+  aspect-ratio: 890 / 508;
+  min-width: 0;
+}
+/* The quotation marks and the type they enclose. `min-width: 0` because a grid
+   item's automatic minimum is its content, and one long unbroken word in the
+   statement would otherwise widen this column and squeeze the print. */
+.hero-text {
+  min-width: 0;
 }
 
-.fact-photo img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
-  object-position: center 22%;
+/* The column is the measure now: the paragraph no longer sizes anything beside
+   it, so the cap that used to drive the photograph's height is just a second
+   constraint fighting the grid track. */
+.about-hero .hero-statement {
+  max-width: none;
+  margin-top: var(--s4);
+}
+
+.about-hero .hero-greeting {
+  margin-top: 0;
+}
+
+/* Two blocks side by side need roughly 720px between them — the lockup is wide,
+   and squeezing it also squeezes the head. Under that the title stacks over the
+   type and takes the whole measure, which is the arrangement it was drawn for
+   anyway. */
+@container about (max-width: 720px) {
+  .about-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s4);
+  }
+}
+
+/* ── Panels ────────────────────────────────────────────────────────────
+   A bordered box with a named bar across its head. Square, not rounded: the
+   corner radius on `.card` is 2px, which reads as a softened panel, and these
+   sit under a picture made entirely of hard-edged cells.
+
+   Built as its own thing rather than as a modifier on `.card` because the two
+   disagree about padding — a card pads its content, and this has to let the
+   bar run the full width to its own border while the body inside it is
+   inset. */
+.panel {
+  border: 1px solid var(--card-line);
+  background: var(--card-fill);
+  min-width: 0;
+}
+
+.panel-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--s2, 8px);
+  padding: 8px var(--s4);
+  border-bottom: 1px solid var(--card-line);
+  /* A shade lighter than the body, not a colour: the bar is chrome, and chrome
+     that takes a hue starts competing with the marks below it. */
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+
+.panel-title {
+  font-family: var(--family-ui);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 52%, transparent);
+}
+
+.panel-body {
+  padding: var(--pad);
+}
+
+/* The marks at the foot of the status panel, standing off the last fact by more
+   than the facts stand off each other — they are a different kind of thing from
+   the rows above them, and equal spacing would file them as one more row. */
+.fact-links {
+  display: flex;
+  gap: var(--s3);
+  margin-top: auto;
+  padding-top: var(--s2, 8px);
+}
+
+.fact-links a {
+  display: grid;
+  place-items: center;
+  opacity: 0.92;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.fact-links a:hover {
+  opacity: 1;
+  transform: translateY(-1px);
 }
 
 /* The advance strip is fixed to the foot of the content column and visible at
@@ -2593,54 +2817,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   }
 }
 
-/* Three across needs about 900px of column. Below that the record takes the
-   full measure — its longest line is 46 characters and it is the panel that
-   suffers first — and the print and the address share the line beneath it. */
-/* Not enough width for three across. The record and the print stay on the top
-   row and the address drops under the record — the print is the thing that
-   holds the composition together, and sending it down with the address left
-   the top row as a lone strip of text.
-
-   The print then spans both rows, which is what makes this an improvement
-   rather than a rearrangement: it is drawn wider so that its 2:3 crop stands
-   as tall as the two stacked cards beside it, and the space that used to sit
-   empty under the address is a photograph instead. */
-@container about (max-width: 900px) {
-  .about-band {
-    grid-template-columns: minmax(0, 1fr) 340px;
-  }
-
-  .about-band > .fact-photo {
-    grid-column: 2;
-    grid-row: 1 / 3;
-  }
-
-  .about-band > .fact-card {
-    grid-column: 1;
-    grid-row: 2;
-  }
-}
-
-/* One column. The explicit placement above has to be undone as well as the
-   template — left set, the print stays pinned to a column 2 that no longer
-   exists, and the grid invents an implicit one to hold it. */
+/* One column. Two panels hold their line down to about 560px of column; under
+   that the record's 46-character lines start breaking badly and the address is
+   squeezed to nothing, so they stack. */
 @container about (max-width: 560px) {
   .about-band {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .about-band > .record-card,
-  .about-band > .fact-photo,
-  .about-band > .fact-card {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  /* The print takes the full measure, like the cards it now sits between.
-     Capped at 260 it was the one narrow thing in a column of full-width
-     blocks, which read as a mistake rather than as a choice. Still 2:3. */
-  .fact-photo {
-    max-width: none;
   }
 }
 
@@ -2664,7 +2846,15 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    extra line-breaking work in exchange for not stranding the last word of a
    short paragraph on its own line — which is what binding "things work"
    together would otherwise have caused in a column this narrow. */
+/* The line under the name is a sentence about a person, not a field of data,
+   and it was the one paragraph in the sidebar the mono was making you decode.
+   Slightly larger than the interface text around it: Raleway sets narrower
+   than the mono at the same size, so matching on px would read as a step down. */
 .bio {
+  font-family: var(--family-read);
+  font-size: 15px;
+  line-height: 1.55;
+  letter-spacing: 0.004em;
   text-wrap: pretty;
 }
 
@@ -2737,9 +2927,16 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    type stacked beside it. The index used to sit at 11px above the title
    where it read as a stray piece of metadata; at plate size it becomes the
    item's mark, and the two lines beside it become the item's content. */
+/* `auto`, not a fixed 40px. The 40 was the icon's own size back when the tiles
+   were drawn at 40, and it stayed behind when they came down to 26 — leaving
+   fourteen pixels of slack inside the column that the gap then added to. The
+   result was 26px between mark and title here against 12px in the nav above,
+   for two rows that are meant to read as the same kind of thing. Sizing the
+   column to its content means the gap is the only thing setting that distance,
+   so it cannot drift again the next time the tiles are resized. */
 .study-link {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
   gap: var(--s3);
   align-items: center;
 }
@@ -2747,23 +2944,17 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .study-no {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--card-line);
-  border-radius: var(--r);
-  font-size: var(--fs-studyno);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  color: color-mix(in srgb, var(--foreground) 52%, transparent);
-  transition: color 260ms ease, border-color 260ms ease, background-color 260ms ease;
+  width: 26px;
+  height: 26px;
+  /* Dimmed at rest so four saturated tiles do not shout down the titles they
+     belong to; full strength on the one you are pointing at. */
+  opacity: 0.62;
+  transition: opacity 200ms ease, transform 200ms ease;
 }
 
 .study-link:hover .study-no,
 .study-link[data-active='true'] .study-no {
-  color: var(--foreground);
-  border-color: var(--card-line-strong);
-  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+  opacity: 1;
 }
 
 /* The record's own leading, tighter than body copy because the entries are

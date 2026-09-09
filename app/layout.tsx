@@ -1,48 +1,59 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Space_Mono, EB_Garamond } from 'next/font/google'
+import { Raleway } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 
 /**
- * The working face. Everything in the system reads from --font-ui, so this
- * import is the only place the family is named.
+ * The working face.
  *
- * Space Mono ships 400 and 700 only — there is no 500 or 600 to ask for, and
- * asking would make the browser synthesise one. The three weight tokens in
- * globals.css are set to weights it actually has.
+ * Tronica Mono, held in the repo rather than fetched: it is not on Google
+ * Fonts, and a face this particular is part of the work rather than a
+ * dependency of it. One file, one weight, no italic — which is the whole
+ * family, so there is nothing to lazy-load and nothing to fall back to
+ * mid-render.
  *
- * It is also a wide, low-contrast face that loses legibility faster than most
- * as it shrinks, which is the reason for the 12px floor on page content.
+ * Declared at 400, its true weight, which leaves the browser to synthesise
+ * the 700 the labels and titles ask for. The alternative — claiming a 100-900
+ * range so nothing is ever synthesised — was tried on the face this replaced
+ * and looked worse: every label, title and body line draws at one weight and
+ * the hierarchy the page was built on flattens out.
+ *
+ * It advances at 0.65em where the previous face advanced at 0.7, so every
+ * line of interface type on the site is about seven percent narrower than it
+ * was, and 1ch — which the name signature is built on — narrows with it.
  */
-const ui = Space_Mono({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  // Italic carries Mr. Toast's untranslated speech. It has to be the same
-  // monospace family as the translation so a meow and the English word it
-  // becomes occupy identical width — the swap then happens with no reflow.
-  style: ['normal', 'italic'],
+const ui = localFont({
+  src: './fonts/Tronica-Mono.otf',
+  weight: '400',
+  style: 'normal',
   variable: '--font-ui',
   display: 'swap',
 })
 
 /**
- * The display face, and now the voice of the About statement too. Pairing a
- * serif against the mono is what creates hierarchy — four mono sizes between
- * 10px and 14px read as one size no matter how the weights are set.
+ * The reading face.
  *
- * EB Garamond is a variable font, so the weight range costs one file rather
- * than one per step.
+ * Case study prose is the one place on this site where someone is asked to
+ * read several hundred words in a row, and a monospace is the wrong tool for
+ * that — the even colour that makes it good interface type is exactly what
+ * makes a paragraph of it hard to get through. Raleway is set larger than the
+ * interface around it, which is the point: the size change is the signal that
+ * this is to be read rather than scanned.
+ *
+ * Variable, so the weight range costs one file.
  */
-const display = EB_Garamond({
+const read = Raleway({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-display',
+  variable: '--font-read',
   display: 'swap',
 })
+
 import { LayoutShell } from '@/components/LayoutShell'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { CustomCursor } from '@/components/CustomCursor'
+import { CrtGlass } from '@/components/CrtGlass'
 
 export const metadata: Metadata = {
   title: 'Anshul Suthar - Product Designer',
@@ -68,11 +79,14 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light dark',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
-  ],
+  // One palette, so one answer to both of these. A light themeColor on an OS
+  // set to light would have drawn a white browser bar above a page that is
+  // always dark — the only place the removed light mode could still show.
+  //
+  // The favicon above keeps its media queries on purpose: those describe the
+  // tab strip the icon sits in, not the page it points at.
+  colorScheme: 'dark',
+  themeColor: '#252525',
 }
 
 export default function RootLayout({
@@ -81,31 +95,25 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${ui.variable} ${display.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${ui.variable} ${read.variable}`} suppressHydrationWarning>
       <head>
         {/*
-          Resolves the theme before first paint, so the page never flashes the
-          wrong palette.
+          Holds settle-able content before hydration, so the boot animation
+          starts from its displaced position instead of flashing in settled
+          first. Added from script and never in the served HTML, which is what
+          keeps the page readable with JS off.
 
-          Three palette blocks exist in globals.css: `:root` (light), `.dark`
-          (manual dark), and `@media (prefers-color-scheme: dark) :root:not(.light)`
-          (system dark). Leaving the class off means the system block decides,
-          which makes a manual "light" choice unreachable on an OS set to dark.
-          So this always writes an explicit `.light` or `.dark` — falling back to
-          the system preference only when nothing is stored.
+          This used to resolve the theme too. There is one palette now, so
+          there is nothing to resolve and nothing to flash.
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}var e=document.documentElement;e.classList.add(t);e.classList.remove(t==='dark'?'light':'dark')}catch(err){document.documentElement.classList.add('dark')}
-/* Hold settle-able content before hydration so the boot animation starts from
-   its displaced position instead of flashing in settled first. Adding this
-   from script (never in the served HTML) is what keeps the page readable when
-   JS is off. */
-try{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('boot')}}catch(err){}})();`,
+            __html: `(function(){try{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('boot')}}catch(err){}})();`,
           }}
         />
       </head>
       <body className="antialiased bg-background">
+        <CrtGlass />
         <SmoothScroll />
         <CustomCursor />
         <LayoutShell context="portfolio">

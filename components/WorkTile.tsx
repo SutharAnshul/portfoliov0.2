@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import type { CaseStudy } from '@/lib/types'
+import { CrtScreen } from '@/components/CrtScreen'
 import { CornerMarks } from '@/components/CornerMarks'
 import { setNavOrigin } from '@/lib/nav-origin'
 
@@ -36,10 +37,10 @@ export function WorkTile({ study }: { study: CaseStudy }) {
         <div className="work-shot">
           <CornerMarks />
           <div className="well" style={{ aspectRatio: '4 / 3' }}>
-            <img
+            <CrtScreen
               src={study.thumbnail}
               alt={study.title}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              className="transition-transform duration-500 group-hover:scale-[1.03]"
             />
           </div>
         </div>

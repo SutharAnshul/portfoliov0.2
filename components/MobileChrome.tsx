@@ -3,19 +3,12 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ThemeToggle } from '@/components/ThemeToggle'
 import { SoundControl } from '@/components/SoundControl'
 import { CornerMarks } from '@/components/CornerMarks'
 import {
-  IconAperture,
-  IconSheet,
-  IconBolt,
-  IconMail,
-  IconPhone,
-  IconLinkedIn,
-  IconBehance,
   CatMark,
 } from '@/components/Icons'
+import { PixelIcon } from '@/components/PixelIcon'
 
 /**
  * The site's chrome on a phone.
@@ -38,16 +31,16 @@ import {
 
 /** Withheld from the rail, same as on desktop — see the note in SideNav. */
 const NAV = [
-  { href: '/', title: 'About', Icon: IconAperture },
-  { href: '/work', title: 'Work', Icon: IconSheet },
-  { href: '/garage', title: 'Garage', Icon: IconBolt, hidden: true },
+  { href: '/', title: 'About', icon: 'about' },
+  { href: '/work', title: 'Work', icon: 'work' },
+  { href: '/garage', title: 'Garage', icon: 'garage', hidden: true },
 ] as const
 
 const CONTACT = [
-  { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', Icon: IconMail },
-  { href: 'tel:+916376542708', label: 'Phone', Icon: IconPhone },
-  { href: 'https://linkedin.com/in/sutharanshul', label: 'LinkedIn', Icon: IconLinkedIn },
-  { href: 'https://behance.net/anshulsuthar', label: 'Behance', Icon: IconBehance },
+  { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', icon: 'mail' },
+  { href: 'tel:+916376542708', label: 'Phone', icon: 'phone' },
+  { href: 'https://linkedin.com/in/sutharanshul', label: 'LinkedIn', icon: 'linkedin' },
+  { href: 'https://behance.net/anshulsuthar', label: 'Behance', icon: 'behance' },
 ] as const
 
 export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
@@ -113,7 +106,6 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
             </svg>
           </span>
         </button>
-        <ThemeToggle />
       </header>
 
       <div id="studio-card" className="m-studio" data-open={open}>
@@ -131,11 +123,11 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
             className="link-quiet"
             style={{ marginTop: 'var(--s4)' }}
           >
-            Curriculum vitae ↗
+            Curriculum vitae →
           </a>
 
           <div className="contact-row">
-            {CONTACT.map(({ href, label, Icon }) => (
+            {CONTACT.map(({ href, label, icon }) => (
               <a
                 key={label}
                 href={href}
@@ -145,7 +137,7 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
                 className="contact-chip"
                 aria-label={label}
               >
-                <Icon size={20} />
+                <PixelIcon name={icon} size={26} />
               </a>
             ))}
           </div>
@@ -163,7 +155,7 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
 
       {/* ── Where ───────────────────────────────────────────────────── */}
       <nav ref={railRef} className="m-rail" aria-label="Sections">
-        {NAV.filter((n) => !('hidden' in n && n.hidden)).map(({ href, title, Icon }) => {
+        {NAV.filter((n) => !('hidden' in n && n.hidden)).map(({ href, title, icon }) => {
           const active = isActive(href)
           return (
             <Link
@@ -175,7 +167,7 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
               aria-current={active ? 'page' : undefined}
             >
               <CornerMarks />
-              <Icon size={19} />
+              <PixelIcon name={icon} size={26} />
               <span className="t-label">{title}</span>
             </Link>
           )
