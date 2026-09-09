@@ -62,8 +62,29 @@ const CYCLE = HOLD_NAME + COVER + HOLD_BLOCKS + REVEAL
 /** How far the second row lags the first, in ms. */
 const LAG = 110
 
-/** The pause after arrival before the mark starts cycling. */
+/**
+ * The pause before the mark starts cycling, measured from page load rather
+ * than from arrival on screen.
+ *
+ * The rail can afford to wait: it is beside the page, the reader is reading
+ * something else, and the mark going off at 2.4 seconds is a thing noticed out
+ * of the corner of an eye.
+ *
+ * The phone cannot. There the mark *is* the first screen, and the first thing
+ * anyone does with a screen holding one word and an instruction to scroll is
+ * scroll. Wait two and a half seconds and the animation plays to a page that
+ * has already been left — see the `settle` prop.
+ */
 const SETTLE = 2400
+
+/**
+ * How soon after mounting it may go, however late hydration was.
+ *
+ * `settle` is counted from first paint, so hydration can land after it has
+ * already elapsed. Firing in the same frame as hydration reads as a glitch
+ * rather than as an entrance, so there is a floor under it.
+ */
+const SETTLE_MIN = 150
 
 /** One ring of the hover ripple. */
 const STEP = 30
@@ -115,8 +136,18 @@ const field = (t: number) => ROWS.map((_, r) => cellsAt(t - r * LAG))
 export function NameMark({
   as = 'h1',
   interactive = true,
+  settle = SETTLE,
   className = '',
 }: {
+  /**
+   * Milliseconds from first paint before the first sweep, not from mount.
+   *
+   * From first paint, because what matters is how long the reader has been
+   * looking at it — and hydration lands well after the mark is on screen.
+   * Counting from mount would make the wait longest exactly when the reader
+   * has already been waiting.
+   */
+  settle?: number
   /**
    * The element to render. The rail wants the page's `h1`; the phone masthead
    * puts the mark inside a button, and a heading is not phrasing content — it
@@ -146,9 +177,16 @@ export function NameMark({
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    // Counted from a point far enough in the past that the first thing it does
-    // is finish holding the name, not start mid-wipe.
-    let start = performance.now() - (HOLD_NAME - SETTLE)
+    /* Counted from first contentful paint, not from navigation.
+       `settle` is about how long the reader has been looking at the thing, and
+       on a slow load navigation start can be most of a second before anything
+       is on screen — anchor to it and the sweep can be over before the first
+       frame. Falls back to navigation where the entry is missing. */
+    const fcp =
+      performance.getEntriesByType('paint').find((p) => p.name === 'first-contentful-paint')
+        ?.startTime ?? 0
+    const wait = Math.max(SETTLE_MIN, settle - (performance.now() - fcp))
+    let start = performance.now() - (HOLD_NAME - wait)
     let pausedAt: number | null = null
     let frame = 0
     let last = ''
@@ -252,7 +290,7 @@ export function NameMark({
     }
     frame = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frame)
-  }, [])
+  }, [settle])
 
   return createElement(
     as,

@@ -238,7 +238,7 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
             the name by moving across the boxes is a pointer idea, and on touch
             the twelve cells would only be twelve things to press by accident. */}
         <span className="m-mark">
-          <NameMark as="span" interactive={false} />
+          <NameMark as="span" interactive={false} settle={500} />
         </span>
 
         <button
