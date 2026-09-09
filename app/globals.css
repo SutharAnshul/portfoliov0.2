@@ -2845,6 +2845,22 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 /* Only once a context, a program and a texture all exist. Until then the
    plain image is what is on screen, with the CSS raster over it. */
+/* The boomerang's other stills. In the markup so the browser fetches and
+   decodes them normally, but a pixel across and invisible so they take part in
+   no layout and are never the fallback — if WebGL never starts, the poster is
+   the picture. display:none would also load them, but it makes the element
+   unrenderable, and decode() on an unrenderable image is a coin toss across
+   engines. */
+.crt-frame {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .crt-screen[data-gl='on'] .crt-src {
   opacity: 0;
 }
@@ -3107,11 +3123,14 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 /* ── Filling the first screen ──────────────────────────────────────────
-   The page is four short things, and with the chat panel closed they used
-   to finish a third of the way up the viewport, leaving a dead band under
-   everything. Anchoring the row to the bottom turns that leftover into air
-   between two placed blocks — the statement at the top, the record at the
-   foot — which is space doing something rather than space left over.
+   The page is three short things and it starts at the top, which is where a
+   page starts. An auto top margin used to sit in here pushing the content
+   down to the foot: with a hero and a band below it, that turned the
+   leftover height into air between the two. The page is one block now, and
+   the same rule left a screen of nothing above the portrait.
+
+   The min-height stays, so the column still reaches the fold and the strip
+   at the foot has something to sit against.
 
    Desktop only: the phone scrolls inside its own container, where 100vh is
    both wrong and famously unstable as the address bar moves. */
@@ -3123,12 +3142,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     min-height: calc(100vh - 5rem);
   }
 
-  /* The last child, not `.about-band` — the band is wrapped in a Settle, so
-     the band is not the flex item and an auto margin on it distributes
-     nothing. Targeting the child also survives the wrapper changing. */
-  .about-page > *:last-child {
-    margin-top: auto;
-  }
+  
 }
 
 @media (max-width: 1023px) {
@@ -3775,5 +3789,239 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   .present-open,
   .deck-x {
     transition: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE ABOUT PAGE — a portrait, a record, and a statement
+   ═══════════════════════════════════════════════════════════════════════════
+   Three pieces floating in the dark: the portrait down the left, the record
+   and the statement stacked on the right.
+
+   Nothing here is framed, filled or rounded. State is carried by the corner
+   marks and by opacity, and the only accent is the site's pink. That means
+   distance is the only separator on the page, so the gaps are load bearing —
+   tightening them collapses the three pieces into one block of text.
+
+   With the channel labels gone, type carries the hierarchy on its own:
+
+     name        the largest thing by a clear margin. It is the only heading
+                 the page has left, so it has to read as the title.
+     record      monospace, tabular figures. A column of dates against a column
+                 of names, read by scanning down.
+     statement   the reading face, at a reading size. The one piece of running
+                 prose here, and the only thing read sentence by sentence. */
+
+.stage {
+  display: grid;
+  /* The portrait takes the larger share: it is the thing you look at, and the
+     column beside it is the thing you read. */
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+  column-gap: var(--s7, 48px);
+  row-gap: var(--s6);
+  /* Stretch, not start: both columns take the row's height, which is what
+     makes them end level. */
+  align-items: stretch;
+}
+
+/* The picture is the whole of the left column and fills whatever height the
+   row settles on. Deliberately no aspect-ratio: a ratio would set its height
+   from its own width and leave the text column hanging off the bottom, which
+   is approximately equal rather than equal. The shader crops rather than
+   stretches, so the layout is free to choose the proportion. */
+.stage-signal {
+  display: flex;
+}
+
+/* The right column, spread to the same height. space-between is what fills it:
+   the name sits at the top, the statement at the foot, and the record takes
+   the middle however long it runs. */
+.stage-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--s5);
+  min-width: 0;
+}
+
+/* The identity, heading the column. Padded to the same inset as the pieces
+   beside it so the three left edges line up — it is not a piece itself, so it
+   does not get that padding for free. */
+.stage-id {
+  padding: 2px var(--s3);
+}
+
+/* ── A piece ──────────────────────────────────────────────────────────── */
+.piece {
+  position: relative;
+  min-width: 0;
+  padding: 2px var(--s3);
+  transition: opacity 350ms ease;
+}
+
+/* Dimming is relative to something pointed at. At rest nothing is dimmed —
+   the page has to be readable on arrival without touching it. */
+.piece[data-state='dim'] {
+  opacity: 0.32;
+}
+
+/* The site's own marks: gathered on the centre line at rest, open at the
+   corners when the piece has the attention. The accent is the pink, because
+   every other "this one" on this site is drawn in it. */
+.piece[data-state='tuned'] > .marks {
+  opacity: 0.9;
+  --edge: 0%;
+}
+
+.piece[data-state='tuned'] > .marks .mark::before,
+.piece[data-state='tuned'] > .marks .mark::after {
+  background: var(--brand);
+}
+
+/* The one bit of chrome left, and the only place a joke lives. Quiet at rest
+   and only slightly less so when pointed at — it is an aside, not a caption. */
+.piece-foot {
+  margin: var(--s5) 0 0;
+  font-family: var(--family-ui);
+  font-size: var(--fs-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 18%, transparent);
+  transition: color 300ms ease;
+}
+
+.piece[data-state='tuned'] .piece-foot {
+  color: color-mix(in srgb, var(--foreground) 36%, transparent);
+}
+
+/* ── The portrait ─────────────────────────────────────────────────────── */
+.stage-shot {
+  flex: 1;
+  /* A floor so that a short record cannot squash the picture into a letterbox.
+     Above it, the text column decides. */
+  min-height: 420px;
+}
+
+.stage-name {
+  margin: 0;
+  font-family: var(--family-ui);
+  /* Against the container, not the viewport — the column this sits in can be
+     under 800px with the chat panel open, and the name has to come down with
+     it rather than with the window. */
+  font-size: clamp(26px, 4.4cqw, 42px);
+  font-weight: 400;
+  line-height: 1;
+  /* Tronica is already generously spaced by its own advance; at this size the
+     default tracking opens into gaps, so it closes a little. */
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
+.stage-role {
+  margin: var(--s3) 0 0;
+  font-family: var(--family-ui);
+  font-size: 12.5px;
+  letter-spacing: 0.05em;
+  color: color-mix(in srgb, var(--foreground) 62%, transparent);
+}
+
+/* The separators sit back, so the three facts read as three rather than as one
+   run-on line. */
+.stage-role span {
+  margin: 0 0.5em;
+  color: color-mix(in srgb, var(--foreground) 26%, transparent);
+}
+
+/* ── The record ───────────────────────────────────────────────────────── */
+.record {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--s3);
+}
+
+.record-row {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+  gap: var(--s3);
+  align-items: baseline;
+}
+
+.record-span {
+  font-family: var(--family-ui);
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  /* Tabular, so five different date ranges still make a straight left column
+     and the eye can run down it. */
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--foreground) 34%, transparent);
+}
+
+.record-org {
+  font-family: var(--family-ui);
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  color: var(--foreground);
+  min-width: 0;
+}
+
+/* The role is the least of the three and set in the reading face, which at
+   this size reads quieter beside the mono than a smaller mono would. */
+.record-role {
+  font-family: var(--family-read);
+  font-size: 11.5px;
+  text-align: right;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--foreground) 46%, transparent);
+}
+
+/* ── The statement ────────────────────────────────────────────────────── */
+.statement {
+  margin: 0;
+  /* Long enough to read in, short enough not to lose the line. */
+  max-width: 40ch;
+  font-family: var(--family-read);
+  font-size: 17px;
+  line-height: 1.62;
+  color: color-mix(in srgb, var(--foreground) 84%, transparent);
+  text-wrap: pretty;
+}
+
+.statement b {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+/* ── Narrower columns ─────────────────────────────────────────────────── */
+/* Container, not viewport: the sidebar and the chat panel both take width the
+   window knows nothing about. */
+@container about (max-width: 860px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--s6);
+  }
+
+  /* Stacked, the two are no longer side by side, so there is no height to
+     match and nothing to spread against. */
+  .stage-side {
+    justify-content: flex-start;
+  }
+
+  .stage-shot {
+    min-height: 320px;
+    max-height: 60vh;
+  }
+}
+
+@container about (max-width: 520px) {
+  .record-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  /* The date moves above its row rather than being squeezed beside it. */
+  .record-span {
+    grid-column: 1 / -1;
   }
 }

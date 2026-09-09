@@ -54,6 +54,15 @@ uniform float uWarp;     // barrel strength
 uniform float uMask;     // grille strength, 0..1
 uniform float uBloom;
 uniform float uShift;    // convergence error, in device pixels
+uniform float uNoise;    // how badly the set is holding, 0 = fine
+uniform float uRoll;     // vertical sync: the picture will not sit still
+uniform float uTear;     // horizontal sync: lines shoved sideways
+uniform float uSag;      // supply sag: the raster swells as the beam weakens
+uniform float uSnow;     // signal dropout: static, and the picture going away
+uniform float uPhase;    // the set hunting for lock and not finding it
+uniform float uLife;     // a working set's own small restlessness
+uniform float uKey;      // backdrop key strength, 0 = leave the picture alone
+uniform vec2  uKeyBand;  // the luminance band the backdrop lives in
 
 varying vec2 vUv;
 
@@ -131,9 +140,106 @@ vec3 bloom(vec2 uv, vec2 s) {
    contributes nothing rather than a colour nobody chose — which is what puts a
    warm rim on one side of the silhouette and a cool one on the other, exactly
    where a real tube's convergence shows first. */
-vec3 converge(vec2 uv, vec2 s) {
-  vec2 o = vec2(uShift, 0.0) * s / uRes;
+vec3 converge(vec2 uv, vec2 s, float px) {
+  vec2 o = vec2(px, 0.0) * s / uRes;
   return vec3(tap(uv + o).r, tap(uv).g, tap(uv - o).b);
+}
+
+/* A cheap hash, and everything unstable is quantised through it on purpose.
+   Faults on a tube arrive on the frame, not smoothly: a tear is there and then
+   gone, and interpolating one in and out reads as a wobble rather than a
+   fault. floor() on time is what makes it snap. */
+/* Keeps its input inside the unit square at every step, so it does not lose
+   its footing once uTime is large. The sine version this replaces degenerated
+   into a few repeating values after a couple of minutes. */
+float hash2(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float hash(float n) { return hash2(vec2(n, n * 1.7 + 0.3)); }
+
+/* A position that never repeats: three rates with no common multiple, so the
+   pattern would have to run for hours to come back to where it started. */
+float wander(float t, float a, float b, float c) {
+  return sin(t * a) * 0.5 + sin(t * b + 2.1) * 0.31 + sin(t * c + 4.7) * 0.19;
+}
+
+/* Where the picture is, as opposed to where the glass is.
+
+   Vertical hold gives way in bursts: most seconds are clean, and the ones that
+   are not sweep the frame a full height so it wraps through the seam. The tear
+   is per-band and much more frequent, a few scanlines at a time shoved
+   sideways. Both wrap rather than clamp, because a tube with no picture at the
+   edge shows the other edge, not a smear of the last column. */
+vec2 wobble(vec2 uv) {
+  float roll = 0.0;
+  float tear = 0.0;
+
+  if (uRoll > 0.0) {
+    // The slow half: the frame is never quite held, and drifts.
+    roll += wander(uTime, 0.23, 0.61, 1.07) * 0.10 * uRoll;
+
+    /* The fast half: every so often the hold lets go entirely and the picture
+       runs. Each slip gets its own speed, direction and length, so no two look
+       alike — which is what the fixed sawtooth could never do. */
+    float ev = floor(uTime * 0.7);
+    float fire = step(0.62, hash(ev * 3.1));
+    float life = mix(0.2, 0.85, hash(ev * 7.7));
+    float local = fract(uTime * 0.7);
+    float speed = mix(0.6, 3.4, hash(ev * 11.3));
+    float dir = hash(ev * 5.9) < 0.28 ? -1.0 : 1.0;
+    roll += fire * step(local, life) * dir * local * speed * uRoll;
+  }
+
+  if (uTear > 0.0) {
+    /* Tearing arrives in blocks of lines rather than one line at a time, and
+       the block boundaries move — a fixed band count reads as a venetian
+       blind. */
+    float rows = mix(14.0, 42.0, hash(floor(uTime * 2.3)));
+    float band = floor(uv.y * rows + wander(uTime, 0.7, 1.9, 3.3) * 6.0);
+    float beat = floor(uTime * mix(9.0, 26.0, hash(floor(uTime * 0.9))));
+    float torn = step(mix(0.95, 0.72, uTear), hash2(vec2(band, beat)));
+    tear = torn * (hash2(vec2(band * 1.7, beat * 2.3)) - 0.5) * 0.16 * uTear;
+  }
+
+  return vec2(fract(uv.x + tear), fract(uv.y + roll));
+}
+
+/* Value noise, for the ground the keyed backdrop is replaced with. Two
+   octaves is enough: one for the clumps, one for the grain. It is generated
+   rather than sampled from a texture so it costs no bytes and never tiles. */
+float vnoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float a = hash(i.x + i.y * 57.0);
+  float b = hash(i.x + 1.0 + i.y * 57.0);
+  float c = hash(i.x + (i.y + 1.0) * 57.0);
+  float d = hash(i.x + 1.0 + (i.y + 1.0) * 57.0);
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+/* How much of this pixel is subject.
+
+   Two terms, and both are needed. The band says the backdrop is neither the
+   darkest thing on screen nor the brightest — the shirt is below it and the
+   skin is above it — so what gets removed is the middle. Detail says the
+   backdrop is smooth and everything on the subject is not, which is what saves
+   hair: a mid-tone strand sits squarely inside the band and is kept anyway
+   because it has contrast against its neighbours. */
+float subject(vec3 c, vec3 blur) {
+  if (uKey <= 0.0) return 1.0;
+  float l = luma(c);
+  // 1 inside the backdrop band, falling off on both sides.
+  float inBand = smoothstep(uKeyBand.x - 0.05, uKeyBand.x, l) *
+                 (1.0 - smoothstep(uKeyBand.y, uKeyBand.y + 0.12, l));
+  float detail = abs(l - luma(blur));
+  // Less detail is needed to count as subject than the first pass allowed.
+  // At the wider threshold, skin in shadow — mid-tone and almost as smooth as
+  // the backdrop — was being speckled away along the jaw.
+  float flatness = 1.0 - smoothstep(0.0006, 0.0045, detail);
+  return 1.0 - clamp(inBand * flatness * uKey, 0.0, 1.0);
 }
 
 /* Stepped on gl_FragCoord, so one stripe is one physical pixel however the
@@ -158,11 +264,59 @@ void main() {
     return;
   }
 
-  vec2 cs = coverScale();
-  vec2 uv = cover(sUv, cs);
+  /* Supply sag. The raster swells as the beam weakens, so the picture gets
+     bigger and dimmer at the same moment and then snaps back. Brightness on
+     its own reads as a fade; tied to geometry it reads as a set that cannot
+     hold its supply. Kept in screen space, before the crop, because it is the
+     scan going wrong rather than the picture changing. */
+  float sag = 0.0;
+  if (uSag > 0.0) {
+    sag = (wander(uTime, 0.9, 2.3, 5.1) * 0.5 + 0.5) * uSag;
+    sag += step(0.86, hash(floor(uTime * 3.0))) * 0.5 * uSag;
+    vec2 c = sUv - 0.5;
+    // Wider than it is tall: the horizontal scan gives out first.
+    sUv = 0.5 + c * (1.0 - vec2(0.13, 0.09) * sag);
+  }
 
-  vec3 src = converge(uv, cs);
+  /* Phase. One wandering value drives all of it, so the guns, the line start
+     and the raster all drift together the way they would on a set whose
+     timebase is the thing at fault.
+
+     The swing goes negative, which is the important part: at the crossover the
+     red and blue guns trade sides, so the fringe on an edge flips from warm to
+     cool. A convergence error that only ever grows and shrinks reads as a
+     focus problem; one that changes sign reads as timing. */
+  float phase = 0.0;
+  float shiftPx = uShift;
+  if (uPhase > 0.0) {
+    phase = wander(uTime, 0.31, 0.83, 1.97);
+    shiftPx += phase * 9.0 * uPhase;
+    // Horizontal phase: where the line starts, sliding and never settling.
+    sUv.x += phase * 0.035 * uPhase;
+  }
+
+  vec2 cs = coverScale();
+  // sUv stays the glass; pUv is the picture sliding about behind it.
+  vec2 uv = cover(wobble(sUv), cs);
+
+  vec3 src = converge(uv, cs, shiftPx);
   vec3 bl = bloom(uv, cs);
+
+  /* Backdrop out, noise in — before the raster, so the beam and the bloom run
+     across the new ground exactly as they run across the picture. Composited
+     here rather than behind the canvas for that reason: a ground laid under
+     the tube would be the one thing on screen the tube was not affecting. */
+  if (uKey > 0.0) {
+    float keep = subject(src, bl);
+    vec2 np = gl_FragCoord.xy * 0.35;
+    float grain = vnoise(np + floor(uTime * 12.0) * 13.0) * 0.55 +
+                  vnoise(np * 0.25 - floor(uTime * 12.0) * 7.0) * 0.45;
+    // Dark, and a touch cooler than the picture, so it reads as the inside of
+    // a tube with nothing on it rather than as a grey card.
+    vec3 ground = toLinear(vec3(0.055, 0.06, 0.07) + grain * 0.075);
+    src = mix(ground, src, keep);
+    bl = mix(ground, bl, keep);
+  }
 
   // The beam. Width tracks brightness, which is the whole point: a bright
   // line spills over its gap, a dark one does not.
@@ -170,7 +324,11 @@ void main() {
   // fixed by the glass. Run it on the cropped coordinate and the number of
   // scanlines would change as the column resizes.
   float b = clamp(luma(src + bl * uBloom), 0.0, 1.0);
-  float d = abs(fract(sUv.y * uLines) - 0.5) * 2.0;
+  /* The raster beating against the picture. The scanlines belong to the glass
+     and do not move, but the picture's timing drifts underneath them, so the
+     lines appear to crawl through it. Slow on purpose — fast enough to notice
+     and too slow to watch. */
+  float d = abs(fract(sUv.y * uLines + phase * 2.4 * uPhase + uTime * 0.35 * uPhase) - 0.5) * 2.0;
   float beam = exp(-pow(d / mix(0.42, 1.15, b), 2.0) * 1.9);
 
   vec3 col = src * beam + bl * uBloom;
@@ -179,9 +337,66 @@ void main() {
   col *= grille(gl_FragCoord.x);
   col *= mix(1.0, 1.5, uMask);
 
+  /* What a set that is working still does.
+
+     A brief dip, a few times a minute, gone before it can be looked at
+     directly. A bright bar drifting through, rarer still. And a shimmer under
+     both, small enough that it registers as the picture being alive rather
+     than as anything happening to it.
+
+     All three ride on uTime, which every instance has already offset by its
+     own random amount — so four tiles side by side never do this together. */
+  if (uLife > 0.0) {
+    /* A flicker is a couple of frames, not a fade — anything long enough to
+       watch stops being a flicker and becomes a dip. Two chances per window
+       rather than one, so it sometimes stutters twice and never arrives on a
+       count you can predict. */
+    float w = floor(uTime * 0.9);
+    float t = fract(uTime * 0.9);
+    float f1 = step(0.88, hash(w * 3.7)) * step(t, 0.045);
+    float f2 = step(0.94, hash(w * 8.3)) * step(abs(t - 0.14), 0.03);
+    col *= 1.0 - min(f1 + f2, 1.0) * (0.10 + hash(w * 9.1) * 0.14) * uLife;
+
+    /* Beam current, which is never perfectly steady. Two rates, because one
+       sine is a pulse and the eye finds a pulse. */
+    col *= 1.0 + (sin(uTime * 9.7) * 0.006 + sin(uTime * 23.3) * 0.003) * uLife;
+  }
+
   // One soft band drifting down, slowly enough to be caught not watched.
+  // Deeper on a set that is not holding.
   float hum = fract(sUv.y * 0.5 - uTime * 0.055);
-  col *= 1.0 - 0.055 * smoothstep(0.0, 0.09, hum) * (1.0 - smoothstep(0.09, 0.24, hum));
+  col *= 1.0 - (0.055 + 0.10 * uNoise) * smoothstep(0.0, 0.09, hum) * (1.0 - smoothstep(0.09, 0.24, hum));
+
+  // Beam current wandering: the whole picture breathes, stepped so it flickers
+  // rather than pulses.
+  col *= 1.0 + (hash(floor(uTime * 17.0)) - 0.5) * 0.30 * uNoise;
+
+  // Dimmer exactly as it swells — the other half of the sag.
+  col *= 1.0 - 0.42 * sag;
+
+
+  /* Dropout. The signal goes and static comes back in its place, in bursts
+     with a long quiet between them. The snow is per device pixel and reseeded
+     every frame, which is what stops it crawling like a texture. */
+  if (uSnow > 0.0) {
+    float burst = smoothstep(0.72, 0.95, hash(floor(uTime * 1.9)) * 0.6 +
+                                          hash(floor(uTime * 5.3) + 31.0) * 0.4);
+
+    /* And now and then the signal goes altogether — no picture, only snow,
+       for a moment. Rare and short on purpose: an occasional total loss stops
+       being occasional the second it is on a timer you can feel. */
+    float win = floor(uTime * 0.45);
+    float total = step(0.88, hash(win * 9.7)) *
+                  step(fract(uTime * 0.45), mix(0.06, 0.22, hash(win * 2.9)));
+
+    float lost = max(burst, total) * uSnow;
+    float grain = hash2(gl_FragCoord.xy + floor(uTime * 30.0) * vec2(41.0, 17.0));
+    // A band of it rather than the whole frame, most of the time.
+    float bandY = smoothstep(0.0, 0.12, abs(fract(sUv.y * 1.3 - uTime * 0.6) - 0.5));
+    // A band of it normally; the whole frame when the signal has gone.
+    float reach = max(mix(0.35, 1.0, 1.0 - bandY), total);
+    col = mix(col, vec3(grain) * 0.75, lost * reach);
+  }
 
   // Falloff at the edge of the glass. Weak, because a source with a
   // transparent ground has no glass to fall off — here it would only be
@@ -226,6 +441,17 @@ export function CrtScreen({
   focusX = 0.5,
   focusY = 0.5,
   pixelated = false,
+  instability = 0,
+  life = 0,
+  roll,
+  tear,
+  sag,
+  snow,
+  phase,
+  keyStrength = 0,
+  keyBand = [0.08, 0.34],
+  frames,
+  frameMs = 1500,
 }: {
   src: string
   alt: string
@@ -249,11 +475,72 @@ export function CrtScreen({
   focusY?: number
   /** Source is pixel art: sample it NEAREST and never smooth it. */
   pixelated?: boolean
+  /**
+   * How badly the set is holding, 0 to 1. Zero is a tube in good order, which
+   * is every other screen on this site. Past about 0.5 the vertical hold
+   * starts letting go and the picture rolls.
+   */
+  instability?: number
+  /**
+   * A working set's own restlessness, 0 to 1 — an occasional flicker and a
+   * shallow ripple in the beam, and nothing else. Not a fault: it is what a
+   * tube in good order does while it sits there displaying a still, which is
+   * why it is separate from `instability`.
+   */
+  life?: number
+  /**
+   * The individual faults, each 0 to 1. Left unset, roll and tear follow
+   * `instability` so it keeps working as a single knob; sag and snow are off
+   * unless asked for, because they are the two that stop a picture being
+   * readable.
+   *
+   *   roll  vertical sync — the frame drifts, and now and then runs
+   *   tear  horizontal sync — blocks of lines shoved sideways
+   *   sag   the supply giving out — the raster swells as the beam weakens
+   *   snow  dropout — the signal goes and static arrives
+   *   phase the timebase drifting — the guns swing apart and cross over, the
+   *         line start slides, and the raster crawls through the picture
+   */
+  roll?: number
+  tear?: number
+  sag?: number
+  snow?: number
+  phase?: number
+  /**
+   * Key the backdrop out and put noise behind, 0 to 1. For studio portraits
+   * where the ground is a smooth gradient and the subject is both darker and
+   * lighter than it.
+   */
+  keyStrength?: number
+  /** The luminance band the backdrop occupies, measured off the files. */
+  keyBand?: [number, number]
+  /**
+   * Extra stills to run as a boomerang: 1 → 2 → 3 → 2 → 1. `frameMs` is the
+   * middle of the hold rather than the hold itself — each one is drawn from a
+   * spread either side of it, so the sequence never settles into a rhythm.
+   * When given, these replace `src` as the picture; `src` stays the poster,
+   * which is what ships in the HTML and what shows if WebGL never comes up.
+   */
+  frames?: string[]
+  frameMs?: number
 }) {
   const host = useRef<HTMLSpanElement>(null)
   const canvas = useRef<HTMLCanvasElement>(null)
   const img = useRef<HTMLImageElement>(null)
+  const extra = useRef<(HTMLImageElement | null)[]>([])
+  const glowImg = useRef<HTMLImageElement>(null)
   const [on, setOn] = useState(false)
+
+  /* The poster first, then the rest. One list means the loop does not have to
+     care whether it is running one picture or four. */
+  const shots = frames?.length ? [src, ...frames] : [src]
+  /* Ping-pong, precomputed: for three shots this is 0,1,2,1 — four holds, and
+     the two ends are not held twice as long as the middle. */
+  const order =
+    shots.length < 2
+      ? [0]
+      : [...shots.keys(), ...[...shots.keys()].slice(1, -1).reverse()]
+  const shotKey = shots.join('|')
 
   useEffect(() => {
     const cv = canvas.current
@@ -311,18 +598,25 @@ export function CrtScreen({
     gl.enableVertexAttribArray(aPos)
     gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0)
 
-    const tex = gl.createTexture()
-    gl.bindTexture(gl.TEXTURE_2D, tex)
-    // Non-power-of-two, so clamp and no mipmaps or it samples black.
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     // NEAREST for pixel art. LINEAR is right for a photograph and ruinous for
     // a drawing whose whole subject is that it has visible pixels — it would
     // smooth every block edge into a gradient.
     const filter = pixelated ? gl.NEAREST : gl.LINEAR
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter)
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1)
+
+    /* One texture per still. They are uploaded once each, as they decode, and
+       from then on a frame change is a bind — no pixels move. */
+    const texes = shots.map(() => {
+      const t = gl.createTexture()
+      gl.bindTexture(gl.TEXTURE_2D, t)
+      // Non-power-of-two, so clamp and no mipmaps or it samples black.
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter)
+      return t
+    })
+    const dims: ([number, number] | null)[] = shots.map(() => null)
 
     const u = {
       res: gl.getUniformLocation(prog, 'uRes'),
@@ -334,6 +628,15 @@ export function CrtScreen({
       mask: gl.getUniformLocation(prog, 'uMask'),
       bloom: gl.getUniformLocation(prog, 'uBloom'),
       shift: gl.getUniformLocation(prog, 'uShift'),
+      noise: gl.getUniformLocation(prog, 'uNoise'),
+      roll: gl.getUniformLocation(prog, 'uRoll'),
+      tear: gl.getUniformLocation(prog, 'uTear'),
+      sag: gl.getUniformLocation(prog, 'uSag'),
+      snow: gl.getUniformLocation(prog, 'uSnow'),
+      phase: gl.getUniformLocation(prog, 'uPhase'),
+      life: gl.getUniformLocation(prog, 'uLife'),
+      key: gl.getUniformLocation(prog, 'uKey'),
+      keyBand: gl.getUniformLocation(prog, 'uKeyBand'),
     }
     // The texture is uploaded flipped, so v = 1 is the top of the picture and
     // a CSS-style focus measured from the top has to be turned over.
@@ -343,10 +646,26 @@ export function CrtScreen({
     gl.uniform1f(u.mask, mask)
     gl.uniform1f(u.bloom, bloomAmount)
     gl.uniform1f(u.shift, shift)
+    gl.uniform1f(u.noise, instability)
+    // Unset faults fall back to the master, so instability on its own still
+    // behaves the way it did before any of these existed.
+    gl.uniform1f(u.roll, roll ?? instability)
+    gl.uniform1f(u.tear, tear ?? instability)
+    gl.uniform1f(u.sag, sag ?? 0)
+    gl.uniform1f(u.snow, snow ?? 0)
+    gl.uniform1f(u.phase, phase ?? 0)
+    gl.uniform1f(u.life, life)
+    gl.uniform1f(u.key, keyStrength)
+    gl.uniform2f(u.keyBand, keyBand[0], keyBand[1])
 
     let ready = false
     let frame = 0
     const t0 = performance.now()
+    /* Minutes, not seconds, and drawn once per instance. Small enough to stay
+       well inside float precision for as long as anyone will keep the page
+       open, large enough that two tubes booted in the same frame have nothing
+       in common. */
+    const offset = Math.random() * 420
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     const size = () => {
@@ -363,10 +682,52 @@ export function CrtScreen({
       gl.uniform2f(u.res, cv.width, cv.height)
     }
 
+    /* Which still the clock is on, and the last one actually bound — the
+       texture and its proportion only change on a step, not on every frame. */
+    let shown = -1
+
+    /* Where the boomerang is, and when it moves next.
+
+       Not floor(elapsed / frameMs): a fixed division makes every hold exactly
+       as long as every other one, and three stills on a metronome read as a
+       slideshow. Each hold is drawn from a spread either side of frameMs
+       instead, so the head rests on one angle and hurries past the next, and
+       the loop never announces its own period. */
+    let at = 0
+    let until = -1
+    const hold = () => frameMs * (0.6 + Math.random() * 0.95)
+
+    const pick = (now: number) => {
+      if (order.length < 2) return 0
+      if (until < 0) until = now + hold()
+      else if (now >= until) {
+        at = (at + 1) % order.length
+        until = now + hold()
+      }
+      const step = order[at]
+      // Hold on the last decoded still rather than flashing a blank texture at
+      // one that has not arrived yet.
+      return dims[step] ? step : shown < 0 ? 0 : shown
+    }
+
     const draw = (now: number) => {
       if (!ready) return
       size()
-      gl.uniform1f(u.time, (now - t0) / 1000)
+
+      const next = pick(now)
+      if (next !== shown) {
+        shown = next
+        gl.bindTexture(gl.TEXTURE_2D, texes[next])
+        const d = dims[next]
+        if (d) gl.uniform2f(u.texSize, d[0], d[1])
+        // The glow is a blurred copy of the picture, so it has to follow it.
+        // Every still is already decoded by this point, so this is a swap of
+        // an already-cached image, not a fetch.
+        if (glowImg.current) glowImg.current.src = shots[next]
+      }
+
+      // Offset per instance, so no two tubes are ever on the same beat.
+      gl.uniform1f(u.time, (now - t0) / 1000 + offset)
       gl.clearColor(0, 0, 0, 0)
       gl.clear(gl.COLOR_BUFFER_BIT)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
@@ -389,32 +750,48 @@ export function CrtScreen({
       frame = 0
     }
 
-    const upload = () => {
-      gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im)
+    const upload = (i: number, el: HTMLImageElement) => {
+      gl.bindTexture(gl.TEXTURE_2D, texes[i])
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, el)
       // Cover needs the picture's own proportion, which only exists once it
       // has actually decoded.
-      gl.uniform2f(u.texSize, im.naturalWidth, im.naturalHeight)
-      ready = true
-      setOn(true)
-      start()
+      dims[i] = [el.naturalWidth, el.naturalHeight]
+      // Whatever is bound now is stale, so make the next draw rebind.
+      shown = -1
+      // The first still is enough to start: the rest join as they arrive
+      // rather than holding the tube dark until all of them have.
+      if (i === 0) {
+        gl.uniform2f(u.texSize, el.naturalWidth, el.naturalHeight)
+        ready = true
+        setOn(true)
+        start()
+      }
     }
 
-    const load = () =>
-      im.decode().then(upload, () => {
-        // decode() rejects on some cached-image paths; complete is enough.
-        if (im.complete && im.naturalWidth) upload()
-      })
+    const load = (i: number, el: HTMLImageElement) =>
+      el.decode().then(
+        () => upload(i, el),
+        () => {
+          // decode() rejects on some cached-image paths; complete is enough.
+          if (el.complete && el.naturalWidth) upload(i, el)
+        },
+      )
 
-    if (im.complete && im.naturalWidth) load()
-    else im.addEventListener('load', load, { once: true })
+    const watch = (i: number, el: HTMLImageElement | null) => {
+      if (!el) return
+      if (el.complete && el.naturalWidth) load(i, el)
+      else el.addEventListener('load', () => load(i, el), { once: true })
+    }
+
+    watch(0, im)
+    shots.slice(1).forEach((_, i) => watch(i + 1, extra.current[i]))
 
     resume = start
     pause = stop
 
     return () => {
       stop()
-      gl.deleteTexture(tex)
+      texes.forEach((t) => gl.deleteTexture(t))
       gl.deleteBuffer(buf)
       gl.deleteProgram(prog)
       gl.deleteShader(vs)
@@ -446,7 +823,30 @@ export function CrtScreen({
       ro.disconnect()
       teardown?.()
     }
-  }, [src, lines, warp, mask, bloomAmount, shift, focusX, focusY, pixelated])
+  // key, not frames: a fresh array literal on every render would rebuild
+  // the whole tube on every render.
+  }, [
+    shotKey,
+    lines,
+    warp,
+    mask,
+    bloomAmount,
+    shift,
+    instability,
+    life,
+    roll,
+    tear,
+    sag,
+    snow,
+    phase,
+    keyStrength,
+    keyBand[0],
+    keyBand[1],
+    frameMs,
+    focusX,
+    focusY,
+    pixelated,
+  ])
 
   return (
     <span ref={host} className={`crt-screen ${className}`} data-gl={on ? 'on' : undefined}>
@@ -460,7 +860,7 @@ export function CrtScreen({
 
           `filter: blur()` paints outside the element's box, which is what lets
           it spill past the tube without anything being sized to hold it. */}
-      {glow && <img src={src} alt="" aria-hidden="true" className="crt-glow" />}
+      {glow && <img ref={glowImg} src={src} alt="" aria-hidden="true" className="crt-glow" />}
       <img
         ref={img}
         src={src}
@@ -468,6 +868,22 @@ export function CrtScreen({
         data-pixelated={pixelated ? '' : undefined}
         className={`crt-src ${imgClassName}`}
       />
+      {/* The other stills, in the markup so the browser fetches and decodes
+          them the ordinary way. Hidden rather than absent: an <img> that is
+          never laid out still loads, and this keeps them out of the fallback
+          — if WebGL never starts, the poster above is the picture. */}
+      {shots.slice(1).map((u, i) => (
+        <img
+          key={u}
+          ref={(el) => {
+            extra.current[i] = el
+          }}
+          src={u}
+          alt=""
+          aria-hidden="true"
+          className="crt-frame"
+        />
+      ))}
       <canvas ref={canvas} className="crt-canvas" aria-hidden="true" />
     </span>
   )

@@ -37,9 +37,14 @@ export function WorkTile({ study }: { study: CaseStudy }) {
         <div className="work-shot">
           <CornerMarks />
           <div className="well" style={{ aspectRatio: '4 / 3' }}>
+            {/* A set in good order, but not a still: an occasional dip, a bar
+                drifting through now and then, and a shimmer under both. Each
+                tile offsets its own clock, so four of them side by side never
+                do any of it at the same moment. */}
             <CrtScreen
               src={study.thumbnail}
               alt={study.title}
+              life={1}
               className="transition-transform duration-500 group-hover:scale-[1.03]"
             />
           </div>
