@@ -871,14 +871,26 @@ export function CrtScreen({
       {/* The other stills, in the markup so the browser fetches and decodes
           them the ordinary way. Hidden rather than absent: an <img> that is
           never laid out still loads, and this keeps them out of the fallback
-          — if WebGL never starts, the poster above is the picture. */}
+          — if WebGL never starts, the poster above is the picture.
+
+          The src is withheld until the tube is actually running, and that is
+          the whole of the page's weight problem. Measured on the production
+          build, this page was 2.45MB and 2.20MB of it was three portraits,
+          every one of them requested inside the same millisecond — for a loop
+          whose second still is not wanted for nearly two seconds. Setting the
+          attribute later is what starts the fetch.
+
+          Nothing downstream needs to know: `watch` already listens for load on
+          any still that is not complete, which is what an <img> with no src
+          is, and `pick` already holds the last decoded still rather than
+          binding a texture that has not arrived. */}
       {shots.slice(1).map((u, i) => (
         <img
           key={u}
           ref={(el) => {
             extra.current[i] = el
           }}
-          src={u}
+          src={on ? u : undefined}
           alt=""
           aria-hidden="true"
           className="crt-frame"

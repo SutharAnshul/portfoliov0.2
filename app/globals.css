@@ -986,11 +986,14 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    transport. Replaces border-weight changes, which were too quiet to read
    against a monochrome card. */
 .marks {
-  /* Where the top and bottom pairs sit. 50% puts all four vertices on the
-     element's centre line, where they merge into one bright bar; 0 opens them
-     out onto the corners. Only the vertical axis ever collapses, which is why
-     none of this needs to know the element's size — a percentage does it. */
-  --edge: 50%;
+  /* Where the four vertices sit, and now the only place they ever sit: 0 is
+     the open position, on the corners.
+
+     This was 50% — all four gathered on the element's centre line — with every
+     selected and hovered state opening them out to here and a strike of glow
+     as they arrived. The travel is gone. What is left is whether they are
+     drawn at all, which is the part that was carrying the meaning. */
+  --edge: 0%;
   --arm: 7px;
   --glow: 0 0 0 rgba(250, 250, 250, 0);
 
@@ -1016,7 +1019,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   position: absolute;
   width: var(--arm);
   height: var(--arm);
-  transition: top var(--switch-off), bottom var(--switch-off);
 }
 
 .mark::before,
@@ -1085,17 +1087,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   transition: opacity 50ms ease;
 }
 
-[data-active='true'] > .marks .mark {
-  transition: top var(--switch), bottom var(--switch);
-}
-
-/* The strike: bright at the instant of switch-on, gone by the time the picture
-   has finished opening. */
-[data-active='true'] > .marks .mark::before,
-[data-active='true'] > .marks .mark::after {
-  animation: mark-strike 480ms ease-out;
-}
-
 @keyframes mark-strike {
   from { box-shadow: 0 0 7px rgba(250, 250, 250, 0.9); }
   to { box-shadow: 0 0 0 rgba(250, 250, 250, 0); }
@@ -1134,16 +1125,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   opacity: 0.95;
   --edge: 0%;
   transition: opacity 50ms ease;
-}
-
-.work-tile:hover .work-shot > .marks .mark,
-.work-tile:focus-visible .work-shot > .marks .mark {
-  transition: top var(--switch), bottom var(--switch);
-}
-
-.work-tile:hover .work-shot > .marks .mark::before,
-.work-tile:hover .work-shot > .marks .mark::after {
-  animation: mark-strike 480ms ease-out;
 }
 
 /* ── The tube ──────────────────────────────────────────────────────
@@ -1209,22 +1190,15 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   transition: filter 120ms ease;
 }
 
+/* Nothing to collapse to any more: the marks go out with the frame rather
+   than gathering to its centre line on the way. */
 [data-tube='off'] .shot > .marks {
-  --edge: 50%;
+  opacity: 0;
 }
 
 /* The marks travel out on the same curve and the same beat as the frame, so
    the four of them and the picture read as one movement rather than as a
    reveal with decoration around it. */
-[data-tube='on'] .shot > .marks .mark {
-  transition: top var(--switch), bottom var(--switch);
-}
-
-[data-tube='on'] .shot > .marks .mark::before,
-[data-tube='on'] .shot > .marks .mark::after {
-  animation: mark-strike 520ms ease-out;
-}
-
 /* ─── The sidebar, in three bands ─────────────────────────────────────────
    The whole column used to scroll, so on any window shorter than the content
    a bar sat down the side of the name, the bio and the sections — none of
