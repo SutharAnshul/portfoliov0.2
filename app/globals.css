@@ -227,8 +227,14 @@
      handle's 300px, not the viewport's, and below the breakpoint the sidebar
      is gone and the phone header carries the name instead. */
   --fs-sig: 24px;
-  /* The reading size. Clamped inside the 20-24 the face was chosen for. */
-  --fs-read: clamp(20px, 1.35vw, 22px);
+  /* The reading size.
+
+     16, down from a 20-22 clamp. The measure does not need touching with it:
+     .case-prose is set in ems, so 34em is the same 65-75 characters at any
+     size — the column simply gets narrower rather than the lines getting
+     longer, which is the whole reason it was moved off ch in the first
+     place. */
+  --fs-read: 16px;
 
   /* Leading. Unitless, so it scales with whatever size the token above sets. */
   --lh-display: 1.02;
@@ -1904,7 +1910,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .case-deck {
   font-family: var(--family-read);
   font-weight: 400;
-  font-size: clamp(1.0625rem, 1.7vw, var(--fs-case-deck));
+  /* Was a clamp landing on about 20px at a normal window — the same size as
+     the prose below it, so the two read as one block rather than as a line
+     about the work followed by the work. Both are 16 now; if the deck should
+     lead, it wants a different weight or colour rather than two points of
+     size, which was never doing the job anyway. */
+  font-size: var(--fs-read);
   line-height: 1.5;
   letter-spacing: 0.004em;
   color: color-mix(in srgb, var(--foreground) 72%, transparent);
@@ -1921,7 +1932,10 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   display: inline-flex;
   align-items: center;
   padding: 4px 10px;
-  border: 1px solid currentColor;
+  /* The outline stays neutral and only the word is pink. currentColor was
+     handing the border the accent too, which made the whole chip a marker
+     rather than a label with an accent on it. */
+  border: 1px solid var(--card-line-strong);
   border-radius: 999px;
   font-size: 10px;
   letter-spacing: 0.14em;
