@@ -1925,26 +1925,20 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    along after a middle dot is gone from the data, not just from the view.
    "Six months" is a fact about a calendar, not about the work.
 
-   Pink, because it is the one thing on a case study that says what kind of
-   work this is, and pink is how this site marks the thing that matters on a
-   page. currentColor does the border, so the outline follows. */
+   No accent. It labels the work rather than pointing at it, and the pink on
+   this site is reserved for the thing that is live or selected — spending it
+   on a chip that is simply true of the page devalues it everywhere it means
+   something. */
 .pill {
   display: inline-flex;
   align-items: center;
   padding: 4px 10px;
-  /* The outline stays neutral and only the word is pink. currentColor was
-     handing the border the accent too, which made the whole chip a marker
-     rather than a label with an accent on it. */
   border: 1px solid var(--card-line-strong);
   border-radius: 999px;
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  /* One colour declaration, not two. The rule already ended with a muted
-     foreground, so an accent added above it was simply overridden by its own
-     rule — the later declaration wins and nothing looks broken enough to
-     notice. */
-  color: var(--brand);
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
 }
 
 /* The facts, ruled off above and below like a specification block. */
