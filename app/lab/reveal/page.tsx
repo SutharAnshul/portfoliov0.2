@@ -6,84 +6,61 @@ import { useState } from 'react'
 import { DURATION, Reveal, type Mode } from './reveal'
 
 /**
- * Four image reveals for the case studies, side by side.
+ * Two CRT load animations for the case study screens.
  *
- * The reveal the site ships today is a CSS bloom, and it is about the frame —
- * two marks on a centre line, and the plate grows out from between them. It
- * says a panel opened. None of these say that. Each one is about the picture,
- * and each answers a different question about why it was not there a moment
- * ago. That is the choice being made here, not which one looks best in
- * isolation.
+ * The lesson from the earlier round of four is that the interesting question
+ * is not which effect but how much of one — what shipped had to be quietened
+ * twice, and what made it too much was never the mechanism, it was having
+ * several going at once. So each of these is a single gesture, under half a
+ * second, ending exactly on the photograph.
  *
- * Press one to run it again; press Run all to see them together, which is the
- * only way to judge pace against each other.
+ * Run both together to judge them against each other; that is the only
+ * comparison that means anything at this length.
  */
 
 const SHOT = '/images/incentiwise/deck/01.png'
 const ALT = 'Incentiwise — the feed, organisation and badges screens in perspective'
 
 const NOTES: Record<Mode, { title: string; claim: string; how: string; against: string }> = {
-  raster: {
-    title: 'A · Raster',
-    claim: 'It is being drawn, and the beam has not got there yet.',
-    how: 'The beam sweeps once and leaves heat behind it — the lines just painted are brighter and cool back to correct, because a hard edge between drawn and not-drawn is a wipe, and a wipe is a mask sliding rather than a tube working. The raster jitters while it lays down and locks as the frame completes.',
-    against: 'The most literal reading of the site’s own metaphor, which is either the point or the problem: with tubes on About and on every thumbnail, a fourth CRT idea risks reading as a filter applied to everything rather than as a motif.',
+  switchon: {
+    title: 'A · Switch-on',
+    claim: 'The tube comes on.',
+    how: 'The picture is squashed into a bright line across the middle and opens out, overbright, settling to correct. Squashed rather than masked — sampling through the opening rather than clipping to it — because a mask parting is a pair of doors, and a tube holds the whole frame in that line the entire time. The brightness runs on a slower curve than the geometry, so the shape arrives and then the light settles, which is the order it happens in.',
+    against: 'The theatrical one. It moves the whole picture, so twenty-four of them down a page is twenty-four small performances — and it is close to what the frame’s own plate bloom used to do, which is the thing that read as too much.',
   },
-  converge: {
-    title: 'B · Converge',
-    claim: 'It is there and wrong, and the set is pulling it straight.',
-    how: 'Nothing is hidden — the picture is complete from the first frame and simply misregistered, pincushioned and ringing. The ring is a damped oscillation, constant frequency with a falling envelope, because a degauss coil is an LC circuit; a linear ease is the one thing that would give it away.',
-    against: 'It reveals nothing, so on a long page it may read as a glitch rather than an arrival. Also the strongest of the four, which makes it the most tiring to meet four times in a row.',
-  },
-  resolve: {
-    title: 'C · Resolve',
-    claim: 'It is there and coarse, and more of it is coming.',
-    how: 'Cells and levels both step in powers of two — 16px and two colours up to pixels and thirty-two. It steps rather than slides, because a blur clearing is a continuous thing losing radius and this is a discrete thing gaining resolution: you should be able to count the stages. Ordered Bayer dither, not noise, so two levels make a pattern instead of a mess.',
-    against: 'The only one that is not about a display, so it sits with the icons rather than with the tubes. That is either the cleanest fit with the pixel language or a second, competing story about what this site is.',
-  },
-  transmit: {
-    title: 'D · Transmit',
-    claim: 'It is arriving in pieces, out of order, down a wire.',
-    how: 'Bands land on an interlaced schedule — every eighth, then the fours, then the twos, then the rest — which is how a progressive JPEG came in over a modem. Each lands with a sideways tear and snaps straight. Unlanded bands hold snow.',
-    against: 'Out-of-order arrival is legible to anyone who used the web before broadband and possibly to nobody else. It is also the longest, and length is the one thing a reveal cannot afford four times down a page.',
+  interlace: {
+    title: 'B · Interlace',
+    claim: 'The two fields have not meshed yet.',
+    how: 'Alternate lines sit up to three device pixels out of register and close. Nothing else moves — the picture stays exactly where it is, at exactly the size it will be, and only its own lines shift against each other, so every edge in it is briefly combed and then is not. Device pixels rather than uv, so it is the same amount on a thumbnail as on a full-width screen.',
+    against: 'Subtle enough that on a soft or low-contrast screen it may not register at all. It is a fault you notice on hard edges, and some of these pictures do not have many.',
   },
 }
 
-const ORDER: Mode[] = ['raster', 'converge', 'resolve', 'transmit']
+const ORDER: Mode[] = ['switchon', 'interlace']
 
 export default function RevealLab() {
-  const [keys, setKeys] = useState<Record<Mode, number>>({
-    raster: 1,
-    converge: 1,
-    resolve: 1,
-    transmit: 1,
-  })
+  const [keys, setKeys] = useState<Record<Mode, number>>({ switchon: 1, interlace: 1 })
 
   const play = (m: Mode) => setKeys((k) => ({ ...k, [m]: k[m] + 1 }))
   const playAll = () =>
-    setKeys((k) => ({
-      raster: k.raster + 1,
-      converge: k.converge + 1,
-      resolve: k.resolve + 1,
-      transmit: k.transmit + 1,
-    }))
+    setKeys((k) => ({ switchon: k.switchon + 1, interlace: k.interlace + 1 }))
 
   return (
     <div className="rv-page">
       <header className="rv-head">
-        <h1>Image reveal · four options</h1>
+        <h1>Screen load · two CRT options</h1>
         <p>
-          The reveal on the case studies today is a CSS bloom, and it is about the frame: two marks
-          on a centre line, and the plate grows out from between them. It says a panel opened. None
-          of these say that — each is about the picture, and each answers a different question about
-          why it was not there a moment ago.
+          One gesture each, under half a second, ending exactly on the photograph. A is a display
+          starting; B is a display locking. A moves the whole picture, B never moves it at all —
+          only its lines against each other — which makes B the quieter by a long way.
         </p>
         <p className="rv-note">
-          That is the choice: a screen in a case study is either a thing being shown to you (A, B)
-          or a thing being received (C, D). Pick the fiction first and the animation second.
+          What is on screen now is the dither resolve, which had to be quietened twice. The thing
+          that made it too much was never the mechanism, it was having more than one going at once.
+          Both of these are deliberately a single idea.
         </p>
         <button className="rv-btn" type="button" onClick={playAll}>
-          ▶ Run all
+          ▶ Run both
         </button>
       </header>
 
