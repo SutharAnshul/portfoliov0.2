@@ -1818,17 +1818,27 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    table of the facts, the prose, and then the screens on their own with
    nothing written over them. */
 
+/* Out on the left, where you are on the right, and where you can go after
+   that. Three tracks rather than space-between: with three items of unequal
+   width, space-between centres the middle one only by accident — it lands
+   halfway between its neighbours, not halfway across the bar, and it moves
+   every time "Prev" is disabled or a number gains a digit. Two 1fr tracks put
+   the counter on the bar's own centre line and hold it there. */
 .record-bar {
   position: sticky;
   top: 0;
   z-index: 30;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: var(--s4);
   padding: var(--s4) var(--s6);
   background: var(--background);
   border-bottom: 1px solid var(--card-line);
+}
+
+.record-back {
+  justify-self: start;
 }
 
 /* Tabular figures so the counter does not jitter between entries. */
@@ -1838,6 +1848,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 .record-nav {
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: var(--s2);
@@ -1847,6 +1858,11 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  /* Two words and an arrow, on one line. In a three-track bar on a 375px
+     screen the middle track takes what it needs and these get the remainder,
+     which was enough to break "Next →" over two lines and make the bar taller
+     than its own type. */
+  white-space: nowrap;
   padding: 6px 11px;
   border: 1px solid var(--card-line);
   border-radius: var(--r-sm);
@@ -1866,23 +1882,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .record-btn[aria-disabled='true'] {
   opacity: 0.35;
   pointer-events: none;
-}
-
-/* The close is a circle because everything else here is square. */
-.record-close {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--card-line-strong);
-  border-radius: 999px;
-  color: var(--foreground);
-  transition: background var(--dur-light, 300ms) var(--ease-light, ease-out);
-}
-
-.record-close:hover {
-  background: var(--card-fill-hover);
 }
 
 /* The one display moment on the page. A name, set in the working face.
@@ -4001,4 +4000,76 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    two labels that bracket the list sit the same way against it. */
 .about-foot-end {
   margin: var(--s3) 0 0;
+}
+
+/* ── The record bar, on a phone ────────────────────────────────────────
+   The bar is sticky, and sticky is measured against the scrollport — which on
+   a phone starts at the very top of the screen, behind the fixed masthead. So
+   at top: 0 it stuck itself underneath the header and sat there half hidden.
+   Offsetting it by the masthead's measured height lands its top edge exactly
+   on the header's bottom edge.
+
+   The measurement is published by MobileChrome; the fallback is only for the
+   first paint before that effect runs. */
+@media (max-width: 767px) {
+  /* Negative, and that is not a hack — it is the arithmetic.
+
+     Sticky offsets are measured from the scrollport's padding edge, and this
+     scroller already carries padding-top: masthead + --s4 so its content
+     clears the fixed header. That padding is therefore *already* the header's
+     height; adding the header's height again on top of it parked the bar a
+     full masthead plus a step down the screen. Backing off the --s4 is what is
+     left to remove, and it lands the bar's top edge exactly on the header's
+     bottom edge. */
+  .record-bar {
+    top: calc(var(--s4) * -1);
+  }
+
+  /* Room for three groups on a narrow bar: the labels lose their padding
+     before the counter loses its place. */
+  .record-bar {
+    gap: var(--s3);
+    padding: var(--s3) var(--s5);
+  }
+
+  .record-btn {
+    padding: 6px 9px;
+  }
+}
+
+/* The mark is a link, but not while the opening is still playing.
+   ──────────────────────────────────────────────────────────────────────
+   During the opening it is the large centred thing in the middle of the
+   screen — which is precisely where someone taps to find out what the screen
+   wants, and that tap is answered by the nudge. Live as a link it would
+   swallow that tap and navigate instead, so the one gesture the splash invites
+   would be the one gesture it cannot receive.
+
+   Inert until the mark has settled into the bar. From then on it is chrome,
+   and chrome with his name on it should go home. */
+.m-masthead[data-settled='false'] .m-mark {
+  pointer-events: none;
+}
+
+/* ── Arrows only, on a phone ───────────────────────────────────────────
+   The counter is supposed to sit on the bar's centre line, and with three
+   groups on a 375px bar it could not: "← Prev  Next →" is more than twice the
+   width of "← Back", so the right track took the space the left one did not
+   need and carried the middle off centre with it. Dead-centring the counter
+   instead just walked it into "Prev".
+
+   So the words go and the arrows stay. Direction is the whole content of those
+   two controls — the words were only ever naming the arrow — and losing them
+   makes the two side groups near enough equal that the centre track lands
+   where it should.
+
+   The word was carrying the accessible name, so hiding it would have left two
+   controls announced as "←" and "→". They have explicit labels now, which say
+   more than the visible text ever did.
+
+   Kept on desktop, where there is room and a labelled control is better. */
+@media (max-width: 767px) {
+  .record-btn-word {
+    display: none;
+  }
 }

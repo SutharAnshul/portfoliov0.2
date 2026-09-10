@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { SoundControl } from '@/components/SoundControl'
 import { NameMark } from '@/components/NameMark'
@@ -335,9 +336,19 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
             so it goes back to being the thing it is. Not interactive: reading
             the name by moving across the boxes is a pointer idea, and on touch
             the twelve cells would only be twelve things to press by accident. */}
-        <span className="m-mark">
+        {/* The way home. It is the one thing on a phone that is always on
+            screen and always his name, which is what a masthead is for.
+
+            Not interactive in the desktop sense — reading the name by moving
+            across its twelve cells is a pointer idea, and on touch those cells
+            would be twelve things to press by accident. The whole mark is one
+            target instead.
+
+            It only becomes a link once the opening has settled; see the note
+            in globals.css. */}
+        <Link href="/" className="m-mark" aria-label="Home">
           <NameMark as="span" interactive={false} settle={500} />
-        </span>
+        </Link>
 
         <button
           onClick={() => setOpen((v) => !v)}

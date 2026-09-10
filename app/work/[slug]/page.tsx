@@ -88,6 +88,14 @@ export default async function CaseStudyPage({ params }: Props) {
     <div className="bg-background text-foreground min-h-screen">
       {/* The bar stays with you the whole way down the record. */}
       <div className="record-bar t-meta">
+        {/* Out, on the left, where getting out of a thing lives. This was a
+            cross on the right, next to Prev and Next — which put "leave" in
+            the same cluster as "keep going", drawn as a glyph that means close
+            a dialog rather than leave a page. */}
+        <Link href="/work" data-sfx="tick" className="record-btn record-back t-meta">
+          ← Back
+        </Link>
+
         <span className="record-no">
           # {pad(index + 1)} / {pad(caseStudies.length)}
         </span>
@@ -99,8 +107,9 @@ export default async function CaseStudyPage({ params }: Props) {
             tabIndex={prev ? undefined : -1}
             data-sfx="tick"
             className="record-btn t-meta"
+            aria-label="Previous case study"
           >
-            ← Prev
+            ← <span className="record-btn-word">Prev</span>
           </Link>
           <Link
             href={next ? `/work/${next.slug}` : '#'}
@@ -108,21 +117,9 @@ export default async function CaseStudyPage({ params }: Props) {
             tabIndex={next ? undefined : -1}
             data-sfx="tick"
             className="record-btn t-meta"
+            aria-label="Next case study"
           >
-            Next →
-          </Link>
-          <Link href="/work" data-sfx="tick" className="record-close" aria-label="Close, back to work">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
+            <span className="record-btn-word">Next</span> →
           </Link>
         </div>
       </div>
