@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { makeOsd, type Osd } from '@/lib/crt-osd'
 
 /**
  * A picture put through a real tube.
@@ -63,6 +64,9 @@ uniform float uPhase;    // the set hunting for lock and not finding it
 uniform float uLife;     // a working set's own small restlessness
 uniform float uKey;      // backdrop key strength, 0 = leave the picture alone
 uniform vec2  uKeyBand;  // the luminance band the backdrop lives in
+uniform sampler2D uOsd;  // the set's own diagnostic layer, as a texture
+uniform float uOsdOn;    // 0 = the set is not a diagnostic display at all
+uniform float uScan;     // where the scan line is, 0..1 from the top; <0 idle
 
 varying vec2 vUv;
 
@@ -296,8 +300,12 @@ void main() {
   }
 
   vec2 cs = coverScale();
-  // sUv stays the glass; pUv is the picture sliding about behind it.
-  vec2 uv = cover(wobble(sUv), cs);
+  /* Kept, rather than inlined into cover(): the diagnostic layer is sampled
+     with this same coordinate, which is what makes it tear and roll with the
+     picture instead of floating serenely over a failing one. */
+  vec2 wUv = wobble(sUv);
+  // sUv stays the glass; uv is the picture sliding about behind it.
+  vec2 uv = cover(wUv, cs);
 
   vec3 src = converge(uv, cs, shiftPx);
   vec3 bl = bloom(uv, cs);
@@ -316,6 +324,31 @@ void main() {
     vec3 ground = toLinear(vec3(0.055, 0.06, 0.07) + grain * 0.075);
     src = mix(ground, src, keep);
     bl = mix(ground, bl, keep);
+  }
+
+  /* The diagnostic layer, and the scan that generates it.
+
+     Both go in here — after the key, before the beam. After the key because
+     the key decides what is subject from luminance and local detail, and
+     white text handed to it would be read as a face. Before the beam because
+     everything from here down is the tube: the text picks up the scanlines,
+     the grille, the bloom and the dropout, and that is the difference between
+     a display showing text and text drawn on a picture of a display. */
+  if (uOsdOn > 0.0) {
+    vec4 osd = texture2D(uOsd, wUv);
+    src += toLinear(osd.rgb) * osd.a * uOsdOn;
+
+    /* The line is drawn here rather than into the texture, because it is the
+       beam doing something rather than a picture of a beam — it belongs to
+       the same coordinate the raster does. Thin core, small halo, and a very
+       short trail behind it: enough to read as a pass, not enough to become a
+       swipe transition. */
+    if (uScan >= 0.0) {
+      float d = (1.0 - wUv.y) - uScan;
+      float core = exp(-d * d * 26000.0);
+      float trail = exp(max(d, 0.0) * -46.0) * step(0.0, d) * 0.16;
+      src += vec3(0.60, 0.78, 0.66) * (core * 0.42 + trail) * uOsdOn;
+    }
   }
 
   // The beam. Width tracks brightness, which is the whole point: a bright
@@ -452,6 +485,7 @@ export function CrtScreen({
   keyBand = [0.08, 0.34],
   frames,
   frameMs = 1500,
+  diagnostic,
 }: {
   src: string
   alt: string
@@ -523,6 +557,14 @@ export function CrtScreen({
    */
   frames?: string[]
   frameMs?: number
+  /**
+   * Turn the tube into a display that is trying to read what it is showing.
+   *
+   * Off by default and free when off — no second texture, no 2D canvas, no
+   * extra uniform work. The thumbnails and the work tiles are screens showing
+   * a picture; only the About tube is a machine looking at one.
+   */
+  diagnostic?: { subject: string; traits: string[] }
 }) {
   const host = useRef<HTMLSpanElement>(null)
   const canvas = useRef<HTMLCanvasElement>(null)
@@ -541,6 +583,12 @@ export function CrtScreen({
       ? [0]
       : [...shots.keys(), ...[...shots.keys()].slice(1, -1).reverse()]
   const shotKey = shots.join('|')
+  /* Content, not identity. A caller writing diagnostic={{...}} inline hands a
+     fresh object on every render, and this component's effect rebuilds the
+     whole context — new textures, recompiled shaders — when its deps change.
+     Keying on what the layer says means an inline literal costs nothing and
+     only a real change to the words rebuilds anything. */
+  const diagKey = diagnostic ? `${diagnostic.subject}|${diagnostic.traits.join(',')}` : ''
 
   useEffect(() => {
     const cv = canvas.current
@@ -606,6 +654,10 @@ export function CrtScreen({
 
     /* One texture per still. They are uploaded once each, as they decode, and
        from then on a frame change is a bind — no pixels move. */
+    /* Unit 0 is the picture for the life of the context. Stated rather than
+       assumed, because there is a second texture now and a bind without a
+       unit lands on whichever was last active. */
+    gl.activeTexture(gl.TEXTURE0)
     const texes = shots.map(() => {
       const t = gl.createTexture()
       gl.bindTexture(gl.TEXTURE_2D, t)
@@ -637,6 +689,9 @@ export function CrtScreen({
       life: gl.getUniformLocation(prog, 'uLife'),
       key: gl.getUniformLocation(prog, 'uKey'),
       keyBand: gl.getUniformLocation(prog, 'uKeyBand'),
+      osd: gl.getUniformLocation(prog, 'uOsd'),
+      osdOn: gl.getUniformLocation(prog, 'uOsdOn'),
+      scan: gl.getUniformLocation(prog, 'uScan'),
     }
     // The texture is uploaded flipped, so v = 1 is the top of the picture and
     // a CSS-style focus measured from the top has to be turned over.
@@ -667,6 +722,49 @@ export function CrtScreen({
        in common. */
     const offset = Math.random() * 420
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    /* ── The diagnostic layer ──────────────────────────────────────────
+       A 2D canvas of text on texture unit 1, redrawn only when its content
+       changes and uploaded only then. See lib/crt-osd.ts for the sequence. */
+    let osd: Osd | null = null
+    let osdTex: WebGLTexture | null = null
+
+    if (diagnostic) {
+      /* The face has to be resolved to a real family name — canvas takes no
+         var(). Asking a throwaway span for its computed font is the only way
+         to get what --family-ui actually resolves to, including the fallbacks
+         behind it, without duplicating the token here. */
+      const probe = document.createElement('span')
+      probe.style.font = '400 16px var(--family-ui)'
+      probe.style.position = 'absolute'
+      probe.style.visibility = 'hidden'
+      box.appendChild(probe)
+      const font = getComputedStyle(probe).fontFamily || 'monospace'
+      probe.remove()
+
+      osd = makeOsd({ ...diagnostic, font, still: reduce })
+
+      gl.activeTexture(gl.TEXTURE1)
+      osdTex = gl.createTexture()
+      gl.bindTexture(gl.TEXTURE_2D, osdTex)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+      gl.uniform1i(u.osd, 1)
+      gl.uniform1f(u.osdOn, 1)
+
+      /* Metrics are wrong until the face has loaded, and the first draw would
+         be laid out in the fallback and then never redrawn — the layer only
+         redraws when its own content changes, and a font arriving is not
+         content changing. */
+      document.fonts?.ready?.then(() => {
+        if (osd) osd.resize(0, 0)
+      })
+    } else {
+      gl.uniform1f(u.osdOn, 0)
+    }
+    gl.uniform1f(u.scan, -1)
 
     const size = () => {
       // Capped at 2: past that the grille is finer than anyone can see and it
@@ -717,6 +815,7 @@ export function CrtScreen({
       const next = pick(now)
       if (next !== shown) {
         shown = next
+        gl.activeTexture(gl.TEXTURE0)
         gl.bindTexture(gl.TEXTURE_2D, texes[next])
         const d = dims[next]
         if (d) gl.uniform2f(u.texSize, d[0], d[1])
@@ -727,7 +826,22 @@ export function CrtScreen({
       }
 
       // Offset per instance, so no two tubes are ever on the same beat.
-      gl.uniform1f(u.time, (now - t0) / 1000 + offset)
+      const t = (now - t0) / 1000 + offset
+      gl.uniform1f(u.time, t)
+
+      if (osd) {
+        /* Half resolution. This is small text on a dark picture, seen through
+           a raster and a grille — full device resolution would double the
+           upload for detail the beam immediately eats. */
+        osd.resize(Math.round(cv.width * 0.5), Math.round(cv.height * 0.5))
+        const { scan, changed } = osd.tick(t)
+        if (changed) {
+          gl.activeTexture(gl.TEXTURE1)
+          gl.bindTexture(gl.TEXTURE_2D, osdTex)
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, osd.canvas)
+        }
+        gl.uniform1f(u.scan, scan)
+      }
       gl.clearColor(0, 0, 0, 0)
       gl.clear(gl.COLOR_BUFFER_BIT)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
@@ -751,6 +865,7 @@ export function CrtScreen({
     }
 
     const upload = (i: number, el: HTMLImageElement) => {
+      gl.activeTexture(gl.TEXTURE0)
       gl.bindTexture(gl.TEXTURE_2D, texes[i])
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, el)
       // Cover needs the picture's own proportion, which only exists once it
@@ -792,6 +907,9 @@ export function CrtScreen({
     return () => {
       stop()
       texes.forEach((t) => gl.deleteTexture(t))
+      if (osdTex) gl.deleteTexture(osdTex)
+      osd?.dispose()
+      osd = null
       gl.deleteBuffer(buf)
       gl.deleteProgram(prog)
       gl.deleteShader(vs)
@@ -846,6 +964,7 @@ export function CrtScreen({
     focusX,
     focusY,
     pixelated,
+    diagKey,
   ])
 
   return (

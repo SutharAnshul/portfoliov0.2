@@ -61,6 +61,22 @@ const RECORD = [
   { span: '2021 – 2025', org: 'IIT Guwahati', role: 'B.Des.' },
 ]
 
+/**
+ * What the set reports while it is looking at him.
+ *
+ * Four characteristics and no numbers against them. A score would be the
+ * machine claiming a precision it has no way to have, and a bar next to a word
+ * is the single thing that turns this from a piece of equipment into a game
+ * character sheet.
+ *
+ * Module scope so the reference is stable — see the note on diagKey in
+ * CrtScreen.
+ */
+const DIAGNOSTIC = {
+  subject: '001',
+  traits: ['PATTERN RECOGNITION', 'SYSTEMS THINKING', 'VISUAL CRAFT', 'CURIOSITY'],
+}
+
 function Piece({
   id,
   state,
@@ -146,6 +162,7 @@ export function AboutStage() {
             sag={0.45}
             snow={0.95}
             keyStrength={1}
+            diagnostic={DIAGNOSTIC}
           />
         </div>
       </Piece>
