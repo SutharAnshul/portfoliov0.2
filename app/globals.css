@@ -2,21 +2,6 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
-/* Registered so the two closing axes can be transitioned. An unregistered
-   custom property is a string as far as the engine is concerned, and the
-   marks would snap back to the corners rather than travelling. */
-@property --kx {
-  syntax: '<number>';
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --ky {
-  syntax: '<number>';
-  inherits: true;
-  initial-value: 0;
-}
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -732,155 +717,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   .portrait-stack[data-splash='true'] .portrait-splash {
     animation: none;
   }
-}
-
-/* ─── Overscroll to turn the page ─────────────────────────────────────────
-   Four corner marks around the content column: vertex on the corner, arms
-   running along the inside edges, so at rest they read as a viewfinder on the
-   page rather than as chrome added to it.
-
-   --ky closes the vertical, leaving a ⊢ and a ⊣ facing each other across the
-   middle. --kx closes the horizontal and brings those two together, at which
-   point all four right angles lie on one another as the plus they were cut
-   from — every arm accounted for exactly once. Both are published from
-   ScrollAdvance, eased, with a band of dead travel between them.
-
-   Positioned in percentages of this element rather than of themselves: that is
-   what lets all four vertices land exactly on 50% / 50%. */
-.turn {
-  --kx: 0;
-  --ky: 0;
-  --arm: 14px;
-
-  /* top and height are measured in ScrollAdvance: the frame starts below the
-     breadcrumb, which stays put through a turn. */
-  position: fixed;
-  top: 0;
-  height: 100svh;
-  z-index: 60;
-  pointer-events: none;
-  padding: 12px;
-  opacity: 0;
-  transition: opacity 260ms ease;
-}
-
-/* Three weights, not two. Reaching an edge that leads somewhere shows the
-   frame quietly, so the gesture is offered rather than having to be guessed;
-   pushing brings it up; the turn itself is at full strength. */
-.turn[data-state='resting'] { opacity: 0.3; }
-.turn[data-state='charging'],
-.turn[data-state='out'],
-.turn[data-state='hold'],
-.turn[data-state='in'] { opacity: 1; }
-
-.turn-cnr {
-  position: absolute;
-  width: var(--arm);
-  height: var(--arm);
-}
-
-.turn-cnr::before,
-.turn-cnr::after {
-  content: '';
-  position: absolute;
-  background: var(--foreground);
-}
-
-.turn-cnr::before { width: var(--arm); height: 1px; }
-.turn-cnr::after { width: 1px; height: var(--arm); }
-
-.turn-tl { left: calc(var(--kx) * 50%); top: calc(var(--ky) * 50%); }
-.turn-tl::before, .turn-tl::after { left: 0; top: 0; }
-.turn-tr { right: calc(var(--kx) * 50%); top: calc(var(--ky) * 50%); }
-.turn-tr::before, .turn-tr::after { right: 0; top: 0; }
-.turn-bl { left: calc(var(--kx) * 50%); bottom: calc(var(--ky) * 50%); }
-.turn-bl::before, .turn-bl::after { left: 0; bottom: 0; }
-.turn-br { right: calc(var(--kx) * 50%); bottom: calc(var(--ky) * 50%); }
-.turn-br::before, .turn-br::after { right: 0; bottom: 0; }
-
-/* Coming apart is the same two stages in reverse, so the sequence reads the
-   same forwards and backwards. The transition is only attached during the
-   retraction — while you are pushing, the marks must track the scroll exactly
-   rather than chase it. */
-.turn[data-back='x'] .turn-cnr {
-  transition: --kx 260ms cubic-bezier(0.25, 0.9, 0.3, 1);
-}
-
-.turn[data-back='y'] .turn-cnr {
-  transition: --ky 240ms cubic-bezier(0.25, 0.9, 0.3, 1);
-}
-
-/* Exists only between the two stages: once the halves have formed and before
-   they meet. Without it they are two marks on a line; with it they are two
-   marks aimed at each other. */
-.turn-rail {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  top: 50%;
-  height: 1px;
-  translate: 0 -50%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in srgb, var(--foreground) 20%, transparent),
-    transparent
-  );
-  opacity: calc(min(var(--ky), 1) * (1 - var(--kx)));
-}
-
-/* The destination, named before you commit to it. Sits against the edge you
-   are pushing toward. */
-.turn-label {
-  position: absolute;
-  left: 50%;
-  translate: -50% 0;
-  padding: 4px 10px;
-  pointer-events: auto;
-  font-family: var(--family-ui);
-  font-size: var(--fs-label);
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--foreground) 62%, transparent);
-  transition: color 160ms ease;
-}
-
-.turn[data-dir='down'] .turn-label { bottom: 14px; }
-.turn[data-dir='up'] .turn-label { top: 14px; }
-.turn-label:hover { color: var(--foreground); }
-
-.turn[data-state='out'] .turn-label,
-.turn[data-state='hold'] .turn-label,
-.turn[data-state='in'] .turn-label { opacity: 0; }
-
-/* ── The page shutting ─────────────────────────────────────────────
-   Untouched while you push — no dimming, no scaling, no cropping. It only
-   moves once the turn has been committed, and then it shuts onto the line the
-   plus has made and the next page opens back out of it. */
-[data-turn] [data-page-content] {
-  transform: scaleY(calc(1 - var(--page-shut, 0)));
-  transform-origin: 50% 50%;
-  opacity: calc(1 - var(--page-shut, 0));
-}
-
-/* Scoped to [data-turn] on purpose: a transform left on permanently, even an
-   identity one, makes this element the containing block for every fixed
-   descendant inside it. */
-
-[data-turn='out'] [data-page-content] {
-  transition: transform 130ms cubic-bezier(0.45, 0, 0.9, 0.35), opacity 80ms ease;
-}
-
-[data-turn='shut'] [data-page-content] { transition: none; }
-
-[data-turn='in'] [data-page-content] {
-  transition: transform 300ms cubic-bezier(0.25, 0.9, 0.3, 1), opacity 70ms ease;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .turn { display: none; }
-  [data-page-content] { transform: none; opacity: 1; transition: none; }
 }
 
 /* ─── The transport ───────────────────────────────────────────────────── */
@@ -3047,16 +2883,9 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   transform: translateY(-1px);
 }
 
-/* The advance strip is fixed to the foot of the content column and visible at
-   all times now, so every page has to stand clear of it or its last line sits
-   behind it. Reserved once here rather than page by page. */
-[data-page-content] {
-}
-
 .about-page {
   container: about / inline-size;
-  /* Even on all four sides — the row stands off the strip below it by exactly
-     what it stands off the left edge. */
+  /* Even on all four sides. */
   padding: var(--s6);
 }
 
@@ -3305,10 +3134,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 [data-breadcrumb],
 [data-breadcrumb] * {
   font-size: var(--fs-meta-content);
-}
-
-.turn-label {
-  font-size: var(--fs-label-content);
 }
 
 /* The two content sizes that were literals rather than tokens. */
@@ -4122,4 +3947,33 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    desktop window too, where the page really does end at that line. */
 [data-scroll-root] .stage-end {
   display: none;
+}
+
+/* The foot of the phone's scroll.
+   ──────────────────────────────────────────────────────────────────────
+   Contacts, then the rule, then the sign-off — in that order because the
+   contacts are the last useful thing on the page and the sign-off is the
+   thing that says there is nothing after them. Putting the rule above the
+   icons instead would close the document before offering the one action
+   anybody has left to take.
+
+   The gap above is a full step larger than the one between the work tiles.
+   Below four pictures, anything less reads as a fifth item in the list. */
+/* A clear step further off the tiles than the tiles are off each other.
+   At one step the icons read as a fifth item in the list rather than as the
+   foot of the page — the gap that separates a section from the next thing has
+   to be bigger than the one separating items inside it, or it is not saying
+   anything the row gap is not already saying. */
+.about-foot {
+  margin-top: calc(var(--s8) * 1.8);
+}
+
+.about-foot .contact-row {
+  margin-bottom: var(--s6);
+}
+
+/* Set off the rule the same distance the work index sets off its own, so the
+   two labels that bracket the list sit the same way against it. */
+.about-foot-end {
+  margin: var(--s3) 0 0;
 }

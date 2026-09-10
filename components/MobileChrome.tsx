@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { SoundControl } from '@/components/SoundControl'
-import { PixelIcon } from '@/components/PixelIcon'
 import { NameMark } from '@/components/NameMark'
+import { ContactRow } from '@/components/ContactRow'
 
 /**
  * The site's chrome on a phone.
@@ -33,12 +33,15 @@ import { NameMark } from '@/components/NameMark'
  * whole lower half of the screen given back to the page.
  */
 
-const CONTACT = [
-  { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', icon: 'mail' },
-  { href: 'tel:+916376542708', label: 'Phone', icon: 'phone' },
-  { href: 'https://linkedin.com/in/sutharanshul', label: 'LinkedIn', icon: 'linkedin' },
-  { href: 'https://behance.net/anshulsuthar', label: 'Behance', icon: 'behance' },
-] as const
+/**
+ * Whether the opening has already played in this page load.
+ *
+ * Module scope on purpose — see the note on the latch below. It resets when
+ * the script is evaluated again, which is exactly on a reload and at no other
+ * time, and that is the rule: the mark comes back to the centre of the screen
+ * for someone arriving at the site, and for nobody else.
+ */
+let introDone = false
 
 export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
   const pathname = usePathname()
@@ -98,17 +101,50 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
    * On [data-scroll-root] and not the window: on a phone this layout scrolls
    * inside its own element, so window scroll never fires at all.
    */
-  const [settled, setSettled] = useState(false)
+  const [settled, setSettled] = useState(introDone)
 
   useEffect(() => {
     const root = document.querySelector<HTMLElement>('[data-scroll-root]')
     if (!root) return
 
     let frame = 0
+
+    /**
+     * Pin the opening open, for good.
+     *
+     * The run-up goes to zero and the scroller comes down by the same amount,
+     * in that order and in one go: the spacer is above the page, so taking it
+     * away without moving the scroller would slide everything the reader is
+     * looking at up by half a screen. Setting scrollTop forces the layout the
+     * height change needs, so the two land in the same frame.
+     */
+    const latch = (range: number) => {
+      introDone = true
+      const css = document.documentElement.style
+      css.setProperty('--reveal', '1')
+      css.setProperty('--follow', '1')
+      css.setProperty('--reveal-range', '0px')
+      document.documentElement.dataset.reveal = 'done'
+      root.scrollTop = Math.max(0, root.scrollTop - range)
+      setSettled(true)
+    }
+
     const write = () => {
       frame = 0
+      /* Nothing left to compute once it is over — and nothing that should be,
+         since every value here is a function of a scroll position that no
+         longer means anything. */
+      if (introDone) return
       const range = Math.max(1, root.clientHeight * 0.45)
-      const p = Math.min(1, Math.max(0, root.scrollTop / range))
+      /* A pixel of tolerance, and it is load bearing. scrollTop is an integer
+         in every engine that matters while the range is a fraction of a
+         height — scrolling exactly to the end of the run-up lands on 365
+         against a range of 365.4, so a strict p >= 1 never became true and the
+         opening never formally finished. That left the lifting transform on
+         permanently, and a transformed ancestor is a containing block for
+         everything fixed inside it. */
+      const done = root.scrollTop >= range - 1
+      const p = done ? 1 : Math.min(1, Math.max(0, root.scrollTop / range))
       const css = document.documentElement.style
       css.setProperty('--reveal', String(p))
       /**
@@ -126,11 +162,12 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
          opening is over: a transformed ancestor is a containing block for
          anything fixed inside it, and translateY(0) is still a transform.
          Leaving it on would quietly break position: fixed for every page. */
-      document.documentElement.dataset.reveal = p >= 1 ? 'done' : 'live'
+      document.documentElement.dataset.reveal = done ? 'done' : 'live'
       // Only the things that cannot be a fraction — what is pressable, and
       // what is still in the layer tree. React drops the identical boolean, so
       // this is not a render on every frame.
-      setSettled(p >= 1)
+      setSettled(done)
+      if (done) latch(range)
     }
 
     /**
@@ -159,6 +196,7 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
     let snapping = false
 
     const settle = () => {
+      if (introDone) return
       const range = Math.max(1, root.clientHeight * 0.45)
       const y = root.scrollTop
       // Only inside the opening. Past the range the reveal is over and this has
@@ -188,25 +226,96 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
     }
 
     /** A hand on the screen outranks a snap in flight. */
-    const onGrab = () => {
+    const onGrab = (e: Event) => {
       clearTimeout(idle)
       snapping = false
+      mark(e as PointerEvent)
     }
 
-    write()
+    /* Where and when the finger went down, so a tap can be told from a drag
+       that happened to end where it started. */
+    let from: { x: number; y: number; t: number } | null = null
+    let nudging = false
+
+    const mark = (e: PointerEvent) => {
+      from =
+        typeof e.clientX === 'number' ? { x: e.clientX, y: e.clientY, t: performance.now() } : null
+    }
+
+    const nudge = (e: PointerEvent) => {
+      const start = from
+      from = null
+
+      /* Only while the opening is still shut. Past the top of the range the
+         reader is reading, and a tap there is a tap on the page — and once it
+         has latched there is no opening left to demonstrate. */
+      if (introDone || root.scrollTop > 0.5 || nudging || !start) return
+
+      /* A tap, not the end of a drag. Ten pixels and half a second is the
+         usual line, and it matters here because letting go of a short drag
+         lands at scrollTop 0 as often as not. */
+      if (Math.hypot(e.clientX - start.x, e.clientY - start.y) > 10) return
+      if (performance.now() - start.t > 500) return
+
+      /* Nothing that was pressed on purpose. The menu button lives on this
+         screen, and its answer is the menu, not a demonstration of scrolling. */
+      if ((e.target as Element | null)?.closest('a, button, input, select, textarea, [role="button"]'))
+        return
+
+      /* Someone who has asked for less motion has asked not to be shown this. */
+      if (reduce) return
+
+      nudging = true
+      snapping = true
+      const range = Math.max(1, root.clientHeight * 0.45)
+      const lift = Math.min(48, range * 0.14)
+
+      root.scrollTo({ top: lift, behavior: 'smooth' })
+      /* Long enough for the lift to be seen as a movement and not a flicker,
+         short enough that it is plainly a bounce and not the page opening. */
+      window.setTimeout(() => {
+        root.scrollTo({ top: 0, behavior: 'smooth' })
+        window.setTimeout(() => {
+          nudging = false
+          snapping = false
+        }, 460)
+      }, 240)
+    }
+
+    /* Arriving on a new route with the opening already over: pin it before
+       the first paint rather than waiting for a scroll that may never come.
+       The properties survived the last route's cleanup for the same reason. */
+    if (introDone) {
+      const css = document.documentElement.style
+      css.setProperty('--reveal', '1')
+      css.setProperty('--follow', '1')
+      css.setProperty('--reveal-range', '0px')
+      document.documentElement.dataset.reveal = 'done'
+    } else {
+      write()
+    }
+
     root.addEventListener('scroll', onScroll, { passive: true })
     root.addEventListener('pointerdown', onGrab, { passive: true })
     root.addEventListener('touchstart', onGrab, { passive: true })
+    root.addEventListener('pointerup', nudge as EventListener, { passive: true })
     return () => {
       root.removeEventListener('scroll', onScroll)
       root.removeEventListener('pointerdown', onGrab)
       root.removeEventListener('touchstart', onGrab)
+      root.removeEventListener('pointerup', nudge as EventListener)
       clearTimeout(idle)
       if (frame) cancelAnimationFrame(frame)
-      for (const p of ['--reveal', '--follow', '--reveal-range']) {
-        document.documentElement.style.removeProperty(p)
+      /* Left in place once the opening is over. Clearing them would let the
+         run-up back for the frame between this route unmounting and the next
+         one's effect running, which is a flash of the splash on every
+         navigation. */
+      if (!introDone) {
+        for (const p of ['--reveal', '--follow', '--reveal-range']) {
+          document.documentElement.style.removeProperty(p)
+        }
+        delete document.documentElement.dataset.reveal
       }
-      delete document.documentElement.dataset.reveal
     }
   }, [pathname])
 
@@ -277,21 +386,7 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
             Curriculum vitae →
           </a>
 
-          <div className="contact-row">
-            {CONTACT.map(({ href, label, icon }) => (
-              <a
-                key={label}
-                href={href}
-                target={href.startsWith('http') ? '_blank' : undefined}
-                rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                data-sfx="tick"
-                className="contact-chip"
-                aria-label={label}
-              >
-                <PixelIcon name={icon} size={26} />
-              </a>
-            ))}
-          </div>
+          <ContactRow />
 
           <div style={{ marginTop: 'var(--s5)' }}>
             <SoundControl />

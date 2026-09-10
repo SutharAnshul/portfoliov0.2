@@ -7,7 +7,6 @@ import { SideNav } from '@/components/SideNav'
 import { ChatDrawer } from '@/components/ChatDrawer'
 import { MobileChrome } from '@/components/MobileChrome'
 import { BreadcrumbNav } from '@/components/BreadcrumbNav'
-import { ScrollAdvance } from '@/components/ScrollAdvance'
 
 const NAV_MIN = 300
 const NAV_MAX = 480
@@ -123,8 +122,6 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
 
   return (
     <>
-      <ScrollAdvance />
-      
       {/* Desktop Layout */}
       <div className="hidden md:block">
         <SideNav width={navWidth} />

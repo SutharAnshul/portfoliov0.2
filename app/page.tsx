@@ -2,6 +2,7 @@ import { Settle } from '@/components/Settle'
 import { AboutStage } from '@/components/AboutStage'
 import { PhoneOnly } from '@/components/PhoneOnly'
 import { WorkIndex } from '@/components/WorkIndex'
+import { ContactRow } from '@/components/ContactRow'
 
 /**
  * About.
@@ -39,6 +40,18 @@ export default function Page() {
       <PhoneOnly>
         <section className="about-continues" aria-label="Selected work">
           <WorkIndex />
+
+          {/* The foot of the whole scroll, and the only place on a phone where
+              the contacts sit in the page rather than behind the menu button.
+              By here someone has read the about page and looked at four pieces
+              of work — which is the one moment on the site where getting in
+              touch is the obvious next thing, and the worst possible moment to
+              ask them to go back up and open a menu to do it. */}
+          <footer className="about-foot">
+            <ContactRow />
+            <hr className="rule" />
+            <p className="t-label about-foot-end">End of selected work</p>
+          </footer>
         </section>
       </PhoneOnly>
     </div>

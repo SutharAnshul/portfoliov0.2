@@ -66,10 +66,14 @@ export function Settle({
   const ref = useRef<HTMLElement | null>(null)
   const [state, setState] = useState<'idle' | 'held' | 'settled'>('idle')
   /**
-   * +1 arrives from below, -1 from above. ScrollAdvance stamps data-nav-dir on
-   * the root before navigating, so a page reached by scrolling *up* enters
-   * from the top — the content keeps travelling the way the scroll was going
-   * instead of reversing direction mid-transition.
+   * +1 arrives from below, -1 from above.
+   *
+   * Nothing stamps data-nav-dir any more — it was set by the overscroll
+   * gauge, so that a page reached by scrolling up entered from the top. With
+   * the gauge gone every arrival is +1, which is the right default for one
+   * reached by pressing a link: it has no direction of its own to keep. The
+   * read stays because it costs nothing and is the hook if a directional
+   * transition is ever wanted again.
    */
   const [sign, setSign] = useState(1)
   /** True when this mount is the result of a page transition, not a cold load. */

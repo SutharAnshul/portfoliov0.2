@@ -10,6 +10,7 @@ import { PixelIcon } from '@/components/PixelIcon'
 import { studyIcon } from '@/lib/pixel-icons'
 import { SoundControl } from '@/components/SoundControl'
 import { CornerMarks } from '@/components/CornerMarks'
+import { ContactRow } from '@/components/ContactRow'
 
 /**
  * Selection is marked by four corner crosses, not by border weight — against a
@@ -37,13 +38,8 @@ const NAV = [
   { href: '/garage', title: 'My Garage', note: 'Things I tinker with', icon: 'garage', hidden: true },
 ] as const
 
-/** Contact lives with the CV: both are ways to reach him, not page content. */
-const CONTACT = [
-  { href: 'mailto:s.anshul@iitg.ac.in', label: 'Email', icon: 'mail' },
-  { href: 'tel:+916376542708', label: 'Phone', icon: 'phone' },
-  { href: 'https://linkedin.com/in/sutharanshul', label: 'LinkedIn', icon: 'linkedin' },
-  { href: 'https://behance.net/anshulsuthar', label: 'Behance', icon: 'behance' },
-] as const
+/* Contact lives with the CV: both are ways to reach him, not page content.
+   The list itself is in ContactRow, shared with the phone. */
 
 export function SideNav({ width }: SideNavProps) {
   const pathname = usePathname()
@@ -131,22 +127,7 @@ export function SideNav({ width }: SideNavProps) {
           Curriculum vitae →
         </a>
 
-        <div className="contact-row">
-          {CONTACT.map(({ href, label, icon }) => (
-            <a
-              key={label}
-              href={href}
-              target={href.startsWith('http') ? '_blank' : undefined}
-              rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-              data-sfx="tick"
-              className="contact-chip"
-              aria-label={label}
-              title={label}
-            >
-              <PixelIcon name={icon} size={26} />
-            </a>
-          ))}
-        </div>
+        <ContactRow />
 
         {/* Sections */}
         <nav className="stack" style={{ marginTop: 'var(--s6)' }} aria-label="Sections">

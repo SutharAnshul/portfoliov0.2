@@ -150,8 +150,10 @@ export function Presenter({
     if (!open) return
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    // Read by ScrollAdvance, which otherwise turns a wheel inside the deck
-    // into a navigation away from the record.
+    /* Was read by the overscroll gauge, which would otherwise have turned a
+       wheel inside the deck into a navigation away from the record. The gauge
+       is gone; the flag stays as the general "something modal is open" signal
+       it always described itself as. */
     document.documentElement.dataset.modal = 'deck'
     overlay.current?.focus()
     return () => {
