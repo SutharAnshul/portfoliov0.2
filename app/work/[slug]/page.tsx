@@ -120,7 +120,7 @@ export default async function CaseStudyPage({ params }: Props) {
         </Link>
 
         <span className="record-no">
-          # {pad(index + 1)} / {pad(caseStudies.length)}
+          {pad(index + 1)} / {pad(caseStudies.length)}
         </span>
 
         <div className="record-nav">

@@ -1835,16 +1835,21 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    halfway between its neighbours, not halfway across the bar, and it moves
    every time "Prev" is disabled or a number gains a digit. Two 1fr tracks put
    the counter on the bar's own centre line and hold it there. */
+/* Part of the record, not chrome bolted above it.
+
+   It used to stick, which meant it needed a z-index, an opaque background to
+   hide what passed beneath, and — on a phone, under a fixed masthead — an
+   offset worked out against the scroller's own padding. All of that existed
+   to hold a bar over content that was sliding under it. In the flow it is
+   simply the first thing on the page: it scrolls away like everything else,
+   and the rule under it is the only thing it needs to separate itself from
+   the name below. */
 .record-bar {
-  position: sticky;
-  top: 0;
-  z-index: 30;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--s4);
   padding: var(--s4) var(--s6);
-  background: var(--background);
   border-bottom: 1px solid var(--card-line);
 }
 
@@ -4064,19 +4069,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    The measurement is published by MobileChrome; the fallback is only for the
    first paint before that effect runs. */
 @media (max-width: 767px) {
-  /* Negative, and that is not a hack — it is the arithmetic.
-
-     Sticky offsets are measured from the scrollport's padding edge, and this
-     scroller already carries padding-top: masthead + --s4 so its content
-     clears the fixed header. That padding is therefore *already* the header's
-     height; adding the header's height again on top of it parked the bar a
-     full masthead plus a step down the screen. Backing off the --s4 is what is
-     left to remove, and it lands the bar's top edge exactly on the header's
-     bottom edge. */
-  .record-bar {
-    top: calc(var(--s4) * -1);
-  }
-
   /* Room for three groups on a narrow bar: the labels lose their padding
      before the counter loses its place. */
   .record-bar {
