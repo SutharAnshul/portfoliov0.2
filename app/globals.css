@@ -4257,3 +4257,57 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     transition: none;
   }
 }
+
+/* ── The resolve reveal ────────────────────────────────────────────────
+   A canvas laid over the picture for a little over a second, then thrown
+   away. See components/Resolve.tsx for why it is an overlay that destroys
+   itself rather than a permanent canvas.
+
+   The wrapper takes its size from the <img>, and .plate img is width:100% /
+   height:auto — so the box already has the picture's proportion and the canvas
+   can be pinned to it with no letterboxing arithmetic anywhere. */
+.resolve {
+  position: relative;
+  display: block;
+}
+
+.resolve-gl {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* The picture underneath is the real content and stays in the accessibility
+     tree and in the selection; this is paint. */
+  pointer-events: none;
+}
+
+/* The line the observer watches, halfway down the picture. */
+.resolve-half {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+  pointer-events: none;
+}
+
+/* ── One reveal per frame ──────────────────────────────────────────────
+   A still now reveals itself, so the plate around it stops doing so. Running
+   both put the plate blooming open from a hairline and the picture resolving
+   inside it on the same beat, each unaware of the other — which read as an
+   effect stack rather than as one event.
+
+   The corner marks are untouched: they say "this frame is on screen now",
+   which is the frame's own business and not something the picture reports.
+   Embeds keep the bloom, having no picture to resolve. */
+[data-tube] .shot[data-reveal='resolve'] .plate {
+  transform: none;
+  opacity: 1;
+  transition: border-color 160ms ease;
+}
+
+[data-tube] .shot[data-reveal='resolve'] .plate img {
+  filter: none;
+  transition: none;
+}
