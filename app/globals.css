@@ -3796,23 +3796,22 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 /* ── The record ───────────────────────────────────────────────────────── */
-/* Capped, and that cap is what lets the roles range right.
+/* Full width of the panel, deliberately.
    ──────────────────────────────────────────────────────────────────────
-   A right-aligned role sits at the end of the list, so how far it lands from
-   its own organisation is decided by how wide the list is and by nothing else.
-   Across the full panel that came to 273 pixels on the shortest name, at which
-   point the two halves of an entry stop reading as one thing.
-
-   In ch so it tracks the face rather than a pixel guess, and wide enough that
-   the longest entry — the longest date, the longest name, the longest role —
-   still clears its neighbour comfortably. */
+   There was a cap here for a while, to stop a right-aligned role drifting
+   away from a short name — across the whole panel that gap reaches about 270
+   pixels on "IIT Guwahati". It was removed on the judgement that the straight
+   right edge is worth more than the proximity: the dates make a column down
+   the left, the roles make one down the right, and the entry is read as a
+   line spanning between them rather than as two words that need to be near
+   each other. Capping it left a ragged margin of dead panel to the right of
+   the roles, which is the thing the alignment exists to avoid. */
 .record {
   margin: 0;
   padding: 0;
   list-style: none;
   display: grid;
   gap: var(--s3);
-  max-width: 38ch;
 }
 
 /* Date, name, role. The middle column takes the slack so the role is pushed
@@ -3931,12 +3930,8 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      So the pair closes up and the entries stand apart. Proximity is doing
      the grouping here because nothing else is: no rules, no indents, no
      alternating ground. */
-  /* Uncapped once the date is out of the line: the cap exists to stop a
-     right-aligned role drifting away from its name across a wide panel, and
-     down here the panel is not wide. */
   .record {
     gap: var(--s5);
-    max-width: none;
   }
 
   .record-row {
