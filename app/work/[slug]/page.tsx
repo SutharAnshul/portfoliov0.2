@@ -5,6 +5,7 @@ import { Settle } from '@/components/Settle'
 import { CornerMarks } from '@/components/CornerMarks'
 import { Presenter } from '@/components/Presenter'
 import { Tube } from '@/components/Tube'
+import { LivePrototype } from '@/components/LivePrototype'
 
 /**
  * A case study as a catalogue record.
@@ -212,20 +213,12 @@ export default async function CaseStudyPage({ params }: Props) {
                   <CornerMarks />
                   <div className="plate">
                     {'embed' in shot ? (
-                      <div className="live" style={{ ['--live-h' as string]: `${shot.h}px` }}>
-                        <div className="live-bar t-meta">
-                          <span className="live-dot" aria-hidden="true" />
-                          Live prototype — it works, go on
-                        </div>
-                        <iframe
-                          src={shot.embed}
-                          title={shot.alt}
-                          loading="lazy"
-                          className="live-frame cursor-native"
-                          style={{ width: shot.w, height: shot.h }}
-                          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                        />
-                      </div>
+                      <LivePrototype
+                        src={shot.embed}
+                        title={shot.alt}
+                        w={shot.w}
+                        h={shot.h}
+                      />
                     ) : (
                       <img src={shot.src} alt={shot.alt} loading="lazy" />
                     )}

@@ -4073,3 +4073,187 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     display: none;
   }
 }
+
+/* ── The live prototype ────────────────────────────────────────────────
+   Inert until it is asked for, and never able to keep the page. See
+   components/LivePrototype.tsx for why arming is the only option available:
+   the prototype is cross-origin, so this page cannot observe its scrolling or
+   chain out of it, and the gesture's meaning has to be made explicit instead
+   of inferred. */
+
+.live-stage {
+  position: relative;
+  /* The lid is pinned to this box, so it has to be the frame's box exactly. */
+  display: block;
+  margin: 0 auto;
+}
+
+/* The lid. Transparent, because the prototype underneath is running and is a
+   better advertisement for itself than any label — the only drawn thing is the
+   invitation, and that sits at the foot where it covers nothing. */
+.live-arm {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: var(--s5);
+  background: linear-gradient(to top, color-mix(in srgb, #000 55%, transparent), transparent 38%);
+  border: 0;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: background 200ms ease;
+}
+
+.live-arm:hover {
+  background: linear-gradient(to top, color-mix(in srgb, #000 62%, transparent), transparent 46%);
+}
+
+.live-arm-label {
+  font-family: var(--family-ui);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, #fff 45%, transparent);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, #000 45%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+/* Armed, the frame says so with the site's own "this one" colour rather than
+   with a badge — the reader needs to know which of the two surfaces their
+   finger belongs to, and nothing else on the page is pink. */
+.live[data-armed='true'] .live-frame {
+  border-color: color-mix(in srgb, var(--brand) 70%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 30%, transparent);
+}
+
+.live-actions {
+  display: flex;
+  gap: var(--s3);
+  align-items: center;
+}
+
+.live-btn {
+  font-family: var(--family-ui);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 8px 13px;
+  background: var(--card-fill);
+  color: var(--foreground);
+  border: 1px solid var(--card-line);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.live-btn:hover {
+  background: var(--card-fill-hover);
+  border-color: var(--card-line-strong);
+}
+
+.live-btn-strong {
+  border-color: color-mix(in srgb, var(--brand) 65%, transparent);
+  color: var(--brand);
+}
+
+/* ── The way out ───────────────────────────────────────────────────────
+   Fixed to the viewport, not to the page, and that is the whole point: while
+   the prototype is armed the page cannot be scrolled, so anything sitting in
+   the flow below the frame cannot be reached. This is on screen wherever the
+   reader happens to be. */
+.live-escape {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s5));
+  transform: translateX(-50%);
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding: 10px 12px 10px var(--s5);
+  background: color-mix(in srgb, var(--background) 92%, transparent);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--card-line-strong);
+  border-radius: 999px;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
+
+.live-escape-text {
+  color: color-mix(in srgb, var(--foreground) 62%, transparent);
+}
+
+/* ── Full screen ───────────────────────────────────────────────────────
+   The reason this exists at all: on a phone the prototype finally gets a phone
+   to run on, instead of a 390px build squeezed into a plate inside a column. */
+.live-full {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: color-mix(in srgb, #000 82%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+/* Behind everything, covering everything: a press anywhere that is not the
+   device or the bar closes it. */
+.live-full-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.live-full-bar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding: calc(env(safe-area-inset-top, 0px) + var(--s4)) var(--s5) var(--s4);
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+}
+
+.live-full-frame {
+  position: relative;
+  z-index: 1;
+  justify-self: center;
+  align-self: center;
+  width: min(var(--pw), 100vw);
+  height: min(var(--ph), 100%);
+  border: 1px solid var(--card-line-strong);
+  border-radius: var(--r);
+  background: #000;
+}
+
+/* On a phone it takes the whole thing — no border, no radius, no margin. A
+   rounded rectangle inside a rounded rectangle is a picture of a phone on a
+   phone, which is the one place the device frame stops being useful. */
+@media (max-width: 767px) {
+  .live-full-frame {
+    width: 100vw;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .live-escape {
+    left: var(--s4);
+    right: var(--s4);
+    transform: none;
+    justify-content: space-between;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-arm,
+  .live-btn {
+    transition: none;
+  }
+}
