@@ -50,9 +50,6 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
 
   const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
-  // The direction comparison needs the full viewport and no competing chrome.
-  const bare = pathname.startsWith('/compare') || pathname.startsWith('/type')
-
   const startNavResize = useCallback((e: React.PointerEvent) => {
     e.preventDefault()
     draggingRef.current = 'nav'
@@ -131,8 +128,6 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
     css.setProperty('--nav-w', `${navWidth}px`)
     css.setProperty('--aside-w', `${rightEdge}px`)
   }, [navWidth, rightEdge])
-
-  if (bare) return <>{children}</>
 
   return (
     <>
