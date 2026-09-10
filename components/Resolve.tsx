@@ -5,11 +5,16 @@ import { useEffect, useRef } from 'react'
 /**
  * A picture that arrives coarse and gets denser until it is a photograph.
  *
- * Chosen from four studies under /lab/reveal. It begins as a handful of large
- * cells in two colours and gains resolution in steps — smaller cells, more
- * levels — which is the icons' own language rather than the tubes'. The other
- * three were all about a display doing something; this one is about there
- * being more of the picture than there was a moment ago.
+ * Chosen from four studies under /lab/reveal, and then quietened down from
+ * what the study showed. It begins slightly coarse — cells a few pixels
+ * across, gradients stepped — and gains resolution in a few quick steps, which
+ * is the icons' own language rather than the tubes'. The other three were all
+ * about a display doing something; this one is about there being more of the
+ * picture than there was a moment ago.
+ *
+ * It is meant to be felt and not watched. The lab version is much louder, on
+ * purpose: a study has to overstate the thing it is asking about, and this
+ * happens twenty-four times down a page while somebody is reading.
  *
  * ── The two things that keep it from being a blur ────────────────────────
  *
@@ -45,11 +50,14 @@ import { useEffect, useRef } from 'react'
  *              in which the picture is missing.
  */
 
-/** Long enough to read as stages, short enough to not be waited on. */
-const RUN = 1250
+/**
+ * Short. This is a texture settling, not an event — long enough to be felt on
+ * the way past and over before it can be watched.
+ */
+const RUN = 700
 
-/** Stages, including the final passthrough. Five you see, then the truth. */
-const STAGES = 6
+/** Stages, including the final passthrough. Three you feel, then the truth. */
+const STAGES = 4
 
 /**
  * How many may hold a WebGL context at once, across the page.
@@ -86,8 +94,16 @@ const FRAG = `
       return;
     }
 
-    float cell = pow(2.0, 4.0 - uStage);
-    float levels = pow(2.0, uStage + 1.0);
+    /* 8 device pixels down to 2, and 16 grey levels up to 64.
+
+       Both ranges are deliberately shy of what they could be. Cells of 16 and
+       two levels — where this started — make a mosaic that announces itself,
+       and a reveal that announces itself twenty-four times down one page stops
+       being a reveal and becomes a tic. Starting nearly right and arriving
+       right is the whole intent: you should notice that it settled, not watch
+       it assemble. */
+    float cell = pow(2.0, 3.0 - uStage);
+    float levels = pow(2.0, uStage + 4.0);
 
     /* Snap the sample to the cell so a whole block takes one colour. Sampled
        at the cell's centre and not its corner — a corner sample biases every
@@ -102,13 +118,8 @@ const FRAG = `
     float t = bayer8(px / cell);
     vec3 col = floor(src * levels + t) / levels;
 
-    /* The cell edges are part of the picture while cells are big, and gone
-       once they are pixels — the way a grid is part of an icon at icon size
-       and meaningless at photograph size. */
-    vec2 inCell = fract(px / cell);
-    float grid = min(min(inCell.x, inCell.y), min(1.0 - inCell.x, 1.0 - inCell.y));
-    col *= 1.0 - smoothstep(0.10, 0.0, grid) * 0.3 * smoothstep(1.5, 5.0, cell);
-
+    /* No drawn grid. It was the loudest thing here, and it was saying "this
+       is made of cells" over the top of some cells. */
     gl_FragColor = vec4(col, 1.0);
   }
 `
