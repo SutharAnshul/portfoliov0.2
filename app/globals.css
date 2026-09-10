@@ -1082,11 +1082,19 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .mark-br::before,
 .mark-br::after { left: 0; top: 0; }
 
-/* Hovering shows the line the four make where they meet — a real stage of the
-   figure rather than a dimmer copy of the end of it. */
+/* Hover.
+   ──────────────────────────────────────────────────────────────────────
+   This was 0.34, which worked when hovering *merged* the four marks into one
+   bright bar on the centre line — a shape change carried the signal and the
+   weight only had to hint. Standing them still took that away, so the only
+   thing left to separate hovered from resting is how strongly they are drawn,
+   and a third of an opacity is not enough to notice.
+
+   Still clearly under the 0.9 of the page you are actually on: hover is a
+   preview of selection, not selection. */
 .card-link:hover > .marks,
 .nav-item:hover > .marks {
-  opacity: 0.34;
+  opacity: 0.55;
   --glow: 0 0 2px rgba(250, 250, 250, 0.5);
 }
 
@@ -1119,16 +1127,24 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   position: relative;
 }
 
-/* Standing, not hidden. Every thumbnail keeps its marks met in the middle at
-   a weight you read as furniture rather than as a signal — so the grid always
-   shows where its pictures are, and hovering is the picture opening rather
-   than something appearing out of nothing. */
+/* Hidden at rest, not standing.
+
+   This used to hold every tile's marks met on the centre line at a weight
+   that read as furniture, and hovering opened them to the corners. Once the
+   marks stopped travelling, that same weight became four fully-drawn brackets
+   around every picture in the grid — the page filled with corners, and the
+   difference between a hovered tile and a resting one came down to a step in
+   brightness.
+
+   Presence carries it instead, which is what the nav has always done. The
+   pictures show where the pictures are; a grid of photographs does not need
+   marks to point at itself. */
 .work-shot > .marks {
-  /* 4 + 8 = 12px of reach below the picture. The caption now starts 16px
-     down, so the open marks clear the title rather than sitting on it. */
+  /* 4 + 8 = 12px of reach below the picture. The caption starts 16px down, so
+     the marks clear the title rather than sitting on it. */
   inset: -4px;
   --arm: 8px;
-  opacity: 0.26;
+  opacity: 0;
 }
 
 .work-tile:hover .work-shot > .marks,
