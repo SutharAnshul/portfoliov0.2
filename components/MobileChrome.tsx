@@ -305,6 +305,18 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
       css.setProperty('--follow', '1')
       css.setProperty('--reveal-range', '0px')
       document.documentElement.dataset.reveal = 'done'
+      /* And it is chrome, not merely drawn where chrome goes.
+         ────────────────────────────────────────────────────────────────
+         settled starts from whatever introDone held when this component
+         first rendered — and on a direct load of any page but the front
+         door that was still false, because the line above that sets it is
+         in this effect, which runs after. So the opening got pinned open
+         and the flag was left behind: the mark sat in the bar looking
+         exactly like the way home, with pointer-events switched off by the
+         rule that keeps it from swallowing the splash's tap. Tapping his
+         name did nothing at all, on every page reached by a link, a reload
+         or a share. */
+      setSettled(true)
     } else {
       write()
     }

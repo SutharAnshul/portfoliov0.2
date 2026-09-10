@@ -2107,35 +2107,18 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
 
-/* The prototype is a phone build, so it is drawn at phone size rather than
-   stretched across the plate. It only ever gives width away, never takes it. */
+/* The running build itself, wherever it is drawn: pinned to the corner of a
+   box that has been sized to hold it, and scaled from that corner. White
+   ground and a light colour scheme because the build inside is a light one,
+   and a transparent iframe over a dark plate shows through as grey. */
 .live-frame {
-  display: block;
-  max-width: 100%;
-  border: 1px solid var(--card-line);
-  border-radius: var(--r);
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  border: 0;
   background: #fff;
   color-scheme: light;
-}
-
-/* On a phone the plate has no width to spare, and the thing inside it is a
-   phone build anyway — so it gives up its side padding rather than squeezing
-   the prototype into a column narrower than the device it was drawn for. */
-@media (max-width: 640px) {
-  .live {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .live-bar {
-    padding-left: var(--s4);
-  }
-
-  .live-frame {
-    border-left: 0;
-    border-right: 0;
-    border-radius: 0;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3627,6 +3610,42 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   }
 }
 
+/* The way out, on a screen that has no pointer to reveal it.
+   ──────────────────────────────────────────────────────────────────────
+   Two things were wrong and they compounded.
+
+   The cross was a 30px island held 12px in from two edges, and every pixel
+   around it belongs to the stage — the bar's own padding, the strip out to
+   the corner, the band below it — whose answer to a press is "next slide".
+   So a thumb aimed at the cross and landing a few pixels wide did not miss
+   a control, it hit a different one, and the deck advanced. That is what a
+   dead button looks like from the outside, and it is why it was reported as
+   one.
+
+   And it is drawn at 30% with only :hover to finish it, on the one class of
+   device that has no hover at all. The line on screen says "Tap x to exit"
+   while pointing at something all but invisible.
+
+   So on touch the control takes the corner outright: the bar gives up its
+   padding so there is nothing to fall through, the target goes to 56px, and
+   the safe-area inset is carried as padding — the glyph clears a notch while
+   the box still reaches the physical corner. Half-lit at rest, because
+   faint-until-hovered is a bargain a phone cannot keep its side of. */
+@media (hover: none) and (pointer: coarse) {
+  .deck-bar {
+    padding: 0;
+  }
+
+  .deck-x {
+    box-sizing: border-box;
+    width: 56px;
+    height: 56px;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    opacity: 0.55;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .deck-tick,
   .present-open,
@@ -4111,188 +4130,223 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 
 /* ── The live prototype ────────────────────────────────────────────────
-   Inert until it is asked for, and never able to keep the page. See
-   components/LivePrototype.tsx for why arming is the only option available:
-   the prototype is cross-origin, so this page cannot observe its scrolling or
-   chain out of it, and the gesture's meaning has to be made explicit instead
-   of inferred. */
+   An artifact in the page, and a window over it. See
+   components/LivePrototype.tsx for what was there before and why none of it
+   survived. */
 
-.live-stage {
-  position: relative;
-  /* The lid is pinned to this box, so it has to be the frame's box exactly. */
-  display: block;
-  margin: 0 auto;
+/* The artifact. The whole card is one control, and the thing inside it is the
+   prototype genuinely running — small, holding no gestures, saying nothing
+   about itself.
+
+   It used to be full size and armable: press it and it took every gesture,
+   which is what a 390x844 iframe on a 390pt screen does whether it is asked
+   to or not. Undoing that took a lid to hold the events off, a bar fixed to
+   the viewport to hand them back, and a release button — three pieces of
+   chrome built to reverse one decision. And it was still taller than the
+   screen, so the one control that mattered, the way to open it properly, sat
+   below the fold of a frame you could not scroll past.
+
+   An artifact instead: too small to be mistaken for the real thing, plainly
+   pressable, and always shorter than the viewport it sits in — so the way in
+   is on screen at the same time as the thing it opens. */
+.live-art {
+  display: grid;
+  justify-items: center;
+  /* Definite, and load bearing. The plate is a column flex centring its
+     children, so left to itself this box is sized by its content — and its
+     content is a fit box at width: 100%, measured against this. Each waits for
+     the other and both settle on zero, which is exactly what happened. */
+  width: 100%;
 }
 
-/* The lid. Transparent, because the prototype underneath is running and is a
-   better advertisement for itself than any label — the only drawn thing is the
-   invitation, and that sits at the foot where it covers nothing. */
-.live-arm {
+/* One control, over the device: press the artifact anywhere and it opens.
+   Over the device and not the plate — the artifact is the phone, and a target
+   spanning the empty air either side of it is a press that lands on nothing
+   the reader was aiming at.
+
+   Transparent, because the prototype underneath is running and is a better
+   advertisement for itself than any label could be. So the only drawn thing is
+   the invitation, and it sits at the foot where it covers nothing.
+
+   A lid rather than a <button> wrapped round the card: an iframe is
+   interactive content, and interactive content inside a button is not
+   something any parser is obliged to keep intact. */
+.live-art-hit {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   padding-bottom: var(--s5);
-  background: linear-gradient(to top, color-mix(in srgb, #000 55%, transparent), transparent 38%);
   border: 0;
   border-radius: var(--r);
+  background: linear-gradient(to top, color-mix(in srgb, #000 58%, transparent), transparent 40%);
   cursor: pointer;
   transition: background 200ms ease;
 }
 
-.live-arm:hover {
-  background: linear-gradient(to top, color-mix(in srgb, #000 62%, transparent), transparent 46%);
+.live-art-hit:hover,
+.live-art-hit:focus-visible {
+  background: linear-gradient(to top, color-mix(in srgb, #000 68%, transparent), transparent 50%);
 }
 
-.live-arm-label {
-  font-family: var(--family-ui);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #fff;
+/* The box a device is fitted to. Capped in svh so it is the screen the reader
+   actually has, and in pixels so it does not become a poster on a desktop. */
+.live-fit {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.live-art-fit {
+  height: min(52svh, 440px);
+}
+
+/* Sized in script to exactly the scaled device — see LivePrototype.tsx for
+   why the scale cannot be a calc(). */
+.live-dev {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--card-line);
+  border-radius: var(--r);
+  background: #fff;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+/* The build inside the artifact is a picture of itself. Nothing reaches it. */
+.live-art .live-frame {
+  pointer-events: none;
+}
+
+.live-art:hover .live-dev {
+  border-color: color-mix(in srgb, var(--brand) 70%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
+}
+
+/* The invitation. Present and drawn rather than revealed on hover — half the
+   readers here have no pointer to reveal it with. */
+.live-art-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   padding: 8px 14px;
+  color: #fff;
   border: 1px solid color-mix(in srgb, #fff 45%, transparent);
   border-radius: var(--r-sm);
   background: color-mix(in srgb, #000 45%, transparent);
   backdrop-filter: blur(6px);
 }
 
-/* Armed, the frame says so with the site's own "this one" colour rather than
-   with a badge — the reader needs to know which of the two surfaces their
-   finger belongs to, and nothing else on the page is pink. */
-.live[data-armed='true'] .live-frame {
-  border-color: color-mix(in srgb, var(--brand) 70%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 30%, transparent);
-}
+/* ── Opened ────────────────────────────────────────────────────────────
+   A window floating on the dark, not a second page. The padding is what makes
+   it one: flush to the edges it would read as having replaced the site, and
+   nothing would say the case study is still there underneath, waiting to be
+   come back to.
 
-.live-actions {
-  display: flex;
-  gap: var(--s3);
-  align-items: center;
-}
-
-.live-btn {
-  font-family: var(--family-ui);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  padding: 8px 13px;
-  background: var(--card-fill);
-  color: var(--foreground);
-  border: 1px solid var(--card-line);
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  transition: background 160ms ease, border-color 160ms ease;
-}
-
-.live-btn:hover {
-  background: var(--card-fill-hover);
-  border-color: var(--card-line-strong);
-}
-
-.live-btn-strong {
-  border-color: color-mix(in srgb, var(--brand) 65%, transparent);
-  color: var(--brand);
-}
-
-/* ── The way out ───────────────────────────────────────────────────────
-   Fixed to the viewport, not to the page, and that is the whole point: while
-   the prototype is armed the page cannot be scrolled, so anything sitting in
-   the flow below the frame cannot be reached. This is on screen wherever the
-   reader happens to be. */
-.live-escape {
-  position: fixed;
-  left: 50%;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s5));
-  transform: translateX(-50%);
-  z-index: 80;
-  display: flex;
-  align-items: center;
-  gap: var(--s4);
-  padding: 10px 12px 10px var(--s5);
-  background: color-mix(in srgb, var(--background) 92%, transparent);
-  backdrop-filter: blur(14px);
-  border: 1px solid var(--card-line-strong);
-  border-radius: 999px;
-  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45);
-  white-space: nowrap;
-}
-
-.live-escape-text {
-  color: color-mix(in srgb, var(--foreground) 62%, transparent);
-}
-
-/* ── Full screen ───────────────────────────────────────────────────────
-   The reason this exists at all: on a phone the prototype finally gets a phone
-   to run on, instead of a 390px build squeezed into a plate inside a column. */
+   One way out, and it is drawn: the cross at the top right of the window. The
+   backdrop used to close it too, which on a phone means the thin margin
+   around a full-height frame is a live dismiss target either side of
+   everything you are trying to press. Escape and the back gesture still work.
+   They are the platform's, they cost no pixels, and nobody finds them by
+   looking — which is the difference between a way out and a hazard. */
 .live-full {
   position: fixed;
   inset: 0;
   z-index: 100;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  background: color-mix(in srgb, #000 82%, transparent);
+  padding: clamp(12px, 3.4vw, 44px);
+  padding-top: max(clamp(12px, 3.4vw, 44px), env(safe-area-inset-top, 0px));
+  padding-bottom: max(clamp(12px, 3.4vw, 44px), env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, #000 86%, transparent);
   backdrop-filter: blur(10px);
 }
 
-/* Behind everything, covering everything: a press anywhere that is not the
-   device or the bar closes it. */
-.live-full-scrim {
-  position: absolute;
-  inset: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
+/* Stretched to the padding box, so measuring this measures exactly the room
+   the window has to fit into. */
+.live-area {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
 }
 
-.live-full-bar {
-  position: relative;
-  z-index: 1;
+.live-win {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  max-height: 100%;
+  border: 1px solid var(--card-line-strong);
+  border-radius: var(--r);
+  background: var(--card-fill);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.72);
+  overflow: hidden;
+}
+
+/* A fixed height, because the fit is computed against it. Change it here and
+   change LIVE_BAR in LivePrototype.tsx with it. */
+.live-win-bar {
+  flex: none;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--s4);
-  padding: calc(env(safe-area-inset-top, 0px) + var(--s4)) var(--s5) var(--s4);
-  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+  padding-left: var(--s4);
+  border-bottom: 1px solid var(--card-line);
+  color: color-mix(in srgb, var(--foreground) 66%, transparent);
 }
 
-.live-full-frame {
-  position: relative;
-  z-index: 1;
-  justify-self: center;
-  align-self: center;
-  width: min(var(--pw), 100vw);
-  height: min(var(--ph), 100%);
-  border: 1px solid var(--card-line-strong);
-  border-radius: var(--r);
-  background: #000;
+.live-win-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-/* On a phone it takes the whole thing — no border, no radius, no margin. A
-   rounded rectangle inside a rounded rectangle is a picture of a phone on a
-   phone, which is the one place the device frame stops being useful. */
-@media (max-width: 767px) {
-  .live-full-frame {
-    width: 100vw;
-    height: 100%;
-    border: 0;
-    border-radius: 0;
-  }
+.live-win-stage {
+  flex: 1;
+}
 
-  .live-escape {
-    left: var(--s4);
-    right: var(--s4);
-    transform: none;
-    justify-content: space-between;
-  }
+/* The only control in the window, and so the only one a thumb has to find.
+   44 square, and lit — see the note on the deck's cross for what happens to a
+   small faint mark on a device with no hover. */
+.live-x {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 160ms ease;
+}
+
+.live-x:hover,
+.live-x:focus-visible {
+  opacity: 1;
+}
+
+/* Inside the window the device needs no edge of its own — the window is the
+   edge, and a rounded rectangle inside a rounded rectangle is a picture of a
+   phone on a phone. */
+.live-win .live-dev {
+  border: 0;
+  border-radius: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .live-arm,
-  .live-btn {
+  .live-dev,
+  .live-art-hit,
+  .live-x {
     transition: none;
   }
 }
+
+
 
 /* ── The interlace reveal ──────────────────────────────────────────────
    A canvas laid over the picture for a third of a second, then thrown away.
