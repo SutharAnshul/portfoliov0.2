@@ -3796,26 +3796,33 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 /* ── The record ───────────────────────────────────────────────────────── */
+/* Capped, and that cap is what lets the roles range right.
+   ──────────────────────────────────────────────────────────────────────
+   A right-aligned role sits at the end of the list, so how far it lands from
+   its own organisation is decided by how wide the list is and by nothing else.
+   Across the full panel that came to 273 pixels on the shortest name, at which
+   point the two halves of an entry stop reading as one thing.
+
+   In ch so it tracks the face rather than a pixel guess, and wide enough that
+   the longest entry — the longest date, the longest name, the longest role —
+   still clears its neighbour comfortably. */
 .record {
   margin: 0;
   padding: 0;
   list-style: none;
   display: grid;
   gap: var(--s3);
+  max-width: 38ch;
 }
 
-/* Three columns that shrink to their content, and the slack pushed to the
-   end. The 1fr used to sit under the organisation, which expanded that column
-   to the full width of the panel and left the role stranded at the far side of
-   it — a gap that grew with the window and varied by more than a hundred
-   pixels from the longest name to the shortest.
-
-   Putting the 1fr last instead lines the roles up on their own left edge,
-   immediately after the widest organisation. Three straight columns, and the
-   only whitespace inside a row is what the names themselves require. */
+/* Date, name, role. The middle column takes the slack so the role is pushed
+   to the end of the list and every role starts from the same right edge — a
+   column to run down, which is the point of setting the whole thing in the
+   monospace. What keeps that from stranding the role is the cap above, not the
+   alignment. */
 .record-row {
   display: grid;
-  grid-template-columns: auto auto auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--s3) var(--s4);
   align-items: baseline;
 }
@@ -3831,23 +3838,26 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   color: color-mix(in srgb, var(--foreground) 34%, transparent);
 }
 
+/* The name holds its line. It is a label, not a phrase to be set, and a
+   label broken across two lines with its role stranded beside the first has
+   stopped being one. If it will not fit, the layout below moves the date out
+   of its way rather than letting it break. */
 .record-org {
   font-family: var(--family-ui);
   font-size: 13px;
   letter-spacing: 0.01em;
+  white-space: nowrap;
   color: var(--foreground);
   min-width: 0;
 }
 
 /* The role is the least of the three and set in the reading face, which at
-   this size reads quieter beside the mono than a smaller mono would.
-
-   Ranged left now, not right. Right was aligning it to the panel rather than
-   to the entry it describes, which is what put it a screen's width from its
-   own organisation. */
+   this size reads quieter beside the mono than a smaller mono would. Ranged
+   right, so the five of them make a column. */
 .record-role {
   font-family: var(--family-read);
   font-size: 11.5px;
+  text-align: right;
   white-space: nowrap;
   color: color-mix(in srgb, var(--foreground) 46%, transparent);
 }
@@ -3909,9 +3919,29 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   }
 }
 
-@container about (max-width: 520px) {
+@container about (max-width: 680px) {
+  /* Stacked, the two gaps have to stop being the same number.
+     ────────────────────────────────────────────────────────────────────
+     Wide, a date sits beside its organisation and the row itself is what
+     pairs them. Once the date moves above, the only thing saying which
+     organisation a date belongs to is that it is nearer to it than to the
+     next one — and at 12px both ways it was not nearer to anything. Five
+     rows of that read as ten unrelated lines.
+
+     So the pair closes up and the entries stand apart. Proximity is doing
+     the grouping here because nothing else is: no rules, no indents, no
+     alternating ground. */
+  /* Uncapped once the date is out of the line: the cap exists to stop a
+     right-aligned role drifting away from its name across a wide panel, and
+     down here the panel is not wide. */
+  .record {
+    gap: var(--s5);
+    max-width: none;
+  }
+
   .record-row {
-    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 3px;
   }
 
   /* The date moves above its row rather than being squeezed beside it. */
