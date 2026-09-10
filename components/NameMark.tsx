@@ -301,7 +301,30 @@ export function NameMark({
     as,
     { className: `sig ${className}`.trim() },
     <span className="sr-only">Anshul Suthar</span>,
-    <span className="sig-grid" aria-hidden="true">
+    <span
+      className="sig-grid"
+      aria-hidden={true}
+      /* The unconditional clear.
+
+         Each cell clears itself on leave, but that clear is guarded — it has
+         to be, because moving between two cells fires the old one's leave
+         after the new one's enter, and an unguarded clear would blank the cell
+         the pointer just arrived on. The guard is what made leaving the mark
+         altogether unreliable: flick the pointer off the grid fast enough, or
+         out of the window, and the last cell's leave never arrives, so nothing
+         ever clears it and one box sits resolved for good.
+
+         The grid's own leave fires whenever the pointer exits the whole mark,
+         whichever cell it was over, and it has no neighbour to be confused by
+         — so it needs no guard and cannot be outrun. */
+      onPointerLeave={
+        interactive
+          ? () => {
+              hover.current = null
+            }
+          : undefined
+      }
+    >
       {ROWS.map((word, r) => (
         <span className="sig-row" key={word}>
           {[...word].map((ch, i) => (
