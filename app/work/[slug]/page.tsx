@@ -88,65 +88,6 @@ export default async function CaseStudyPage({ params }: Props) {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      {/* The bar stays with you the whole way down the record. */}
-      <div className="record-bar t-meta">
-        {/* Out, on the left, where getting out of a thing lives. This was a
-            cross on the right, next to Prev and Next — which put "leave" in
-            the same cluster as "keep going", drawn as a glyph that means close
-            a dialog rather than leave a page. */}
-        {/* Two links rather than one, because the destination genuinely
-            differs and CSS cannot rewrite an href.
-
-            On a phone the work index runs on under the About page and /work
-            is a route nobody there has ever been to — landing on it after
-            pressing Back is arriving somewhere new, which is the one thing
-            Back must never do. On a desktop the rail links to /work and that
-            is where Back belongs. */}
-        <Link
-          href="/"
-          data-sfx="tick"
-          data-only="phone"
-          className="record-btn record-back t-meta"
-        >
-          ← Back
-        </Link>
-        <Link
-          href="/work"
-          data-sfx="tick"
-          data-only="desk"
-          className="record-btn record-back t-meta"
-        >
-          ← Back
-        </Link>
-
-        <span className="record-no">
-          {pad(index + 1)} / {pad(caseStudies.length)}
-        </span>
-
-        <div className="record-nav">
-          <Link
-            href={prev ? `/work/${prev.slug}` : '#'}
-            aria-disabled={!prev}
-            tabIndex={prev ? undefined : -1}
-            data-sfx="tick"
-            className="record-btn t-meta"
-            aria-label="Previous case study"
-          >
-            ← <span className="record-btn-word">Prev</span>
-          </Link>
-          <Link
-            href={next ? `/work/${next.slug}` : '#'}
-            aria-disabled={!next}
-            tabIndex={next ? undefined : -1}
-            data-sfx="tick"
-            className="record-btn t-meta"
-            aria-label="Next case study"
-          >
-            <span className="record-btn-word">Next</span> →
-          </Link>
-        </div>
-      </div>
-
       <div style={{ padding: 'var(--s7) var(--s6) var(--s8)' }}>
         {/* ── The record ────────────────────────────────────────────── */}
         <Settle boot mass="medium">

@@ -1835,92 +1835,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    halfway between its neighbours, not halfway across the bar, and it moves
    every time "Prev" is disabled or a number gains a digit. Two 1fr tracks put
    the counter on the bar's own centre line and hold it there. */
-/* Part of the record, not chrome bolted above it.
-
-   It used to stick, which meant it needed a z-index, an opaque background to
-   hide what passed beneath, and — on a phone, under a fixed masthead — an
-   offset worked out against the scroller's own padding. All of that existed
-   to hold a bar over content that was sliding under it. In the flow it is
-   simply the first thing on the page and it scrolls away like everything
-   else — no background, no border, nothing drawn at all. The space above the
-   name is what separates them, which is how every other break on this site
-   works. */
-.record-bar {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: var(--s4);
-  padding: var(--s4) var(--s6);
-}
-
-.record-back {
-  justify-self: start;
-}
-
-/* Tabular figures so the counter does not jitter between entries. */
-.record-no {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.08em;
-}
-
-.record-nav {
-  justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-}
-
-.record-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  /* Two words and an arrow, on one line. In a three-track bar on a 375px
-     screen the middle track takes what it needs and these get the remainder,
-     which was enough to break "Next →" over two lines and make the bar taller
-     than its own type. */
-  white-space: nowrap;
-  padding: 6px 11px;
-  border: 1px solid var(--card-line);
-  border-radius: var(--r-sm);
-  background: var(--card-fill);
-  color: var(--foreground);
-  transition:
-    background var(--dur-light, 300ms) var(--ease-light, ease-out),
-    border-color var(--dur-light, 300ms) var(--ease-light, ease-out),
-    opacity var(--dur-light, 300ms) var(--ease-light, ease-out);
-}
-
-.record-btn:hover {
-  background: var(--card-fill-hover);
-  border-color: var(--card-line-strong);
-}
-
-/* Which Back is on screen.
-   ──────────────────────────────────────────────────────────────────────
-   Done here rather than with Tailwind's hidden / md:hidden, which silently
-   did nothing: .hidden and .record-btn are both one class, so specificity
-   ties and source order decides — and the component CSS is emitted after the
-   utilities, so `display: inline-flex` won every time. Nothing errors; both
-   links simply render. */
-.record-back[data-only='phone'] {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .record-back[data-only='phone'] {
-    display: inline-flex;
-  }
-
-  .record-back[data-only='desk'] {
-    display: none;
-  }
-}
-
-.record-btn[aria-disabled='true'] {
-  opacity: 0.35;
-  pointer-events: none;
-}
-
 /* The one display moment on the page. A name, set in the working face.
 
    Much smaller than the 5.2rem the serif carried, and it has to be: the mono
@@ -3192,9 +3106,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 /* The two content sizes that were literals rather than tokens. */
 [data-page-content] .pill,
-[data-page-content] .plate-no,
-[data-page-content] .record-no,
-[data-page-content] .record-btn {
+[data-page-content] .plate-no {
   font-size: var(--fs-pill-content);
 }
 
@@ -4069,16 +3981,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    The measurement is published by MobileChrome; the fallback is only for the
    first paint before that effect runs. */
 @media (max-width: 767px) {
-  /* Room for three groups on a narrow bar: the labels lose their padding
-     before the counter loses its place. */
-  .record-bar {
-    gap: var(--s3);
-    padding: var(--s3) var(--s5);
-  }
-
-  .record-btn {
-    padding: 6px 9px;
-  }
 }
 
 /* The mark is a link, but not while the opening is still playing.
@@ -4095,28 +3997,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   pointer-events: none;
 }
 
-/* ── Arrows only, on a phone ───────────────────────────────────────────
-   The counter is supposed to sit on the bar's centre line, and with three
-   groups on a 375px bar it could not: "← Prev  Next →" is more than twice the
-   width of "← Back", so the right track took the space the left one did not
-   need and carried the middle off centre with it. Dead-centring the counter
-   instead just walked it into "Prev".
-
-   So the words go and the arrows stay. Direction is the whole content of those
-   two controls — the words were only ever naming the arrow — and losing them
-   makes the two side groups near enough equal that the centre track lands
-   where it should.
-
-   The word was carrying the accessible name, so hiding it would have left two
-   controls announced as "←" and "→". They have explicit labels now, which say
-   more than the visible text ever did.
-
-   Kept on desktop, where there is room and a labelled control is better. */
-@media (max-width: 767px) {
-  .record-btn-word {
-    display: none;
-  }
-}
 
 /* ── The live prototype ────────────────────────────────────────────────
    Inert until it is asked for, and never able to keep the page. See
