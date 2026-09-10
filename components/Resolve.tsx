@@ -53,8 +53,13 @@ import { useEffect, useRef } from 'react'
 /**
  * Short. This is a texture settling, not an event — long enough to be felt on
  * the way past and over before it can be watched.
+ *
+ * At three visible stages that is about 88ms each, which is close to the floor
+ * for this: a stage has to survive a frame or two to register at all, and much
+ * under this the whole thing collapses into a single flicker on arrival rather
+ * than reading as something coming into focus.
  */
-const RUN = 700
+const RUN = 350
 
 /** Stages, including the final passthrough. Three you feel, then the truth. */
 const STAGES = 4
