@@ -5,6 +5,7 @@ import { Settle } from '@/components/Settle'
 import { CornerMarks } from '@/components/CornerMarks'
 import { Presenter } from '@/components/Presenter'
 import { Tube } from '@/components/Tube'
+import { PixelIcon } from '@/components/PixelIcon'
 import { Interlace } from '@/components/Interlace'
 import { LivePrototype } from '@/components/LivePrototype'
 
@@ -88,6 +89,64 @@ export default async function CaseStudyPage({ params }: Props) {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
+      {/* The record's navigation. A row at the head of the page on a
+          desktop; on a phone the same markup is lifted out of the flow and
+          floated at the foot — see globals.css. Document order suits both:
+          fixed positioning does not care where it sits, and at the head is
+          where a desktop reader expects to find the way out. */}
+      <nav className="dock t-meta" aria-label="Record">
+        {/* Back shows where it goes rather than which way it points: the grid
+            is the work index, the mark is home. Two links, because the
+            destination genuinely differs and CSS cannot rewrite an href — on a
+            phone the index runs on under the About page and /work is a route
+            nobody there has ever been to. */}
+        <Link
+          href="/"
+          data-sfx="tick"
+          data-only="phone"
+          className="dock-btn dock-out"
+          aria-label="Back to home"
+        >
+          <PixelIcon name="about" size={20} />
+        </Link>
+        <Link
+          href="/work"
+          data-sfx="tick"
+          data-only="desk"
+          className="dock-btn dock-out"
+          aria-label="Back to selected work"
+        >
+          <PixelIcon name="work" size={20} />
+        </Link>
+
+        <span className="dock-no">
+          {pad(index + 1)} / {pad(caseStudies.length)}
+        </span>
+
+        <div className="dock-nav">
+          <Link
+            href={prev ? `/work/${prev.slug}` : '#'}
+            aria-disabled={!prev}
+            tabIndex={prev ? undefined : -1}
+            data-sfx="tick"
+            className="dock-btn"
+            aria-label="Previous case study"
+          >
+            <PixelIcon name="prev" size={20} />
+          </Link>
+          <Link
+            href={next ? `/work/${next.slug}` : '#'}
+            aria-disabled={!next}
+            tabIndex={next ? undefined : -1}
+            data-sfx="tick"
+            className="dock-btn"
+            aria-label="Next case study"
+          >
+            <PixelIcon name="next" size={20} />
+          </Link>
+        </div>
+      </nav>
+
       <div className="case-page" style={{ padding: 'var(--s7) var(--s6) var(--s8)' }}>
         {/* ── The record ────────────────────────────────────────────── */}
         <Settle boot mass="medium">
@@ -198,51 +257,7 @@ export default async function CaseStudyPage({ params }: Props) {
             </div>
           </Presenter>
 
-      {/* The record's navigation, floating. See globals.css for why it is a
-          faceplate rather than a capsule. */}
-      <nav className="dock t-meta" aria-label="Record">
-        <span className="dock-screw dock-screw-tl" aria-hidden="true" />
-        <span className="dock-screw dock-screw-tr" aria-hidden="true" />
-        <span className="dock-screw dock-screw-bl" aria-hidden="true" />
-        <span className="dock-screw dock-screw-br" aria-hidden="true" />
 
-        {/* Two links, because the destination genuinely differs and CSS cannot
-            rewrite an href. On a phone the work index runs on under the About
-            page and /work is a route nobody there has ever been to. */}
-        <Link href="/" data-sfx="tick" data-only="phone" className="dock-btn dock-out">
-          ← Back
-        </Link>
-        <Link href="/work" data-sfx="tick" data-only="desk" className="dock-btn dock-out">
-          ← Back
-        </Link>
-
-        <span className="dock-no">
-          {pad(index + 1)} / {pad(caseStudies.length)}
-        </span>
-
-        <div className="dock-nav">
-          <Link
-            href={prev ? `/work/${prev.slug}` : '#'}
-            aria-disabled={!prev}
-            tabIndex={prev ? undefined : -1}
-            data-sfx="tick"
-            className="dock-btn"
-            aria-label="Previous case study"
-          >
-            ←
-          </Link>
-          <Link
-            href={next ? `/work/${next.slug}` : '#'}
-            aria-disabled={!next}
-            tabIndex={next ? undefined : -1}
-            data-sfx="tick"
-            className="dock-btn"
-            aria-label="Next case study"
-          >
-            →
-          </Link>
-        </div>
-      </nav>
         </div>
 
         {/* Where the record ends, and what follows it. */}

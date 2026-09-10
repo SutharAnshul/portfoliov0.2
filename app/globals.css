@@ -1850,34 +1850,19 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    own centre line rather than halfway between whatever is either side of it —
    which is what space-between would give, and it would shift every time Prev
    went disabled. */
-.dock {
-  position: fixed;
-  /* Centred on the record, not on the window. The rail is a permanent opaque
-     column, so those two are about 160px apart on a desktop and a bar centred
-     on the window sits visibly left of the thing it navigates. The widths are
-     published by the shell — they are draggable state, so CSS cannot know
-     them, and the fallbacks make this a plain centre wherever they are not. */
-  left: calc(
-    var(--nav-w, 0px) + (100vw - var(--nav-w, 0px) - var(--aside-w, 0px)) / 2
-  );
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s5));
-  transform: translateX(-50%);
-  z-index: 60;
+/* A row at the head of the record. Nothing drawn: no background, no border,
+   no rule under it — the space above the name is what separates them, which is
+   how every other break on this site works.
 
+   Three tracks with the outer two at 1fr, so the counter sits on the row's own
+   centre line rather than halfway between whatever is either side of it, which
+   is what space-between gives and would shift every time Prev went disabled. */
+.dock {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: var(--s5);
-  padding: 9px 14px;
-  min-width: min(420px, calc(100vw - var(--s5) * 2));
-
-  background: color-mix(in srgb, var(--background) 86%, transparent);
-  backdrop-filter: blur(16px) saturate(1.15);
-  border: 1px solid var(--card-line-strong);
-  border-radius: var(--r);
-  /* Deep and soft: the panel is above the page, and the only thing that says
-     so is the shadow it casts on it. */
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+  gap: var(--s4);
+  padding: var(--s4) var(--s6);
 }
 
 .dock-out {
@@ -1918,17 +1903,17 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   gap: 6px;
 }
 
+/* A key, sized to the tile it holds. The padding is what makes the target
+   honest — a 20px icon is not a 44px touch target on its own. */
 .dock-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 30px;
-  padding: 6px 10px;
+  padding: 7px;
   border: 1px solid var(--card-line);
   border-radius: var(--r-sm);
   background: var(--card-fill);
   color: var(--foreground);
-  white-space: nowrap;
   transition: background 160ms ease, border-color 160ms ease;
 }
 
@@ -1942,43 +1927,40 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   pointer-events: none;
 }
 
-/* The screws. The same quarter-cross the transport wears, which is what makes
-   this read as a panel bolted over the page rather than a floating pill. */
-.dock-screw {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  opacity: 0.5;
-}
-
-.dock-screw::before,
-.dock-screw::after {
-  content: '';
-  position: absolute;
-  background: var(--foreground);
-}
-
-.dock-screw::before { width: 5px; height: 1px; top: 2px; }
-.dock-screw::after { width: 1px; height: 5px; left: 2px; }
-
-.dock-screw-tl { left: 5px; top: 5px; }
-.dock-screw-tr { right: 5px; top: 5px; }
-.dock-screw-bl { left: 5px; bottom: 5px; }
-.dock-screw-br { right: 5px; bottom: 5px; }
-
-/* Room at the foot of the record so the dock never lands on the last line. */
-.case-page {
-  padding-bottom: calc(var(--s8) + 72px) !important;
-}
-
 /* On a phone it spans the screen rather than centring, because at 375px a
    centred panel with three groups in it is the screen anyway. */
+/* On a phone it leaves the flow and floats at the foot.
+   ──────────────────────────────────────────────────────────────────────
+   The position is borrowed from the bar Apple floats near the bottom of a
+   screen: always reachable, out of the flow, going nowhere as you read. The
+   look is not — a frosted capsule at a 999px radius is software pretending to
+   be glass, and this site has spent its whole life pretending to be equipment.
+   So: square two-pixel corners like every other corner here, a hairline edge,
+   and a blur that reads as smoked perspex over a lit panel.
+
+   Fixed positioning ignores document order, which is why the same markup can
+   sit at the head of the page on a desktop and at the foot of the screen
+   here. */
 @media (max-width: 767px) {
   .dock {
+    position: fixed;
     left: var(--s4);
     right: var(--s4);
-    transform: none;
-    min-width: 0;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s5));
+    z-index: 60;
+
+    padding: 8px 12px;
+    background: color-mix(in srgb, var(--background) 86%, transparent);
+    backdrop-filter: blur(16px) saturate(1.15);
+    border: 1px solid var(--card-line-strong);
+    border-radius: var(--r);
+    /* The only thing that says the panel is above the page. */
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Room at the foot so the dock never lands on the last line. */
+  .case-page {
+    padding-bottom: calc(var(--s8) + 72px) !important;
   }
 }
 

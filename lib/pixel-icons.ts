@@ -109,6 +109,45 @@ export const PIXEL_ICONS: Record<string, PixelIcon> = {
     ],
   },
 
+  /* The two transport arrows.
+     Solid triangles rather than outlined chevrons: at nine cells an outline is
+     one cell of ink either side of one cell of hole, and it closes up into a
+     smudge at any size a browser is likely to draw it. A filled shape is the
+     only kind that survives this grid.
+
+     One ground for both, and a neutral one — every other tile here is a brand
+     or a study's own colour, and these two are controls rather than
+     identities. Dark enough to read as a key on the faceplate they sit on. */
+  prev: {
+    ground: '#23262c',
+    glyph: [
+      '.........',
+      '......W..',
+      '.....WW..',
+      '....WWW..',
+      '...WWWW..',
+      '....WWW..',
+      '.....WW..',
+      '......W..',
+      '.........',
+    ],
+  },
+
+  next: {
+    ground: '#23262c',
+    glyph: [
+      '.........',
+      '..W......',
+      '..WW.....',
+      '..WWW....',
+      '..WWWW...',
+      '..WWW....',
+      '..WW.....',
+      '..W......',
+      '.........',
+    ],
+  },
+
   work: {
     ground: '#7c4dff',
     glyph: [
