@@ -95,56 +95,34 @@ export default async function CaseStudyPage({ params }: Props) {
           fixed positioning does not care where it sits, and at the head is
           where a desktop reader expects to find the way out. */}
       <nav className="dock t-meta" aria-label="Record">
-        {/* Back shows where it goes rather than which way it points: the grid
-            is the work index, the mark is home. Two links, because the
-            destination genuinely differs and CSS cannot rewrite an href — on a
-            phone the index runs on under the About page and /work is a route
-            nobody there has ever been to. */}
+        {/* The counter with an arrow either side of it: the three read as one
+            control — where you are, and the two ways out of it — rather than
+            as a label and a pair of buttons that happen to share a row. */}
         <Link
-          href="/"
+          href={prev ? `/work/${prev.slug}` : '#'}
+          aria-disabled={!prev}
+          tabIndex={prev ? undefined : -1}
           data-sfx="tick"
-          data-only="phone"
-          className="dock-btn dock-out"
-          aria-label="Back to home"
+          className="dock-btn"
+          aria-label="Previous case study"
         >
-          <PixelIcon name="about" size={20} />
-        </Link>
-        <Link
-          href="/work"
-          data-sfx="tick"
-          data-only="desk"
-          className="dock-btn dock-out"
-          aria-label="Back to selected work"
-        >
-          <PixelIcon name="work" size={20} />
+          <PixelIcon name="prev" size={22} />
         </Link>
 
         <span className="dock-no">
           {pad(index + 1)} / {pad(caseStudies.length)}
         </span>
 
-        <div className="dock-nav">
-          <Link
-            href={prev ? `/work/${prev.slug}` : '#'}
-            aria-disabled={!prev}
-            tabIndex={prev ? undefined : -1}
-            data-sfx="tick"
-            className="dock-btn"
-            aria-label="Previous case study"
-          >
-            <PixelIcon name="prev" size={20} />
-          </Link>
-          <Link
-            href={next ? `/work/${next.slug}` : '#'}
-            aria-disabled={!next}
-            tabIndex={next ? undefined : -1}
-            data-sfx="tick"
-            className="dock-btn"
-            aria-label="Next case study"
-          >
-            <PixelIcon name="next" size={20} />
-          </Link>
-        </div>
+        <Link
+          href={next ? `/work/${next.slug}` : '#'}
+          aria-disabled={!next}
+          tabIndex={next ? undefined : -1}
+          data-sfx="tick"
+          className="dock-btn"
+          aria-label="Next case study"
+        >
+          <PixelIcon name="next" size={22} />
+        </Link>
       </nav>
 
       <div className="case-page" style={{ padding: 'var(--s7) var(--s6) var(--s8)' }}>

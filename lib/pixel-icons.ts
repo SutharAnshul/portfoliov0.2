@@ -115,11 +115,13 @@ export const PIXEL_ICONS: Record<string, PixelIcon> = {
      smudge at any size a browser is likely to draw it. A filled shape is the
      only kind that survives this grid.
 
-     One ground for both, and a neutral one — every other tile here is a brand
+     One ground for both, and a neutral one: every other tile here is a brand
      or a study's own colour, and these two are controls rather than
-     identities. Dark enough to read as a key on the faceplate they sit on. */
+     identities. Mid slate rather than the near-black they started as — with
+     the key removed from around them the tile is the whole control, and a
+     near-black square on a near-black page is not one. */
   prev: {
-    ground: '#23262c',
+    ground: '#4a515c',
     glyph: [
       '.........',
       '......W..',
@@ -134,7 +136,7 @@ export const PIXEL_ICONS: Record<string, PixelIcon> = {
   },
 
   next: {
-    ground: '#23262c',
+    ground: '#4a515c',
     glyph: [
       '.........',
       '..W......',

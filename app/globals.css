@@ -1854,39 +1854,16 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    no rule under it — the space above the name is what separates them, which is
    how every other break on this site works.
 
-   Three tracks with the outer two at 1fr, so the counter sits on the row's own
-   centre line rather than halfway between whatever is either side of it, which
-   is what space-between gives and would shift every time Prev went disabled. */
+   One cluster: the counter with an arrow either side of it, so the three read
+   as one control — where you are, and the two ways out of it — rather than as
+   a label and a pair of buttons sharing a row. Ranged left on a desktop,
+   against the same edge as the name below it and the breadcrumb above; a
+   centred group at the head of a left-aligned page belongs to nothing. */
 .dock {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
-  gap: var(--s4);
+  gap: var(--s3);
   padding: var(--s4) var(--s6);
-}
-
-.dock-out {
-  justify-self: start;
-}
-
-/* Which Back is on screen.
-
-   Attribute-qualified so it outranks .dock-btn: the two would otherwise be a
-   single class each, specificity ties, and source order decides. Tailwind's
-   hidden / md:hidden lost exactly that race on the old bar and silently
-   rendered both links. */
-.dock-out[data-only='phone'] {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .dock-out[data-only='phone'] {
-    display: inline-flex;
-  }
-
-  .dock-out[data-only='desk'] {
-    display: none;
-  }
 }
 
 .dock-no {
@@ -1897,29 +1874,24 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   white-space: nowrap;
 }
 
-.dock-nav {
-  justify-self: end;
-  display: flex;
-  gap: 6px;
-}
+/* No box. The tile is the control — a square with its corners taken off,
+   which is what every icon in the sidebar already is; drawing a rounded
+   rectangle around one of those is two containers for one thing.
 
-/* A key, sized to the tile it holds. The padding is what makes the target
-   honest — a 20px icon is not a 44px touch target on its own. */
+   The padding stays and is invisible. A 22px tile is not a 44px touch target,
+   and the target is the part a thumb cares about — 11 either side is exactly
+   what takes it there. */
 .dock-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 7px;
-  border: 1px solid var(--card-line);
-  border-radius: var(--r-sm);
-  background: var(--card-fill);
+  padding: 11px;
   color: var(--foreground);
-  transition: background 160ms ease, border-color 160ms ease;
+  transition: opacity 160ms ease;
 }
 
 .dock-btn:hover {
-  background: var(--card-fill-hover);
-  border-color: var(--card-line-strong);
+  opacity: 0.75;
 }
 
 .dock-btn[aria-disabled='true'] {
@@ -1949,7 +1921,10 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s5));
     z-index: 60;
 
-    padding: 8px 12px;
+    /* Centred here, where the panel spans the screen and the cluster is the
+       only thing in it. */
+    justify-content: center;
+    padding: 6px 12px;
     background: color-mix(in srgb, var(--background) 86%, transparent);
     backdrop-filter: blur(16px) saturate(1.15);
     border: 1px solid var(--card-line-strong);
