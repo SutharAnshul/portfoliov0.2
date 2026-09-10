@@ -1878,14 +1878,14 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    which is what every icon in the sidebar already is; drawing a rounded
    rectangle around one of those is two containers for one thing.
 
-   The padding stays and is invisible. A 22px tile is not a 44px touch target,
-   and the target is the part a thumb cares about — 11 either side is exactly
-   what takes it there. */
+   The padding stays and is invisible: a tile is not a touch target on its
+   own, and the target is the part a thumb cares about. Nine either side of a
+   26 tile clears the 44 that costs nothing to honour. */
 .dock-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 11px;
+  padding: 9px;
   color: var(--foreground);
   transition: opacity 160ms ease;
 }
@@ -1916,15 +1916,17 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 @media (max-width: 767px) {
   .dock {
     position: fixed;
-    left: var(--s4);
-    right: var(--s4);
+    /* Only as wide as what is in it. Spanning the screen made a panel with
+       three small things adrift in the middle of it — a floating control that
+       is mostly its own background is a bar, and the point of lifting it out
+       of the flow was that it stops being one. */
+    left: 50%;
+    transform: translateX(-50%);
     bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s5));
+    max-width: calc(100vw - var(--s5) * 2);
     z-index: 60;
 
-    /* Centred here, where the panel spans the screen and the cluster is the
-       only thing in it. */
-    justify-content: center;
-    padding: 6px 12px;
+    padding: 5px 10px;
     background: color-mix(in srgb, var(--background) 86%, transparent);
     backdrop-filter: blur(16px) saturate(1.15);
     border: 1px solid var(--card-line-strong);

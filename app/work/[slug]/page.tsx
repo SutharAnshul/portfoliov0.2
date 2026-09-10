@@ -106,7 +106,7 @@ export default async function CaseStudyPage({ params }: Props) {
           className="dock-btn"
           aria-label="Previous case study"
         >
-          <PixelIcon name="prev" size={22} />
+          <PixelIcon name="prev" size={26} />
         </Link>
 
         <span className="dock-no">
@@ -121,7 +121,7 @@ export default async function CaseStudyPage({ params }: Props) {
           className="dock-btn"
           aria-label="Next case study"
         >
-          <PixelIcon name="next" size={22} />
+          <PixelIcon name="next" size={26} />
         </Link>
       </nav>
 
