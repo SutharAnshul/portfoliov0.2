@@ -1841,16 +1841,16 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    hide what passed beneath, and — on a phone, under a fixed masthead — an
    offset worked out against the scroller's own padding. All of that existed
    to hold a bar over content that was sliding under it. In the flow it is
-   simply the first thing on the page: it scrolls away like everything else,
-   and the rule under it is the only thing it needs to separate itself from
-   the name below. */
+   simply the first thing on the page and it scrolls away like everything
+   else — no background, no border, nothing drawn at all. The space above the
+   name is what separates them, which is how every other break on this site
+   works. */
 .record-bar {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--s4);
   padding: var(--s4) var(--s6);
-  border-bottom: 1px solid var(--card-line);
 }
 
 .record-back {
