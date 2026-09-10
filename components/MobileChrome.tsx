@@ -283,6 +283,19 @@ export function MobileChrome({ onOpenChat }: { onOpenChat?: () => void }) {
       }, 240)
     }
 
+    /* The opening belongs to the front door.
+       ──────────────────────────────────────────────────────────────────
+       It is the site arriving, so it plays at / and nowhere else. Loading a
+       case study directly — a shared link, a reload, a search result — used to
+       run it there too, which put the whole record below the fold behind half
+       a screen of run-up: you arrived at a named piece of work and were shown
+       nothing, and scrolling past the run-up landed you with the title tucked
+       under the sticky bar.
+
+       Latching it here rather than skipping the reveal keeps one code path:
+       everything downstream already knows what "already over" looks like. */
+    if (pathname !== '/') introDone = true
+
     /* Arriving on a new route with the opening already over: pin it before
        the first paint rather than waiting for a scroll that may never come.
        The properties survived the last route's cleanup for the same reason. */
