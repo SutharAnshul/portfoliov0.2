@@ -118,6 +118,20 @@ export function LayoutShell({ context, children }: LayoutShellProps) {
     : 'left var(--dur-light, 380ms) var(--ease-light, cubic-bezier(0.22, 1, 0.36, 1)), right var(--dur-light, 380ms) var(--ease-light, cubic-bezier(0.22, 1, 0.36, 1))'
   const rightEdge = chatShown ? chatWidth : 0
 
+  /**
+   * Publish the columns' widths so fixed-position furniture can centre on the
+   * page rather than on the window.
+   *
+   * Both are React state — the rail is draggable — so CSS has no way to know
+   * them. The same approach the mobile chrome uses to publish the masthead's
+   * measured height.
+   */
+  useEffect(() => {
+    const css = document.documentElement.style
+    css.setProperty('--nav-w', `${navWidth}px`)
+    css.setProperty('--aside-w', `${rightEdge}px`)
+  }, [navWidth, rightEdge])
+
   if (bare) return <>{children}</>
 
   return (
