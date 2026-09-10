@@ -94,7 +94,28 @@ export default async function CaseStudyPage({ params }: Props) {
             cross on the right, next to Prev and Next — which put "leave" in
             the same cluster as "keep going", drawn as a glyph that means close
             a dialog rather than leave a page. */}
-        <Link href="/work" data-sfx="tick" className="record-btn record-back t-meta">
+        {/* Two links rather than one, because the destination genuinely
+            differs and CSS cannot rewrite an href.
+
+            On a phone the work index runs on under the About page and /work
+            is a route nobody there has ever been to — landing on it after
+            pressing Back is arriving somewhere new, which is the one thing
+            Back must never do. On a desktop the rail links to /work and that
+            is where Back belongs. */}
+        <Link
+          href="/"
+          data-sfx="tick"
+          data-only="phone"
+          className="record-btn record-back t-meta"
+        >
+          ← Back
+        </Link>
+        <Link
+          href="/work"
+          data-sfx="tick"
+          data-only="desk"
+          className="record-btn record-back t-meta"
+        >
           ← Back
         </Link>
 

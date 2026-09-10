@@ -942,10 +942,14 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 /* Dark text on a lit ground. Not black: a segment does not block all of the
    lamp, and a little of the backlight always comes through the crystal, which
    is why LCD text at rest looks washed rather than solid. */
+/* 400, not 700. Tronica Mono ships a single weight, so a bold here was the
+   browser inventing one — and a synthesised bold of a monospace is precisely
+   what reads as "that is not the right font". Contrast does the work the fake
+   weight was doing, below. */
 .player-track {
   flex: none;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(8, 13, 4, 0.74);
@@ -969,7 +973,8 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   justify-content: space-between;
   margin-top: var(--s2);
   font-size: 9px;
-  font-weight: 700;
+  /* One weight in the face — see the note on .player-track. */
+  font-weight: 400;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--foreground) 38%, transparent);
@@ -1853,6 +1858,27 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   border-color: var(--card-line-strong);
 }
 
+/* Which Back is on screen.
+   ──────────────────────────────────────────────────────────────────────
+   Done here rather than with Tailwind's hidden / md:hidden, which silently
+   did nothing: .hidden and .record-btn are both one class, so specificity
+   ties and source order decides — and the component CSS is emitted after the
+   utilities, so `display: inline-flex` won every time. Nothing errors; both
+   links simply render. */
+.record-back[data-only='phone'] {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .record-back[data-only='phone'] {
+    display: inline-flex;
+  }
+
+  .record-back[data-only='desk'] {
+    display: none;
+  }
+}
+
 .record-btn[aria-disabled='true'] {
   opacity: 0.35;
   pointer-events: none;
@@ -1884,6 +1910,13 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   color: color-mix(in srgb, var(--foreground) 72%, transparent);
 }
 
+/* The discipline, and only the discipline — the duration that used to ride
+   along after a middle dot is gone from the data, not just from the view.
+   "Six months" is a fact about a calendar, not about the work.
+
+   Pink, because it is the one thing on a case study that says what kind of
+   work this is, and pink is how this site marks the thing that matters on a
+   page. currentColor does the border, so the outline follows. */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -1893,7 +1926,11 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+  /* One colour declaration, not two. The rule already ended with a muted
+     foreground, so an accent added above it was simply overridden by its own
+     rule — the later declaration wins and nothing looks broken enough to
+     notice. */
+  color: var(--brand);
 }
 
 /* The facts, ruled off above and below like a specification block. */
@@ -1912,8 +1949,13 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   }
 }
 
+/* Read, not scanned. Client, role, team and surfaces are short pieces of
+   ordinary language — names of companies and people — and the mono was
+   setting them as data. The labels above them stay mono, because those *are*
+   labels and the pairing is what makes the block read as a spec. */
 .spec-value {
   margin-top: var(--s2);
+  font-family: var(--family-read);
   line-height: 1.6;
 }
 
@@ -3144,7 +3186,9 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   background: #21e07a;
   color: #04150b;
   font-size: var(--fs-meta-content, 12px);
-  font-weight: 700;
+  /* One weight in the face — see the note on .player-track. The dark ink on a
+     lit fill is already the strongest contrast on the page. */
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
