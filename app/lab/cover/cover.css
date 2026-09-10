@@ -1,0 +1,356 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   LINKEDIN COVER LAB
+   ═══════════════════════════════════════════════════════════════════════════
+   Four boards at 1584×396, LinkedIn's real cover size. Everything is drawn at
+   full pixel size and scaled with a transform rather than laid out smaller, so
+   what is on screen is a true reduction of the artwork — a design that only
+   works at the size it was previewed at is not a design, it is a screenshot.
+
+   Scoped to this route. Type is Tronica throughout, via the site's own token. */
+
+.cv-page {
+  padding: var(--s6);
+  max-width: 1400px;
+}
+
+.cv-head {
+  max-width: 70ch;
+  margin-bottom: var(--s7);
+}
+
+.cv-head h1 {
+  margin: 0 0 var(--s4);
+  font-family: var(--family-ui);
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.cv-head p {
+  margin: 0 0 var(--s4);
+  font-family: var(--family-read);
+  font-size: 15px;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--foreground) 72%, transparent);
+}
+
+.cv-note {
+  border-left: 1px solid color-mix(in srgb, var(--brand) 60%, transparent);
+  padding-left: var(--s4);
+}
+
+.cv-controls {
+  display: flex;
+  gap: var(--s3);
+}
+
+.cv-btn {
+  font-family: var(--family-ui);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  padding: 7px 12px;
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid color-mix(in srgb, var(--foreground) 22%, transparent);
+  cursor: pointer;
+}
+
+.cv-btn:hover {
+  border-color: color-mix(in srgb, var(--foreground) 45%, transparent);
+}
+
+.cv-btn-sm {
+  font-size: 10.5px;
+  padding: 5px 9px;
+}
+
+.cv-list {
+  display: grid;
+  gap: var(--s8);
+}
+
+.cv-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--s4);
+}
+
+.cv-title {
+  margin: 0;
+  font-family: var(--family-ui);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+}
+
+/* The reduction. The board keeps its 1584px width and is scaled into whatever
+   room the column has; the wrapper's height is set to match so the page does
+   not keep a full-size hole under it. */
+.cv-scaler {
+  width: 100%;
+  aspect-ratio: 1584 / 396;
+  overflow: hidden;
+  position: relative;
+}
+
+/* --k is the reduction, measured and published by the page — see the note
+   there for why this cannot be a calc(). */
+.cv-scaler .cv-board {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  transform: scale(var(--k, 1));
+}
+
+/* 1:1 — the artwork at its own size, scrollable sideways, for screenshotting. */
+.cv-scaler[data-full='true'] {
+  aspect-ratio: auto;
+  height: 396px;
+  overflow: auto;
+}
+
+.cv-scaler[data-full='true'] .cv-board {
+  transform: none;
+}
+
+/* ── The board ─────────────────────────────────────────────────────────── */
+.cv-board {
+  position: relative;
+  width: 1584px;
+  height: 396px;
+  overflow: hidden;
+  background: #05070a;
+  font-family: var(--family-ui);
+  color: #fff;
+  flex: none;
+}
+
+.cv-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Type sits on a gradient that runs from near-black to a bright cream, so it
+   cannot rely on the background staying dark. A shadow rather than a scrim:
+   a scrim would flatten the artwork the cover exists to show. */
+.cv-board :is(.cv-plate, .cv-readout, .cv-slate-mid, .cv-slate-top, .cv-field) {
+  position: absolute;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55), 0 0 3px rgba(0, 0, 0, 0.4);
+}
+
+.cv-name {
+  font-size: 62px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.cv-role {
+  margin-top: 16px;
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.cv-role i {
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  margin: 0 12px 5px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cv-live {
+  color: #ff8fbe;
+}
+
+/* ── 01 Nameplate ──────────────────────────────────────────────────────── */
+.cv-plate {
+  left: 300px;
+  top: 118px;
+}
+
+/* ── 02 Readout ────────────────────────────────────────────────────────── */
+.cv-readout {
+  left: 300px;
+  top: 96px;
+}
+
+.cv-readout-name {
+  font-size: 34px;
+  letter-spacing: 0.02em;
+  margin-bottom: 26px;
+}
+
+.cv-readout-rows {
+  display: flex;
+  gap: 56px;
+  margin: 0;
+}
+
+.cv-readout-rows dt {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 8px;
+}
+
+.cv-readout-rows dd {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+
+/* ── 03 Slate ──────────────────────────────────────────────────────────── */
+.cv-slate-top {
+  left: 300px;
+  right: 40px;
+  top: 34px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.cv-slate-mid {
+  left: 300px;
+  top: 140px;
+}
+
+.cv-slate-mid .cv-name {
+  font-size: 54px;
+}
+
+/* The site's own corner marks, at the frame rather than around a card. */
+.cv-mark {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+}
+
+.cv-mark::before,
+.cv-mark::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.cv-mark::before { width: 26px; height: 1px; }
+.cv-mark::after { width: 1px; height: 26px; }
+
+.cv-mark-tl { left: 22px; top: 22px; }
+.cv-mark-tr { right: 22px; top: 22px; }
+.cv-mark-tr::before, .cv-mark-tr::after { right: 0; }
+.cv-mark-bl { left: 22px; bottom: 22px; }
+.cv-mark-bl::before, .cv-mark-bl::after { bottom: 0; }
+.cv-mark-br { right: 22px; bottom: 22px; }
+.cv-mark-br::before, .cv-mark-br::after { right: 0; bottom: 0; }
+
+/* ── 04 Field ──────────────────────────────────────────────────────────── */
+.cv-field {
+  left: 300px;
+  top: 104px;
+}
+
+.cv-field-row {
+  display: flex;
+}
+
+/* One monospace advance per cell, so the two rows make a true rectangle — the
+   same geometry the mark uses on the site. */
+.cv-cell {
+  position: relative;
+  width: 1ch;
+  font-size: 56px;
+  line-height: 1.08;
+  text-align: center;
+}
+
+/* Still blocked: the glyph is held in the flow so nothing reflows when it
+   resolves, and a filled box is drawn over it. */
+.cv-cell[data-on='false'] {
+  color: transparent;
+}
+
+.cv-cell[data-on='false']::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 16%;
+  bottom: 22%;
+  background: #fff;
+}
+
+.cv-field .cv-role {
+  margin-top: 22px;
+}
+
+/* ── Dead zones ────────────────────────────────────────────────────────── */
+.cv-zone {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Where the profile photo lands on desktop. */
+.cv-zone-avatar {
+  left: 0;
+  bottom: 0;
+  width: 272px;
+  height: 168px;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 60, 60, 0.16) 0 10px,
+    transparent 10px 20px
+  );
+  outline: 1px dashed rgba(255, 90, 90, 0.5);
+  outline-offset: -1px;
+}
+
+/* What a phone crops off each end. */
+.cv-zone-crop {
+  top: 0;
+  bottom: 0;
+  width: 230px;
+  background: rgba(255, 200, 80, 0.08);
+  outline: 1px dashed rgba(255, 200, 80, 0.35);
+  outline-offset: -1px;
+}
+
+.cv-zone-crop-l { left: 0; }
+.cv-zone-crop-r { right: 0; }
+
+/* ── Notes ─────────────────────────────────────────────────────────────── */
+.cv-claim {
+  margin: var(--s4) 0 var(--s3);
+  font-family: var(--family-read);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--foreground) 82%, transparent);
+  max-width: 78ch;
+}
+
+.cv-against {
+  margin: 0;
+  font-family: var(--family-read);
+  font-size: 13px;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--foreground) 58%, transparent);
+  max-width: 78ch;
+}
+
+.cv-against-tag {
+  font-family: var(--family-ui);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 34%, transparent);
+  margin-right: 10px;
+}

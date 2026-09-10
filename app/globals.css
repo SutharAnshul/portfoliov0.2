@@ -4232,20 +4232,20 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   }
 }
 
-/* ── The resolve reveal ────────────────────────────────────────────────
-   A canvas laid over the picture for a little over a second, then thrown
-   away. See components/Resolve.tsx for why it is an overlay that destroys
-   itself rather than a permanent canvas.
+/* ── The interlace reveal ──────────────────────────────────────────────
+   A canvas laid over the picture for a third of a second, then thrown away.
+   See components/Interlace.tsx for why it is an overlay that destroys itself
+   rather than a permanent canvas.
 
    The wrapper takes its size from the <img>, and .plate img is width:100% /
    height:auto — so the box already has the picture's proportion and the canvas
    can be pinned to it with no letterboxing arithmetic anywhere. */
-.resolve {
+.interlace {
   position: relative;
   display: block;
 }
 
-.resolve-gl {
+.interlace-gl {
   position: absolute;
   inset: 0;
   display: block;
@@ -4257,7 +4257,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 /* The line the observer watches, halfway down the picture. */
-.resolve-half {
+.interlace-half {
   position: absolute;
   left: 0;
   top: 50%;
@@ -4275,13 +4275,13 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    The corner marks are untouched: they say "this frame is on screen now",
    which is the frame's own business and not something the picture reports.
    Embeds keep the bloom, having no picture to resolve. */
-[data-tube] .shot[data-reveal='resolve'] .plate {
+[data-tube] .shot[data-reveal='interlace'] .plate {
   transform: none;
   opacity: 1;
   transition: border-color 160ms ease;
 }
 
-[data-tube] .shot[data-reveal='resolve'] .plate img {
+[data-tube] .shot[data-reveal='interlace'] .plate img {
   filter: none;
   transition: none;
 }

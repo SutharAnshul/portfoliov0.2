@@ -5,7 +5,7 @@ import { Settle } from '@/components/Settle'
 import { CornerMarks } from '@/components/CornerMarks'
 import { Presenter } from '@/components/Presenter'
 import { Tube } from '@/components/Tube'
-import { Resolve } from '@/components/Resolve'
+import { Interlace } from '@/components/Interlace'
 import { LivePrototype } from '@/components/LivePrototype'
 
 /**
@@ -211,8 +211,8 @@ export default async function CaseStudyPage({ params }: Props) {
                   className="shot relative"
                   data-slide={'src' in shot ? slideOf.get(shot.key) : undefined}
                   /* A still reveals itself — see the stylesheet, and the note
-                     at the top of Resolve.tsx. */
-                  data-reveal={'src' in shot ? 'resolve' : undefined}
+                     at the top of Interlace.tsx. */
+                  data-reveal={'src' in shot ? 'interlace' : undefined}
                 >
                   <CornerMarks />
                   <div className="plate">
@@ -224,7 +224,7 @@ export default async function CaseStudyPage({ params }: Props) {
                         h={shot.h}
                       />
                     ) : (
-                      <Resolve src={shot.src} alt={shot.alt} />
+                      <Interlace src={shot.src} alt={shot.alt} />
                     )}
                     <span className="plate-no t-meta">
                       {pad(index + 1)}-{pad(i + 1)}
