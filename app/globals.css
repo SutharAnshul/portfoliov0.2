@@ -997,14 +997,11 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    transport. Replaces border-weight changes, which were too quiet to read
    against a monochrome card. */
 .marks {
-  /* Where the four vertices sit, and now the only place they ever sit: 0 is
-     the open position, on the corners.
-
-     This was 50% — all four gathered on the element's centre line — with every
-     selected and hovered state opening them out to here and a strike of glow
-     as they arrived. The travel is gone. What is left is whether they are
-     drawn at all, which is the part that was carrying the meaning. */
-  --edge: 0%;
+  /* Where the top and bottom pairs sit. 50% puts all four vertices on the
+     element's centre line, where they merge into one bright bar; 0 opens them
+     out onto the corners. Only the vertical axis ever collapses, which is why
+     none of this needs to know the element's size — a percentage does it. */
+  --edge: 50%;
   --arm: 7px;
   --glow: 0 0 0 rgba(250, 250, 250, 0);
 
@@ -1030,6 +1027,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   position: absolute;
   width: var(--arm);
   height: var(--arm);
+  transition: top var(--switch-off), bottom var(--switch-off);
 }
 
 .mark::before,
@@ -1082,19 +1080,11 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .mark-br::before,
 .mark-br::after { left: 0; top: 0; }
 
-/* Hover.
-   ──────────────────────────────────────────────────────────────────────
-   This was 0.34, which worked when hovering *merged* the four marks into one
-   bright bar on the centre line — a shape change carried the signal and the
-   weight only had to hint. Standing them still took that away, so the only
-   thing left to separate hovered from resting is how strongly they are drawn,
-   and a third of an opacity is not enough to notice.
-
-   Still clearly under the 0.9 of the page you are actually on: hover is a
-   preview of selection, not selection. */
+/* Hovering shows the line the four make where they meet — a real stage of the
+   figure rather than a dimmer copy of the end of it. */
 .card-link:hover > .marks,
 .nav-item:hover > .marks {
-  opacity: 0.55;
+  opacity: 0.34;
   --glow: 0 0 2px rgba(250, 250, 250, 0.5);
 }
 
@@ -1104,6 +1094,17 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   opacity: 0.9;
   --edge: 0%;
   transition: opacity 50ms ease;
+}
+
+[data-active='true'] > .marks .mark {
+  transition: top var(--switch), bottom var(--switch);
+}
+
+/* The strike: bright at the instant of switch-on, gone by the time the picture
+   has finished opening. */
+[data-active='true'] > .marks .mark::before,
+[data-active='true'] > .marks .mark::after {
+  animation: mark-strike 480ms ease-out;
 }
 
 @keyframes mark-strike {
@@ -1127,24 +1128,16 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   position: relative;
 }
 
-/* Hidden at rest, not standing.
-
-   This used to hold every tile's marks met on the centre line at a weight
-   that read as furniture, and hovering opened them to the corners. Once the
-   marks stopped travelling, that same weight became four fully-drawn brackets
-   around every picture in the grid — the page filled with corners, and the
-   difference between a hovered tile and a resting one came down to a step in
-   brightness.
-
-   Presence carries it instead, which is what the nav has always done. The
-   pictures show where the pictures are; a grid of photographs does not need
-   marks to point at itself. */
+/* Standing, not hidden. Every thumbnail keeps its marks met in the middle at
+   a weight you read as furniture rather than as a signal — so the grid always
+   shows where its pictures are, and hovering is the picture opening rather
+   than something appearing out of nothing. */
 .work-shot > .marks {
-  /* 4 + 8 = 12px of reach below the picture. The caption starts 16px down, so
-     the marks clear the title rather than sitting on it. */
+  /* 4 + 8 = 12px of reach below the picture. The caption now starts 16px
+     down, so the open marks clear the title rather than sitting on it. */
   inset: -4px;
   --arm: 8px;
-  opacity: 0;
+  opacity: 0.26;
 }
 
 .work-tile:hover .work-shot > .marks,
@@ -1152,6 +1145,16 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   opacity: 0.95;
   --edge: 0%;
   transition: opacity 50ms ease;
+}
+
+.work-tile:hover .work-shot > .marks .mark,
+.work-tile:focus-visible .work-shot > .marks .mark {
+  transition: top var(--switch), bottom var(--switch);
+}
+
+.work-tile:hover .work-shot > .marks .mark::before,
+.work-tile:hover .work-shot > .marks .mark::after {
+  animation: mark-strike 480ms ease-out;
 }
 
 /* ── The tube ──────────────────────────────────────────────────────
@@ -1217,15 +1220,22 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   transition: filter 120ms ease;
 }
 
-/* Nothing to collapse to any more: the marks go out with the frame rather
-   than gathering to its centre line on the way. */
 [data-tube='off'] .shot > .marks {
-  opacity: 0;
+  --edge: 50%;
 }
 
 /* The marks travel out on the same curve and the same beat as the frame, so
    the four of them and the picture read as one movement rather than as a
    reveal with decoration around it. */
+[data-tube='on'] .shot > .marks .mark {
+  transition: top var(--switch), bottom var(--switch);
+}
+
+[data-tube='on'] .shot > .marks .mark::before,
+[data-tube='on'] .shot > .marks .mark::after {
+  animation: mark-strike 520ms ease-out;
+}
+
 /* ─── The sidebar, in three bands ─────────────────────────────────────────
    The whole column used to scroll, so on any window shorter than the content
    a bar sat down the side of the name, the bio and the sections — none of
