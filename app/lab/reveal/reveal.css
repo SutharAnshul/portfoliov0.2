@@ -1,0 +1,175 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   IMAGE REVEAL LAB
+   ═══════════════════════════════════════════════════════════════════════════
+   Scoped to this route and imported by its page. A lab is for choosing between
+   things, not for growing a second stylesheet the real pages have to live
+   with — everything here borrows the site's own tokens so the question being
+   answered is whether each option belongs in this language. */
+
+.rv-page {
+  padding: var(--s6);
+  max-width: 1400px;
+}
+
+.rv-head {
+  max-width: 70ch;
+  margin-bottom: var(--s7);
+}
+
+.rv-head h1 {
+  margin: 0 0 var(--s4);
+  font-family: var(--family-ui);
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.rv-head p {
+  margin: 0 0 var(--s4);
+  font-family: var(--family-read);
+  font-size: 15px;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--foreground) 72%, transparent);
+}
+
+/* The decision the four are really asking about, marked so it is not read as
+   preamble. */
+.rv-note {
+  border-left: 1px solid color-mix(in srgb, var(--brand) 60%, transparent);
+  padding-left: var(--s4);
+}
+
+.rv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: var(--s7);
+}
+
+.rv-panel {
+  min-width: 0;
+}
+
+.rv-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  margin-bottom: var(--s4);
+}
+
+.rv-title {
+  margin: 0;
+  font-family: var(--family-ui);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+}
+
+.rv-btn {
+  font-family: var(--family-ui);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  padding: 7px 12px;
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid color-mix(in srgb, var(--foreground) 22%, transparent);
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.rv-btn:hover {
+  border-color: color-mix(in srgb, var(--foreground) 42%, transparent);
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+}
+
+.rv-btn-sm {
+  font-size: 10.5px;
+  padding: 5px 9px;
+}
+
+/* The whole picture is the replay control, because that is what anyone will
+   click first. A button, not a div with a handler — it is operable from a
+   keyboard and announces itself, and the reset below is only undoing what
+   being a button costs visually. */
+.rv-stage {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  background: #050505;
+  cursor: pointer;
+}
+
+/* One proportion for all four, so the comparison is between the reveals and
+   not between how much room each one took. */
+.rv {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+}
+
+.rv-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Underneath, always. It is the picture the shader is drawing rather than a
+   placeholder, so if WebGL never comes up the panel still shows the work —
+   the canvas is the effect laid over the content, not a replacement for it. */
+.rv-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.rv-claim {
+  margin: var(--s4) 0 var(--s4);
+  font-family: var(--family-read);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--foreground);
+}
+
+.rv-meta {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px var(--s4);
+  margin: 0;
+}
+
+.rv-meta dt {
+  font-family: var(--family-ui);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 34%, transparent);
+  padding-top: 3px;
+}
+
+.rv-meta dd {
+  margin: 0;
+  font-family: var(--family-read);
+  font-size: 13px;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--foreground) 62%, transparent);
+}
+
+/* Someone who has asked for less motion is asking not to be shown four of
+   these at once. The picture is under the canvas already, so hiding the canvas
+   leaves the content rather than a hole. */
+@media (prefers-reduced-motion: reduce) {
+  .rv-canvas {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .rv-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
