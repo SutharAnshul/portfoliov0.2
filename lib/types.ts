@@ -24,6 +24,13 @@ export interface CaseStudy {
     results: string[]
   }
   sections: CaseStudySection[]
+  /**
+   * Frames that come after the record's own screens, under a heading of their
+   * own: the parts of the project worth showing that are not the story the
+   * record tells. Same plates and the same deck as the screens above them —
+   * a second sequence, not a second kind of thing.
+   */
+  more?: CaseStudySection[]
 }
 
 export interface CaseStudySection {

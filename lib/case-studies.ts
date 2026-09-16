@@ -57,6 +57,15 @@ export const caseStudies: CaseStudy[] = [
       { type: 'image', image: '/images/incentiwise/deck/23.png', imageAlt: 'Incentiwise — testimonials from HR leads who ran the programme' },
       { type: 'image', image: '/images/incentiwise/deck/24.png', imageAlt: 'Incentiwise — an appreciation addressed to recruiters' },
     ],
+    more: [
+      { type: 'image', image: '/images/incentiwise/more/01-feed.png', imageAlt: 'Incentiwise — the admin feed, with recognitions as they are posted' },
+      { type: 'image', image: '/images/incentiwise/more/02-culture-overview.png', imageAlt: 'Incentiwise — culture overview — recognition activity across the organisation' },
+      { type: 'image', image: '/images/incentiwise/more/03-organisation-admins.png', imageAlt: 'Incentiwise — organisation — the list of admins and their access' },
+      { type: 'image', image: '/images/incentiwise/more/04-organisation-admins-2.png', imageAlt: 'Incentiwise — organisation — an admin’s access being set' },
+      { type: 'image', image: '/images/incentiwise/more/05-member-transactions.png', imageAlt: 'Incentiwise — a member’s detail, showing their transactions' },
+      { type: 'image', image: '/images/incentiwise/more/06-rewards-transactions.png', imageAlt: 'Incentiwise — rewards — the transaction ledger' },
+      { type: 'image', image: '/images/incentiwise/more/07-settings.png', imageAlt: 'Incentiwise — settings — the programme’s rules in one place' },
+    ],
   },
   {
     slug: 'superhealth',

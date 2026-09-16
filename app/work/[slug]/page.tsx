@@ -4,10 +4,9 @@ import Link from 'next/link'
 import { Settle } from '@/components/Settle'
 import { CornerMarks } from '@/components/CornerMarks'
 import { Presenter } from '@/components/Presenter'
-import { Tube } from '@/components/Tube'
 import { PixelIcon } from '@/components/PixelIcon'
-import { Interlace } from '@/components/Interlace'
 import { LivePrototype } from '@/components/LivePrototype'
+import type { CaseStudySection } from '@/lib/types'
 
 /**
  * A case study as a catalogue record.
@@ -31,6 +30,11 @@ export async function generateStaticParams() {
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')
+
+/** A still, or a running prototype. From the reader's side, the next screen. */
+type Frame =
+  | { key: string; src: string; alt: string }
+  | { key: string; embed: string; alt: string; w: number; h: number }
 
 /** One column of the spec block. Values may be a list. */
 function Spec({ label, children }: { label: string; children: React.ReactNode }) {
@@ -59,22 +63,34 @@ export default async function CaseStudyPage({ params }: Props) {
    * plate with the same corner marks and the same frame number, because from
    * the reader's side they are the same thing — the next screen.
    */
-  const screens = caseStudy.sections
-    .filter((s) => (s.type === 'image' && s.image) || (s.type === 'embed' && s.embed))
-    .map((s) =>
-      s.type === 'embed'
-        ? {
-            key: s.embed!,
-            embed: s.embed!,
-            alt: s.imageAlt ?? `${caseStudy.title}, live prototype`,
-            w: s.embedWidth ?? 390,
-            h: s.embedHeight ?? 844,
-          }
-        : { key: s.image!, src: s.image!, alt: s.imageAlt ?? caseStudy.title },
-    )
+  const framesOf = (sections: CaseStudySection[]): Frame[] =>
+    sections
+      .filter((s) => (s.type === 'image' && s.image) || (s.type === 'embed' && s.embed))
+      .map((s) =>
+        s.type === 'embed'
+          ? {
+              key: s.embed!,
+              embed: s.embed!,
+              alt: s.imageAlt ?? `${caseStudy.title}, live prototype`,
+              w: s.embedWidth ?? 390,
+              h: s.embedHeight ?? 844,
+            }
+          : { key: s.image!, src: s.image!, alt: s.imageAlt ?? caseStudy.title },
+      )
 
-  /** Only the stills can be presented; a running prototype is not a slide. */
-  const stills = screens.filter((s): s is { key: string; src: string; alt: string } => 'src' in s)
+  const screens = framesOf(caseStudy.sections)
+
+  /** The second sequence, under its own heading. Most records have none. */
+  const more = framesOf(caseStudy.more ?? [])
+
+  /**
+   * Only the stills can be presented; a running prototype is not a slide. Both
+   * sequences feed one deck, so pressing any frame on the page opens the same
+   * presentation and the extras are simply the end of it.
+   */
+  const stills = [...screens, ...more].filter(
+    (s): s is { key: string; src: string; alt: string } => 'src' in s,
+  )
   const slides = stills.map((s) => ({ src: s.src, alt: s.alt }))
 
   /**
@@ -86,6 +102,32 @@ export default async function CaseStudyPage({ params }: Props) {
 
   const hasLive = screens.some((s) => 'embed' in s)
   const allLive = screens.length > 0 && screens.every((s) => 'embed' in s)
+
+  /**
+   * One frame in its plate. `at` is its number in the record, counted across
+   * both sequences so the numbering runs on rather than starting again under
+   * the second heading.
+   */
+  function Plate({ shot, at, marks = true }: { shot: Frame; at: number; marks?: boolean }) {
+    return (
+      <figure
+        className="shot relative"
+        data-slide={'src' in shot ? slideOf.get(shot.key) : undefined}
+      >
+        {marks && <CornerMarks />}
+        <div className="plate">
+          {'embed' in shot ? (
+            <LivePrototype src={shot.embed} title={shot.alt} w={shot.w} h={shot.h} />
+          ) : (
+            <img src={shot.src} alt={shot.alt} loading="lazy" decoding="async" />
+          )}
+          <span className="plate-no t-meta">
+            {pad(index + 1)}-{pad(at)}
+          </span>
+        </div>
+      </figure>
+    )
+  }
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -202,37 +244,40 @@ export default async function CaseStudyPage({ params }: Props) {
             className="stack"
             style={{ marginTop: 'var(--s6)', ['--gap' as string]: 'var(--s6)' } as React.CSSProperties}
           >
-            {/* The frames do not settle in like the prose does — they switch
-                on, which is a reveal you can also run backwards. */}
             {screens.map((shot, i) => (
-              <Tube key={shot.key}>
-                <figure
-                  className="shot relative"
-                  data-slide={'src' in shot ? slideOf.get(shot.key) : undefined}
-                  /* A still reveals itself — see the stylesheet, and the note
-                     at the top of Interlace.tsx. */
-                  data-reveal={'src' in shot ? 'interlace' : undefined}
-                >
-                  <CornerMarks />
-                  <div className="plate">
-                    {'embed' in shot ? (
-                      <LivePrototype
-                        src={shot.embed}
-                        title={shot.alt}
-                        w={shot.w}
-                        h={shot.h}
-                      />
-                    ) : (
-                      <Interlace src={shot.src} alt={shot.alt} />
-                    )}
-                    <span className="plate-no t-meta">
-                      {pad(index + 1)}-{pad(i + 1)}
-                    </span>
-                  </div>
-                </figure>
-              </Tube>
+              <Plate key={shot.key} shot={shot} at={i + 1} />
             ))}
-            </div>
+          </div>
+
+          {/* ── And the rest of it ─────────────────────────────────
+              A heading, ruled off the way the screens above are, and then the
+              frames run straight on: the numbering carries over and pressing
+              one opens the same deck, because these are the same project seen
+              further in rather than an appendix to it. */}
+          {more.length > 0 && (
+            <>
+              <div
+                className="flex items-baseline justify-between"
+                style={{ marginTop: 'var(--s8)', paddingBottom: 'var(--s3)' }}
+              >
+                <span className="t-label">More from the project</span>
+                <span className="t-label">{pad(more.length)} frames</span>
+              </div>
+              <hr className="rule" />
+
+              {/* Two columns, packed by height — see .mason. The record's own
+                  screens stay one to a row: they are a sequence and are read in
+                  order, where these are a board to look through. */}
+              <div className="mason">
+                {/* No corner marks on the board. They bracket one thing being
+                    looked at; against a wall of frames two abreast, seven sets
+                    of them are just ticks in the gaps. */}
+                {more.map((shot, i) => (
+                  <Plate key={shot.key} shot={shot} at={screens.length + i + 1} marks={false} />
+                ))}
+              </div>
+            </>
+          )}
           </Presenter>
 
 
