@@ -10,10 +10,15 @@ import { createElement, useEffect, useRef, useState } from 'react'
  * than a ragged one, and every cell is exactly one monospace character wide
  * whether it is holding a letter or a block.
  *
- * Set as it is written rather than in capitals. The grid does not care — the
- * face is monospace, so a lowercase advance is the same 1ch as an uppercase
- * one, and neither word has a descender to fall out of the cell. What changes
- * is the reading: capitals made it a logotype, and it is a name.
+ * Set in capitals. The grid does not care either way — the face is monospace,
+ * so an uppercase advance is the same 1ch as a lowercase one, and the mark is
+ * exactly as wide as it was; with no lowercase there is no descender to fall
+ * out of a cell either. What changes is the reading: capitals make it a
+ * logotype rather than a signature, which is what it is doing at the head of
+ * the page.
+ *
+ * Only the blocks are set this way. The name itself is written properly for
+ * anything that reads the page aloud — see the label under the grid.
  *
  * The band sweeps left to right in both directions — once to uncover the
  * name, once to cover it again — with the leading cell carrying colour. That
@@ -54,7 +59,7 @@ import { createElement, useEffect, useRef, useState } from 'react'
  * interrupted on, and never against a field still in motion underneath it.
  */
 
-const ROWS = ['Anshul', 'Suthar'] as const
+const ROWS = ['ANSHUL', 'SUTHAR'] as const
 const N = ROWS[0].length
 
 /** The beats of one cycle, in ms. */
@@ -302,7 +307,9 @@ export function NameMark({
     { className: `sig ${className}`.trim() },
     <span className="sr-only">Anshul Suthar</span>,
     <span
-      className="sig-grid"
+      /* The crosshair gets out of the way here: the cell under the pointer is
+         resolving into its letter, and the mark would be standing on it. */
+      className={`sig-grid${interactive ? ' cursor-blank' : ''}`}
       aria-hidden={true}
       /* The unconditional clear.
 

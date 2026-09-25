@@ -28,6 +28,21 @@ import { installMaterial } from '@/lib/physics'
  */
 const NATIVE_CURSOR = '.cursor-native, .cursor-col-resize, .cursor-zoom-in, .cursor-zoom-out'
 
+/**
+ * Nothing at the pointer at all.
+ *
+ * Not a native cursor either — everything is already cursor: none while the
+ * crosshair is on, so this simply leaves the spot empty. It is for the places
+ * where the thing under the pointer *is* the interaction: the name's blocks
+ * resolve one cell at a time as the pointer crosses them, and a cell is one
+ * character wide, so four arms standing around that character cover the letter
+ * they are uncovering.
+ */
+const NO_CURSOR = '.cursor-blank'
+
+/** Everything the crosshair fades itself out over. */
+const STAND_ASIDE = `${NATIVE_CURSOR}, ${NO_CURSOR}`
+
 export function CustomCursor() {
   const [enabled, setEnabled] = useState(false)
 
@@ -60,7 +75,7 @@ export function CustomCursor() {
       place(e.clientX, e.clientY)
 
       const el = e.target as Element | null
-      root.style.opacity = el?.closest?.(NATIVE_CURSOR) ? '0' : '1'
+      root.style.opacity = el?.closest?.(STAND_ASIDE) ? '0' : '1'
     }
 
     /**
@@ -74,10 +89,10 @@ export function CustomCursor() {
      * cannot be skipped over by a fast flick of the wrist.
      */
     const onOver = (e: MouseEvent) => {
-      if ((e.target as Element | null)?.closest?.(NATIVE_CURSOR)) root.style.opacity = '0'
+      if ((e.target as Element | null)?.closest?.(STAND_ASIDE)) root.style.opacity = '0'
     }
     const onOut = (e: MouseEvent) => {
-      if ((e.target as Element | null)?.closest?.(NATIVE_CURSOR)) root.style.opacity = '1'
+      if ((e.target as Element | null)?.closest?.(STAND_ASIDE)) root.style.opacity = '1'
     }
 
     const onLeave = () => {
