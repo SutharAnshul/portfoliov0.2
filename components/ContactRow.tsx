@@ -17,9 +17,20 @@ export const CONTACT = [
   { href: 'https://behance.net/anshulsuthar', label: 'Behance', icon: 'behance' },
 ] as const
 
-export function ContactRow({ className = '' }: { className?: string }) {
+export function ContactRow({
+  className = '',
+  direction = 'across',
+}: {
+  className?: string
+  /**
+   * Which way the four stand. Across at the foot of a page, where they are the
+   * last thing in the flow; down at the right edge beside the statement, where
+   * a row would run into the text and a column stands clear of it.
+   */
+  direction?: 'across' | 'down'
+}) {
   return (
-    <div className={`contact-row ${className}`.trim()}>
+    <div className={`contact-row ${className}`.trim()} data-dir={direction}>
       {CONTACT.map(({ href, label, icon }) => (
         <a
           key={label}
