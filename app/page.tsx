@@ -1,59 +1,26 @@
-import { Settle } from '@/components/Settle'
-import { AboutStage } from '@/components/AboutStage'
-import { PhoneOnly } from '@/components/PhoneOnly'
-import { WorkIndex } from '@/components/WorkIndex'
+import { About } from '@/components/About'
+import { WorkGrid } from '@/components/WorkGrid'
 import { ContactRow } from '@/components/ContactRow'
 
 /**
- * About.
+ * The whole site above the records: who he is, then what he has made.
  *
- * A portrait, a record and a statement, floating in the dark — see AboutStage
- * for how the three are arranged and why nothing on it is framed.
- *
- * On a phone the work index follows it in the same scroll. There is no rail
- * down there to move between two sections with any more, and a phone is a
- * scrolling device before it is a navigating one: the two things worth reading
- * are About and the work, so they are one document and the thumb is the only
- * control needed. The "more to explore" at the foot of the About stage stops
- * being a joke about a page that ends and becomes a label for what is under
- * it.
- *
- * The desktop keeps them apart. There the rail is always on screen, both
- * destinations are one press away, and stacking them would only make the
- * page longer without making anything easier to reach.
+ * One page and one scroll. There used to be a rail holding two destinations
+ * and a list of projects, and two routes behind it; the page is short enough
+ * that all of it was navigation to somewhere a thumb's worth of scrolling
+ * would have reached anyway.
  */
-export default function Page() {
+export default function Home() {
   return (
-    <div className="bg-background text-foreground min-h-screen">
-      {/* A container, not just a wrapper: the stage's breakpoints have to read
-          the width of this column rather than of the window. The sidebar and
-          the chat panel both take space the viewport knows nothing about, so
-          at 1500px of window there can be as little as 778px of column. */}
-      <div className="about-page">
-        {/* One Settle around all three rather than one each. Staggering them
-            in would say they arrive in an order; they do not. */}
-        <Settle boot mass="light" className="about-settle">
-          <AboutStage />
-        </Settle>
-      </div>
+    <>
+      <About />
+      <WorkGrid />
 
-      <PhoneOnly>
-        <section className="about-continues" aria-label="Selected work">
-          <WorkIndex />
-
-          {/* The foot of the whole scroll, and the only place on a phone where
-              the contacts sit in the page rather than behind the menu button.
-              By here someone has read the about page and looked at four pieces
-              of work — which is the one moment on the site where getting in
-              touch is the obvious next thing, and the worst possible moment to
-              ask them to go back up and open a menu to do it. */}
-          <footer className="about-foot">
-            <ContactRow />
-            <hr className="rule" />
-            <p className="t-label about-foot-end">End of selected work</p>
-          </footer>
-        </section>
-      </PhoneOnly>
-    </div>
+      {/* The CV has gone up the page to stand beside "Open to work", where
+          it is read at the moment it is wanted. */}
+      <footer className="foot">
+        <ContactRow />
+      </footer>
+    </>
   )
 }

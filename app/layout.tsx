@@ -50,7 +50,7 @@ const read = Raleway({
   display: 'swap',
 })
 
-import { LayoutShell } from '@/components/LayoutShell'
+import { Shell } from '@/components/Shell'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { CustomCursor } from '@/components/CustomCursor'
 import { CrtGlass } from '@/components/CrtGlass'
@@ -116,9 +116,7 @@ export default function RootLayout({
         <CrtGlass />
         <SmoothScroll />
         <CustomCursor />
-        <LayoutShell context="portfolio">
-          {children}
-        </LayoutShell>
+        <Shell>{children}</Shell>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

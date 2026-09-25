@@ -46,6 +46,41 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* The two colours the whole site is mixed from, declared to the browser as
+   colours rather than as text.
+   ──────────────────────────────────────────────────────────────────────
+   A plain custom property is a string: it cannot be interpolated, so it snaps
+   from one value to the next, and anything transitioning a real property off
+   it — background-color, say — eases toward a target that has already
+   arrived. On a record that meant two clocks. The page crossed from ink to
+   cream over 520ms while every gradient mixed from --background changed in
+   one frame, so for half a second the veil under the mark was painting the
+   next act's colour over this one. That is what made its edges visible: not
+   the shape, the timing. Registered with a type, the token itself
+   interpolates, and everything drawn from it — washes, rules, margin type,
+   every color-mix — moves on the one clock. */
+@property --background {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: oklch(0.145 0 0);
+}
+
+/* Registered so it resolves to a length rather than to the text of a calc.
+   An unregistered custom property computes to its own token stream — ask for
+   --drop and you get back the string 'calc(var(--s8) * 2)', which CSS can use
+   and JS cannot. The scroll handler needs the number. */
+@property --drop {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: oklch(0.985 0 0);
+}
+
 /* The palette. There is one.
 
    Three blocks used to live here — a light :root, a .dark class, and a
@@ -154,26 +189,6 @@
     50% {
       opacity: 0.8;
     }
-  }
-
-  .animate-fadeIn {
-    animation: fadeIn 0.6s ease-out;
-  }
-
-  .animate-slideUp {
-    animation: slideUp 0.6s ease-out;
-  }
-
-  .animate-slideDown {
-    animation: slideDown 0.6s ease-out;
-  }
-
-  .animate-scaleIn {
-    animation: scaleIn 0.5s ease-out;
-  }
-
-  .animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
   }
 }
 
@@ -509,27 +524,6 @@ html {
   padding: var(--pad);
 }
 
-/* Interactive variants: state is carried by line and fill, never by hue. */
-.card-link {
-  display: block;
-  border: 1px solid var(--card-line);
-  border-radius: var(--r);
-  background: transparent;
-  padding: var(--s3) var(--s4);
-  text-decoration: none;
-  transition: border-color 220ms ease, background-color 220ms ease;
-}
-
-.card-link:hover {
-  border-color: var(--card-line-strong);
-  background: var(--card-fill);
-}
-
-.card-link[data-active='true'] {
-  border-color: var(--card-line-strong);
-  background: var(--card-fill-hover);
-}
-
 /* A media well: the one place colour is allowed, because it comes from work. */
 /* The thumbnail well. No frame, no fill, and nothing clipping it.
 
@@ -555,7 +549,6 @@ html {
 }
 
 .stack > * + * { margin-top: var(--gap); }
-.stack-lg > * + * { margin-top: var(--s5); }
 
 /* A caption row: label left, description centre, year right — set in tabular
    figures so columns align down the page. */
@@ -719,12 +712,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   .cursor-root { display: none; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .portrait-stack[data-splash='true'] .portrait-splash {
-    animation: none;
-  }
-}
-
 /* ─── The transport ───────────────────────────────────────────────────── */
 
 .player {
@@ -746,249 +733,18 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   --parm: 7px;
 }
 
-.player-screw {
-  position: absolute;
-  width: var(--parm);
-  height: var(--parm);
-  opacity: 0.42;
-  transition: opacity 150ms ease 110ms,
-    top var(--switch-off),
-    bottom var(--switch-off);
-}
-
-.player-screw::before,
-.player-screw::after {
-  content: '';
-  position: absolute;
-  background: var(--foreground);
-}
-.player-screw::before { width: var(--parm); height: 1px; }
-.player-screw::after { width: 1px; height: var(--parm); }
-
-.player-screw-tl {
-  left: -2px;
-  top: var(--pedge);
-  transform: translate(-100%, -100%);
-}
-.player-screw-tl::before,
-.player-screw-tl::after { right: 0; bottom: 0; }
-
-.player-screw-tr {
-  right: -2px;
-  top: var(--pedge);
-  transform: translate(100%, -100%);
-}
-.player-screw-tr::before,
-.player-screw-tr::after { left: 0; bottom: 0; }
-
-.player-screw-bl {
-  left: -2px;
-  bottom: var(--pedge);
-  transform: translate(-100%, 100%);
-}
-.player-screw-bl::before,
-.player-screw-bl::after { right: 0; top: 0; }
-
-.player-screw-br {
-  right: -2px;
-  bottom: var(--pedge);
-  transform: translate(100%, 100%);
-}
-.player-screw-br::before,
-.player-screw-br::after { left: 0; top: 0; }
-
 .player[data-on='true'] {
   --pedge: 0%;
 }
-
-.player[data-on='true'] .player-screw {
-  opacity: 0.9;
-  transition: opacity 50ms ease, top var(--switch), bottom var(--switch);
-}
-
-.player[data-on='true'] .player-screw::before,
-.player[data-on='true'] .player-screw::after {
-  animation: mark-strike 480ms ease-out;
-}
-
-
-
-.player-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s3);
-}
-
-.player-transport {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.player-transport button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 22px;
-  border: 1px solid transparent;
-  border-radius: var(--r-sm);
-  background: none;
-  color: color-mix(in srgb, var(--foreground) 62%, transparent);
-  transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
-}
-
-.player-transport button:hover {
-  color: var(--foreground);
-  border-color: var(--card-line);
-  background: var(--card-fill-hover);
-}
-
-.player-play {
-  width: 30px !important;
-  border-color: var(--card-line) !important;
-}
-
-.player[data-on='true'] .player-play {
-  color: var(--foreground);
-  border-color: var(--card-line-strong) !important;
-  background: var(--card-fill-hover);
-}
-
-/* Level meter: four bars on offset cycles so it never reads as a spinner */
-.player-meter {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 12px;
-  color: color-mix(in srgb, var(--foreground) 45%, transparent);
-}
-.player-meter i {
-  display: block;
-  width: 2px;
-  height: 2px;
-  background: currentColor;
-}
-.player[data-on='true'] .player-meter { color: var(--foreground); }
-.player[data-on='true'] .player-meter i { animation: player-bar 1.4s ease-in-out infinite; }
-.player[data-on='true'] .player-meter i:nth-child(2) { animation-delay: .21s; animation-duration: 1.1s; }
-.player[data-on='true'] .player-meter i:nth-child(3) { animation-delay: .47s; animation-duration: 1.75s; }
-.player[data-on='true'] .player-meter i:nth-child(4) { animation-delay: .12s; animation-duration: 1.3s; }
 
 @keyframes player-bar {
   0%, 100% { height: 2px; }
   50% { height: 12px; }
 }
 
-/* ── The display ───────────────────────────────────────────────────────
-   A backlit LCD module, and everything about it follows from the fact that a
-   liquid crystal panel does not emit light. The lamp behind it does; the
-   segments only block it. So the panel is the brightest thing on the module
-   and the text is the darkest — inverted from every other surface here, and
-   that inversion is the whole of why it reads as an LCD.
-
-   Two elements. The window is the lit panel and the bezel around it; the glass
-   inside is what clips and fades the moving title. They were one element until
-   the lamp went in, and the edge fade is a mask — a mask on the window would
-   have faded the lamp out at both ends along with the text. */
-.player-window {
-  --lcd: 140 174 86;
-  position: relative;
-  margin-top: var(--s3);
-  padding: 5px var(--s2);
-  border: 1px solid rgba(0, 0, 0, 0.55);
-  border-radius: var(--r-sm);
-
-  /* The lamp: a strip along the bottom edge, plus a soft pool in the middle,
-     over the panel's own colour. Two gradients rather than one because an edge
-     lamp alone leaves the top flat and a pool alone has no source. */
-  /* Turned up. The falloff is still there — a lamp with no falloff is the
-     tell — but the dimmest corner now sits well clear of the ground rather
-     than fading into it, so the title is legible across the whole panel
-     instead of only over the middle of the lamp. */
-  background:
-    radial-gradient(
-      130% 165% at 50% 76%,
-      rgb(var(--lcd) / 0.92) 0%,
-      rgb(var(--lcd) / 0.70) 48%,
-      rgb(var(--lcd) / 0.48) 100%
-    ),
-    linear-gradient(
-      to top,
-      rgb(var(--lcd) / 0.34) 0%,
-      rgb(var(--lcd) / 0.16) 60%,
-      rgb(var(--lcd) / 0.08) 100%
-    ),
-    #18200e;
-
-  /* Recessed, and throwing a little light onto the faceplate around it. A
-     module is a part set into the panel, not an area printed on it. */
-  box-shadow:
-    inset 0 1px 3px rgba(0, 0, 0, 0.5),
-    0 0 14px rgb(var(--lcd) / 0.22);
-}
-
-/* Brighter when it is running. The lamp does not go out when the music stops —
-   the unit is still powered — it just has less reason to be looked at. */
-.player[data-on='true'] .player-window {
-  --lcd: 162 200 100;
-}
-
-/* The clipping box. The fade is here and only here, so it softens the title
-   without touching the lamp. */
-.player-glass {
-  display: flex;
-  gap: var(--s6);
-  overflow: hidden;
-  white-space: nowrap;
-  mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 10px), transparent);
-}
-
-/* Dark text on a lit ground. Not black: a segment does not block all of the
-   lamp, and a little of the backlight always comes through the crystal, which
-   is why LCD text at rest looks washed rather than solid. */
-/* 400, not 700. Tronica Mono ships a single weight, so a bold here was the
-   browser inventing one — and a synthesised bold of a monospace is precisely
-   what reads as "that is not the right font". Contrast does the work the fake
-   weight was doing, below. */
-.player-track {
-  flex: none;
-  font-size: 10px;
-  font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(8, 13, 4, 0.74);
-}
-
-.player[data-on='true'] .player-track {
-  color: rgba(6, 11, 3, 0.92);
-}
-
-.player-window[data-pan='true'] .player-track {
-  animation: player-pan 14s linear infinite;
-}
-
 @keyframes player-pan {
   from { transform: translateX(0); }
   to { transform: translateX(calc(-100% - var(--s6))); }
-}
-
-.player-foot {
-  display: flex;
-  justify-content: space-between;
-  margin-top: var(--s2);
-  font-size: 9px;
-  /* One weight in the face — see the note on .player-track. */
-  font-weight: 400;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--foreground) 38%, transparent);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .player[data-on='true'] .player-meter i { animation: none; height: 7px; }
-  .player-window[data-pan='true'] .player-track { animation: none; }
 }
 
 /* ─── Corner marks: the selected state ────────────────────────────────── */
@@ -1080,14 +836,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .mark-br::before,
 .mark-br::after { left: 0; top: 0; }
 
-/* Hovering shows the line the four make where they meet — a real stage of the
-   figure rather than a dimmer copy of the end of it. */
-.card-link:hover > .marks,
-.nav-item:hover > .marks {
-  opacity: 0.34;
-  --glow: 0 0 2px rgba(250, 250, 250, 0.5);
-}
-
 /* Switching on. The fade is instant and the picture blooms out of the line,
    overshooting a little before it settles. */
 [data-active='true'] > .marks {
@@ -1133,10 +881,9 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    shows where its pictures are, and hovering is the picture opening rather
    than something appearing out of nothing. */
 .work-shot > .marks {
-  /* 4 + 8 = 12px of reach below the picture. The caption now starts 16px
-     down, so the open marks clear the title rather than sitting on it. */
-  inset: -4px;
-  --arm: 8px;
+  /* The same mark as everywhere else — 7px arms, 2px clear of the box. Three
+     sizes of one mark read as three different marks. 2 + 7 = 9px of reach
+     below the picture, still clear of the caption 16px under it. */
   opacity: 0.26;
 }
 
@@ -1157,79 +904,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   animation: mark-strike 480ms ease-out;
 }
 
-/* ─── The sidebar, in three bands ─────────────────────────────────────────
-   The whole column used to scroll, so on any window shorter than the content
-   a bar sat down the side of the name, the bio and the sections — none of
-   which will ever grow. Only one thing here can: the list of case studies.
-
-   So the shell no longer scrolls at all. The identity, the sections and the
-   heading over the list are fixed, the transport is pinned to the bottom, and
-   the list between them takes whatever height is left and scrolls only when
-   it actually runs out. */
-/* Auto, not hidden. On a window too short for the fixed chrome plus a usable
-   list, something has to give, and the answer is the whole column scrolling
-   the way it used to rather than the transport being clipped off the bottom
-   where it cannot be reached. On any ordinary window nothing here scrolls. */
-.nav-shell {
-  overflow-y: auto;
-  /* Unconditional, unlike the rule Lenis scopes to its own class: a wheel that
-     runs out of sidebar must stop there rather than chaining into the page. */
-  overscroll-behavior: contain;
-}
-
-.nav-fixed {
-  flex: none;
-  padding: var(--s5) var(--s5) 0;
-}
-
-.nav-studies {
-  /* min-height: 0 is what lets a flex child shrink below its content and
-     scroll. Without it the list keeps its full height, pushes the transport
-     off the bottom, and nothing scrolls anywhere. */
-  flex: 1 1 auto;
-  /* A floor of roughly one card plus its padding, so the list cannot be
-     squeezed to a sliver and stop being a list. The fixed chrome and the
-     transport come to 588px, so this keeps a 700px window — an ordinary
-     laptop — on the fast path with the list scrolling and nothing else;
-     the shell only takes over below about 690. */
-  min-height: 96px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: var(--s3) var(--s5);
-  /* The bar is drawn only while you are in the list, and only when the list
-     has somewhere to go. Firefox reads these two; the pseudo-elements below
-     say the same thing to Chromium and Safari. */
-  scrollbar-color: transparent transparent;
-
-  /* The fades at the two ends. Zero by default, so the mask is a hard stop at
-     0% and 100% and takes nothing away; the data attributes below give the
-     end that has somewhere to go its length back.
-
-     Transitioned, because the fade appearing the instant the list is touched
-     is a state change the reader did not make — easing it in lets it read as
-     part of the same movement as the scroll. */
-  --fade-top: 0px;
-  --fade-bottom: 0px;
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    #000 var(--fade-top),
-    #000 calc(100% - var(--fade-bottom)),
-    transparent 100%
-  );
-  transition: scrollbar-color 300ms ease, --fade-top 220ms ease, --fade-bottom 220ms ease;
-}
-
-/* Deeper than the top fade. The bottom edge runs into the transport, so the
-   content has further to travel before it is out of the way of something. */
-.nav-studies[data-over-top='true'] {
-  --fade-top: 28px;
-}
-
-.nav-studies[data-over-bottom='true'] {
-  --fade-bottom: 56px;
-}
-
 /* Registered so the two lengths can be interpolated. An unregistered custom
    property is a string to the animation engine and jumps between values. */
 @property --fade-top {
@@ -1242,71 +916,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   syntax: '<length>';
   inherits: false;
   initial-value: 0px;
-}
-
-.nav-studies:hover,
-.nav-studies:focus-within {
-  scrollbar-color: color-mix(in srgb, var(--foreground) 26%, transparent) transparent;
-}
-
-.nav-studies::-webkit-scrollbar-thumb {
-  background: transparent;
-  transition: background-color 300ms ease;
-}
-
-.nav-studies:hover::-webkit-scrollbar-thumb,
-.nav-studies:focus-within::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--foreground) 26%, transparent);
-  background-clip: padding-box;
-}
-
-.nav-foot {
-  flex: none;
-  padding: 0 var(--s5) var(--s5);
-}
-
-/* ─── Nav items ───────────────────────────────────────────────────────── */
-
-.nav-item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  padding: var(--s3) var(--s3);
-  border: 1px solid var(--card-line);
-  border-radius: var(--r);
-  text-decoration: none;
-  transition: border-color 240ms ease, background-color 240ms ease;
-}
-
-.nav-item:hover {
-  border-color: var(--card-line-strong);
-  background: var(--card-fill);
-}
-
-.nav-item[data-active='true'] {
-  border-color: var(--card-line-strong);
-  background: var(--card-fill-hover);
-}
-
-/* The icon slot. No frame of its own any more — the icon brought one. */
-.nav-plate {
-  position: relative;
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  /* No border and no radius. The icon is already a square tile with its own
-     outline, so a bordered plate around it was a box drawn around a box. */
-  overflow: hidden;
-  opacity: 0.86;
-  transition: opacity 200ms ease;
-}
-
-.nav-item:hover .nav-plate,
-.nav-item[data-active='true'] .nav-plate {
-  opacity: 1;
 }
 
 /* ── Mechanisms ───────────────────────────────────────────────────────── */
@@ -1326,42 +935,17 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1), opacity 320ms ease;
 }
 
-/* Aperture: the blades stop down at rest and open when you arrive. */
-.mech-blades { transform: rotate(14deg) scale(1.1); }
-.nav-item:hover .mech-blades,
-.nav-item[data-active='true'] .mech-blades { transform: rotate(-16deg) scale(0.82); }
-
-/* Contact sheet: the chinagraph select draws itself on. */
-.mech-select {
-  stroke-dasharray: 15;
-  stroke-dashoffset: 15;
-  opacity: 0;
-  transition: stroke-dashoffset 620ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
-}
-.nav-item:hover .mech-select,
-.nav-item[data-active='true'] .mech-select { stroke-dashoffset: 0; opacity: 1; }
-
-/* Bolt: turned one hex flat, as if by a spanner. */
-.nav-item:hover .mech-bolt,
-.nav-item[data-active='true'] .mech-bolt { transform: rotate(30deg); }
-.mech-slot { transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1); }
-.nav-item:hover .mech-slot,
-.nav-item[data-active='true'] .mech-slot { transform: rotate(90deg); }
-
 @media (prefers-reduced-motion: reduce) {
-  [class^='mech'],
-  .mech-select { transition: none; }
-  .nav-item:hover .nav-plate::after { animation: none; }
+  [class^='mech'] { transition: none; }
   /* No collapse, no bloom, no strike — the marks are simply open and lit.
      The CRT is the one idea on the site that is entirely motion, so for
      anyone who has asked for less of it there is nothing left to play. */
   .marks { --edge: 0%; }
   .player { --pedge: 0%; }
   .marks,
-  .mark,
-  .mark::before,
-  .mark::after,
-  .player-screw { transition: none; animation: none; }
+.mark,
+.mark::before,
+.mark::after { transition: none; animation: none; }
 }
 
 /* Quiet inline link — serif italic, underlined, small. Used for asides that
@@ -1407,122 +991,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   transform: translateY(-1px);
 }
 
-/* ─── Orion button ────────────────────────────────────────────────────────
-   The bloom is clipped to the button: the head sits inside it and the stem is
-   cut by the bottom edge, so it reads as growing out of the button rather than
-   dangling below it.
-
-   Geometry, not guesswork: the head centre sits 34% down the artwork, so for a
-   34px button the offsets below place the head with clearance top and bottom
-   and leave roughly 10px of stem visible before the edge cuts it. */
-
-.orion-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 12px 7px 36px;
-  overflow: hidden;
-}
-
-/* Orion sits on the button's bottom edge like a shelf. He is fully visible
-   here rather than clipped — a cat cut in half by a border reads as a bug. */
-.orion-cat {
-  position: absolute;
-  left: 5px;
-  bottom: 0;
-  display: block;
-  pointer-events: none;
-  transform-origin: 50% 100%;
-  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Perks up as you arrive */
-.orion-btn:hover .orion-cat {
-  transform: translateY(-2px) scale(1.04);
-}
-
-.orion-btn:active .orion-cat {
-  transform: translateY(0) scale(1.01);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .orion-cat { transition: none; }
-  .orion-btn:hover .orion-cat { transform: none; }
-}
-
-/* ─── Orion mark ──────────────────────────────────────────────────────────
-   The chat header carries the same bloom as the button that opens it: same
-   plate, same clip, stem cut by the bottom edge. While Orion is thinking the
-   flower sways — the drawer's own loading state rather than bouncing dots. */
-
-.orion-mark {
-  position: relative;
-  flex: none;
-  width: 56px;
-  height: 56px;
-  overflow: hidden;
-  border: 1px solid var(--card-line);
-  background: var(--card-fill);
-  border-radius: var(--r-sm);
-}
-
-/* Orion's replies read as the page's own voice; yours sit on a plate. */
-.msg {
-  max-width: 30ch;
-  padding: var(--s3) var(--s4);
-  border-radius: var(--r-sm);
-}
-
-.msg-user {
-  border: 1px solid var(--card-line);
-  background: var(--card-fill);
-}
-
-.msg-orion {
-  padding-left: 0;
-  padding-right: 0;
-  padding-top: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-}
-
-/* ─── Orion, the cat ──────────────────────────────────────────────────────
-   A pet, so it moves on its own clock: the eyes blink whether or not anyone
-   is watching. Arriving wakes it — the tail flicks and the ears twitch twice.
-   While a translation is pending the tail keeps a slower, steadier sway.
-
-   Origins are in the icon's own user units; transform-box: view-box makes
-   them resolve against the viewBox rather than each part's tight bounding
-   box, so the tail turns from where it meets the body. */
-
-.cat-tail,
-.cat-ear-l,
-.cat-ear-r,
-.cat-eyes {
-  transform-box: view-box;
-}
-
-.cat-tail {
-  transform-origin: 27.6px 42px;
-  animation: cat-idle-tail 9s ease-in-out infinite;
-}
-
-/* On patrol the body is already moving; a second idle loop on top of it reads
-   as two animations rather than one animal. */
-.cat-prowl .cat-tail,
-.cat-prowl .cat-ear-r {
-  animation: none;
-}
-
-.cat-ear-l { transform-origin: 12.8px 10.5px; }
-
-.cat-ear-r {
-  transform-origin: 27.2px 10.5px;
-  animation: cat-idle-ear 11s ease-out infinite;
-}
-
 /* Never fully still. The periods do not divide into the blink's 6.4s, so the
    tail, the ear and the eyes never fall into step with each other. */
 @keyframes cat-idle-tail {
@@ -1534,11 +1002,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   0%, 86%, 100% { transform: rotate(0deg); }
   90% { transform: rotate(9deg); }
   94% { transform: rotate(-3deg); }
-}
-
-.cat-eyes {
-  transform-origin: 20px 15px;
-  animation: cat-blink 6.4s infinite;
 }
 
 @keyframes cat-blink {
@@ -1563,21 +1026,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   62% { transform: rotate(-4deg); }
 }
 
-.cat-wake:hover .cat-tail { animation: cat-flick 820ms ease-in-out infinite; }
-.cat-wake:hover .cat-ear-l { animation: cat-twitch-l 620ms ease-out 2; }
-.cat-wake:hover .cat-ear-r { animation: cat-twitch-r 620ms ease-out 80ms 2; }
-
-/* Waiting on the words to arrive */
-.orion-mark[data-thinking='true'] .cat-tail {
-  animation: cat-flick 1700ms ease-in-out infinite;
-}
-
-/* The plate the cat sits on — same window as the button's bloom. */
-.orion-mark {
-  display: grid;
-  place-items: center;
-}
-
 /* ─── What Orion says ─────────────────────────────────────────────────────
    Both languages are set in the same monospace family at the same size, and
    each meow carries the character count of the word it stands for. A meow and
@@ -1591,32 +1039,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   padding: 0;
 }
 
-.said-line {
-  animation: say-line 320ms var(--ease-light, ease-out) both;
-}
-
-.said-word {
-  font-size: 13px;
-  line-height: 1.75;
-  white-space: pre;
-}
-
-.said-meow {
-  font-style: italic;
-  color: color-mix(in srgb, var(--foreground) 55%, transparent);
-}
-
-.said-en {
-  font-style: normal;
-  color: var(--foreground);
-  animation: say-word 260ms var(--ease-light, ease-out) both;
-}
-
-.said-translating {
-  animation: say-line 260ms var(--ease-light, ease-out) both;
-  opacity: 0.75;
-}
-
 @keyframes say-line {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: none; }
@@ -1628,91 +1050,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   from { opacity: 0.25; }
   to { opacity: 1; }
 }
-
-/* ─── The patrol ──────────────────────────────────────────────────────────
-   Sits above the drawer's content and is clipped by the drawer's own edges,
-   which is what lets him leave one side and arrive from the other. */
-
-.cat-prowl {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 5;
-  display: block;
-  pointer-events: none;
-  transform-origin: 50% 100%;
-  will-change: transform;
-}
-
-/* His bed. Empty while he is out. */
-.orion-mark {
-  position: relative;
-  flex: none;
-  width: 56px;
-  height: 56px;
-  border: 1px solid var(--card-line);
-  background: var(--card-fill);
-  border-radius: var(--r-sm);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .said-line,
-  .said-en,
-  .cat-eyes,
-  .cat-tail,
-  .cat-ear-r,
-  .cat-wake:hover .cat-tail,
-  .cat-wake:hover .cat-ear-l,
-  .cat-wake:hover .cat-ear-r,
-  .orion-mark[data-thinking='true'] .cat-tail { animation: none; }
-  .msg-meow, .msg-en { animation: none; }
-}
-
-/* ─── Orion's gaits ───────────────────────────────────────────────────────
-   Travel is driven from JS; the gait itself is a CSS cycle so it keeps its own
-   cadence no matter how far or how fast he happens to be going. A cat gallop
-   alternates between gathered — spine up, legs under — and extended, so the
-   front and back legs run in opposition and the body rises on the gather. */
-
-.cat-layer {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 5;
-  display: block;
-  pointer-events: none;
-  transform-origin: 50% 100%;
-  will-change: transform;
-}
-
-.cat-pose {
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform-origin: 50% 100%;
-}
-
-.leg-front,
-.leg-back,
-.tail-s,
-.body-s {
-  transform-box: view-box;
-}
-
-.leg-front { transform-origin: 42px 20px; }
-.leg-back { transform-origin: 22px 20px; }
-.tail-s { transform-origin: 15px 18px; }
-
-/* The head pivots at the neck. Cats hold their heads level through almost any
-   body movement — countering the body's pitch here is the single detail that
-   stops a jump looking like a thrown object. */
-.head-s { transform-origin: 46px 16px; }
-.head-s { transform-box: view-box; }
-
-[data-gait='run'] .leg-front { animation: run-front 240ms linear infinite; }
-[data-gait='run'] .leg-back { animation: run-back 240ms linear infinite; }
-[data-gait='run'] .tail-s { animation: run-tail 480ms ease-in-out infinite; }
-[data-gait='run'] .cat-side { animation: run-body 240ms ease-in-out infinite; }
 
 @keyframes run-front {
   0%, 100% { transform: rotate(21deg); }
@@ -1733,137 +1070,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 @keyframes run-body {
   0%, 100% { transform: translateY(0) scaleY(1); }
   50% { transform: translateY(-2.2px) scaleY(0.945); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-gait='run'] .leg-front,
-  [data-gait='run'] .leg-back,
-  [data-gait='run'] .tail-s,
-  [data-gait='run'] .cat-side { animation: none; }
-}
-
-/* ─── Case study, as a record ─────────────────────────────────────────────
-   Structured after a catalogue entry rather than a blog post: a numbered bar
-   that stays put while you read, a title, one line saying what it was, a spec
-   table of the facts, the prose, and then the screens on their own with
-   nothing written over them. */
-
-/* Out on the left, where you are on the right, and where you can go after
-   that. Three tracks rather than space-between: with three items of unequal
-   width, space-between centres the middle one only by accident — it lands
-   halfway between its neighbours, not halfway across the bar, and it moves
-   every time "Prev" is disabled or a number gains a digit. Two 1fr tracks put
-   the counter on the bar's own centre line and hold it there. */
-/* ═══ The record's dock ════════════════════════════════════════════════
-   Navigation that floats over the record instead of sitting at the top of it.
-
-   The position is borrowed from the bar Apple floats near the bottom of a
-   screen: always reachable, never in the flow, going nowhere as you read. The
-   look is not. A frosted capsule at a 999px radius is software pretending to
-   be glass; this site has spent its whole life pretending to be equipment, so
-   this is a faceplate — square two-pixel corners like every other corner
-   here, a hairline edge, four screws, and a blur that reads as smoked perspex
-   over a lit panel.
-
-   Three tracks with the outer two at 1fr, so the counter sits on the dock's
-   own centre line rather than halfway between whatever is either side of it —
-   which is what space-between would give, and it would shift every time Prev
-   went disabled. */
-/* A row at the head of the record. Nothing drawn: no background, no border,
-   no rule under it — the space above the name is what separates them, which is
-   how every other break on this site works.
-
-   One cluster: the counter with an arrow either side of it, so the three read
-   as one control — where you are, and the two ways out of it — rather than as
-   a label and a pair of buttons sharing a row. Ranged left on a desktop,
-   against the same edge as the name below it and the breadcrumb above; a
-   centred group at the head of a left-aligned page belongs to nothing. */
-.dock {
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  padding: var(--s4) var(--s6);
-}
-
-.dock-no {
-  /* Tabular, so the counter does not jitter between records. */
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.12em;
-  color: color-mix(in srgb, var(--foreground) 52%, transparent);
-  white-space: nowrap;
-}
-
-/* No box. The tile is the control — a square with its corners taken off,
-   which is what every icon in the sidebar already is; drawing a rounded
-   rectangle around one of those is two containers for one thing.
-
-   The padding stays and is invisible: a tile is not a touch target on its
-   own, and the target is the part a thumb cares about. Nine either side of a
-   26 tile clears the 44 that costs nothing to honour. */
-.dock-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 9px;
-  color: var(--foreground);
-  transition: opacity 160ms ease;
-}
-
-.dock-btn:hover {
-  opacity: 0.75;
-}
-
-.dock-btn[aria-disabled='true'] {
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-/* On a phone it spans the screen rather than centring, because at 375px a
-   centred panel with three groups in it is the screen anyway. */
-/* On a phone it leaves the flow and floats at the foot.
-   ──────────────────────────────────────────────────────────────────────
-   The position is borrowed from the bar Apple floats near the bottom of a
-   screen: always reachable, out of the flow, going nowhere as you read. The
-   look is not — a frosted capsule at a 999px radius is software pretending to
-   be glass, and this site has spent its whole life pretending to be equipment.
-   So: square two-pixel corners like every other corner here, a hairline edge,
-   and a blur that reads as smoked perspex over a lit panel.
-
-   Fixed positioning ignores document order, which is why the same markup can
-   sit at the head of the page on a desktop and at the foot of the screen
-   here. */
-@media (max-width: 767px) {
-  .dock {
-    position: fixed;
-    /* Only as wide as what is in it. Spanning the screen made a panel with
-       three small things adrift in the middle of it — a floating control that
-       is mostly its own background is a bar, and the point of lifting it out
-       of the flow was that it stops being one. */
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s5));
-    max-width: calc(100vw - var(--s5) * 2);
-    z-index: 60;
-
-    padding: 5px 10px;
-    background: color-mix(in srgb, var(--background) 86%, transparent);
-    backdrop-filter: blur(16px) saturate(1.15);
-    border: 1px solid var(--card-line-strong);
-    border-radius: var(--r);
-    /* The only thing that says the panel is above the page. */
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
-  }
-
-  /* Room at the foot so the dock never lands on the last line. */
-  .case-page {
-    padding-bottom: calc(var(--s8) + 72px) !important;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .dock-btn {
-    transition: none;
-  }
 }
 
 /* The one display moment on the page. A name, set in the working face.
@@ -1970,7 +1176,13 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    Below the record, the work is left to speak. No captions over the images,
    no cards around them — a plate, a hairline, and a number. */
 
-.plate {
+/* Called .frame-plate, not .plate. The Incentiwise record is an export with
+   its own stylesheet and its own .plate — a figure box — and this rule was
+   reaching into it and putting a hairline border on every one, which made four
+   of them two pixels taller than they were drawn and pushed the rest of the
+   page down. Of 137 class names in that record this was the only one the site
+   also used, and one was enough. */
+.frame-plate {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--card-line);
@@ -1983,7 +1195,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   transition: border-color 160ms ease;
 }
 
-.plate img {
+.frame-plate img {
   display: block;
   width: 100%;
   height: auto;
@@ -2294,9 +1506,9 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 @media (prefers-reduced-motion: reduce) {
   .m-masthead,
-  .m-mark,
-  .m-mark .sig,
-  .m-burger i {
+.m-mark,
+.m-mark .sig,
+.m-burger i {
     transition: none;
   }
 }
@@ -2410,81 +1622,9 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   }
 }
 
-/* ─── Mr. Toast's surface ─────────────────────────────────────────────────
-   A right-hand rail on a desktop, where there is a column to spare, and a
-   bottom sheet on a phone, where there is not — and where the thing you want
-   to reach should rise to meet your thumb rather than sit against an edge. */
-
-.chat-surface {
-  position: fixed;
-  z-index: 70;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: var(--sidebar);
-}
-
-@media (min-width: 768px) {
-  .chat-surface {
-    top: 0;
-    right: 0;
-    height: 100vh;
-    width: var(--chat-w, 324px);
-  }
-  .chat-grip {
-    display: none;
-  }
-}
-
-@media (max-width: 767px) {
-  .chat-surface {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    /* svh, not vh: vh ignores the phone's collapsing address bar and the
-       sheet ends up taller than the screen. */
-    height: 86svh;
-    border-top: 1px solid var(--card-line-strong);
-    border-radius: 16px 16px 0 0;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    animation: sheet-up var(--dur-medium, 460ms) var(--ease-medium, ease-out) both;
-  }
-
-  .chat-grip {
-    display: block;
-    width: 38px;
-    height: 4px;
-    margin: 9px auto 2px;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--foreground) 26%, transparent);
-    flex: none;
-  }
-}
-
 @keyframes sheet-up {
   from { transform: translateY(100%); }
   to { transform: none; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .chat-surface { animation: none; }
-}
-
-/* Only a phone gets a scrim; on a desktop the rail sits beside the page
-   rather than over it, and dimming the work would be wrong. */
-.chat-scrim {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .chat-scrim {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 69;
-    background: color-mix(in srgb, var(--background) 45%, transparent);
-    animation: scrim-in 320ms ease-out both;
-  }
 }
 
 @keyframes scrim-in {
@@ -2500,13 +1640,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    marks would otherwise read as specks. */
 
 .shot > .marks {
+  /* A frame is always the subject, so its picture is always on — and at the
+     same size as every other mark on the site. These were drawn longer here
+     once, on the theory that 7px would read as specks against a frame this
+     big; three sizes of one mark read as three different marks instead. */
   opacity: 1;
-  inset: -4px;
-  /* A frame is always the subject, so its picture is always on. Longer arms
-     than the 7px used on controls, because these frames are an order of
-     magnitude bigger and 7px would read as specks. */
   --edge: 0%;
-  --arm: 10px;
 }
 
 /* No collapse on a frame. The travel is half the frame's height — 250px on a
@@ -2516,43 +1655,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .shot[data-slide]:active > .marks {
   opacity: 0.5;
   transition: opacity 90ms ease;
-}
-
-/* The greeting, on its own line above the statement and set in the same face
-   and size — it is the first sentence of the quotation, not a heading over
-   it, so it should not out-shout what follows. */
-.hero-greeting {
-  margin-top: var(--s3);
-  font-family: var(--family-ui);
-  font-weight: 400;
-  font-size: var(--fs-lede);
-  line-height: var(--lh-lede);
-  letter-spacing: var(--ls-lede);
-  color: var(--foreground);
-}
-
-.hero-statement {
-  margin-top: var(--s4);
-  /* Now in the working face, like everything else that speaks here.
-
-     Two things had to move with it. Weight came back to 400 — the 500 was
-     propping up a delicate serif on a dark ground, and a mono at 500 on the
-     same ground is a wall, which is the exact complaint that sent this to a
-     serif in the first place. And tracking closes instead of opening: the
-     0.002em was holding Garamond apart, where a mono is already spaced by
-     its own advance and only wants the edge taken off. */
-  font-family: var(--family-ui);
-  font-weight: 400;
-  font-size: var(--fs-lede);
-  line-height: var(--lh-lede);
-  letter-spacing: var(--ls-lede);
-  color: var(--foreground);
-  /* In characters, exactly, now that the face is monospaced — 46ch used to
-     mean 46 zero-widths and buy about 56 characters of Garamond. Kept near
-     the same line length rather than the same number, so the statement still
-     breaks in four. */
-  max-width: 52ch;
-  text-wrap: balance;
 }
 
 /* ── The CRT ───────────────────────────────────────────────────────────
@@ -2723,121 +1825,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   }
 }
 
-/* ── One band ──────────────────────────────────────────────────────────
-   Record, face, address, on one line and in that order.
-
-   The record takes the free space because it holds the longest line on the
-   page; the photograph is a fixed column because a portrait has a shape it
-   should keep; the address is capped because a card holding an email and a
-   timezone gets emptier, not better, with width. Stretched to a common
-   height, so the three read as one band rather than three leftovers. */
-.about-band {
-  display: grid;
-  /* The band spans the column edge to edge; the surplus goes to the address
-     card. The record is still capped at 460 — its longest line is 46
-     characters and past that it only stretches a short list — and the print
-     is fixed because its crop is fixed, so the third panel is the only one
-     with any business absorbing width. */
-  /* Two panels now that the print has gone up beside the statement. The record
-     keeps its 460 cap — its longest line is 46 characters and past that it only
-     stretches a short list — and the address takes the rest. */
-  grid-template-columns: minmax(0, 460px) minmax(215px, 1fr);
-  gap: var(--s4);
-  align-items: stretch;
-  margin-top: var(--s6);
-}
-.fact-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s4);
-  padding: var(--s4);
-}
-
-/* Labels stay in the quiet register; the values are the page's own colour,
-   because they are the answer and the label is only the question. */
-.fact-value {
-  margin-top: 3px;
-  font-size: var(--fs-value);
-  line-height: 1.5;
-  color: var(--foreground);
-}
-
-/* The page's own colour, not the mail tint. With the availability chip beside
-   it there is one coloured thing on this card, and an address is not it —
-   two accents in one small panel and neither reads as the accent.
-   Which leaves the underline to say it is a link, so it is drawn always
-   rather than on hover, and darkens under the pointer.
-
-   A real underline rather than a bottom border: it hugs the text instead of
-   the box, and skip-ink lifts it around the descender in "iitg". */
-.fact-mail {
-  color: var(--foreground);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-  text-decoration-color: color-mix(in srgb, var(--foreground) 45%, transparent);
-  transition: text-decoration-color 200ms ease;
-}
-
-.fact-mail:hover {
-  text-decoration-color: currentColor;
-}
-
-/* ── The opening: the lockup and the statement ─────────────────────────
-   The drawn title carries the weight, so it gets the larger share of the row
-   and the type sits beside it rather than under it.
-
-   `align-items: end` rather than stretch or centre. The lockup's own artwork is
-   bottom-heavy — the shoulders run to the last row of the file while the top
-   right is empty air above the word "about" — so aligning the two blocks on
-   their bottom edges lines the paragraph up with the shoulder line, where a
-   centred paragraph floats against nothing. */
-.about-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 1fr);
-  gap: var(--s6);
-  align-items: end;
-}
-
-/* The artwork's own proportion, so nothing is cropped and nothing is stretched.
-   890 × 508 is the file; stating it here rather than letting the image set the
-   height is what lets the shader's canvas size itself before the picture has
-   loaded, which is the difference between the row settling once and the row
-   jumping when the asset arrives. */
-.about-lockup {
-  aspect-ratio: 890 / 508;
-  min-width: 0;
-}
-/* The quotation marks and the type they enclose. `min-width: 0` because a grid
-   item's automatic minimum is its content, and one long unbroken word in the
-   statement would otherwise widen this column and squeeze the print. */
-.hero-text {
-  min-width: 0;
-}
-
-/* The column is the measure now: the paragraph no longer sizes anything beside
-   it, so the cap that used to drive the photograph's height is just a second
-   constraint fighting the grid track. */
-.about-hero .hero-statement {
-  max-width: none;
-  margin-top: var(--s4);
-}
-
-.about-hero .hero-greeting {
-  margin-top: 0;
-}
-
-/* Two blocks side by side need roughly 720px between them — the lockup is wide,
-   and squeezing it also squeezes the head. Under that the title stacks over the
-   type and takes the whole measure, which is the arrangement it was drawn for
-   anyway. */
-@container about (max-width: 720px) {
-  .about-hero {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--s4);
-  }
-}
-
 /* ── Panels ────────────────────────────────────────────────────────────
    A bordered box with a named bar across its head. Square, not rounded: the
    corner radius on `.card` is 2px, which reads as a softened panel, and these
@@ -2853,96 +1840,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   min-width: 0;
 }
 
-.panel-bar {
-  display: flex;
-  align-items: center;
-  gap: var(--s2, 8px);
-  padding: 8px var(--s4);
-  border-bottom: 1px solid var(--card-line);
-  /* A shade lighter than the body, not a colour: the bar is chrome, and chrome
-     that takes a hue starts competing with the marks below it. */
-  background: color-mix(in srgb, var(--foreground) 4%, transparent);
-}
-
-.panel-title {
-  font-family: var(--family-ui);
-  font-size: var(--fs-label);
-  font-weight: var(--fw-label);
-  letter-spacing: var(--ls-label);
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--foreground) 52%, transparent);
-}
-
-.panel-body {
-  padding: var(--pad);
-}
-
-/* The marks at the foot of the status panel, standing off the last fact by more
-   than the facts stand off each other — they are a different kind of thing from
-   the rows above them, and equal spacing would file them as one more row. */
-.fact-links {
-  display: flex;
-  gap: var(--s3);
-  margin-top: auto;
-  padding-top: var(--s2, 8px);
-}
-
-.fact-links a {
-  display: grid;
-  place-items: center;
-  opacity: 0.92;
-  transition: opacity 200ms ease, transform 200ms ease;
-}
-
-.fact-links a:hover {
-  opacity: 1;
-  transform: translateY(-1px);
-}
-
-.about-page {
-  container: about / inline-size;
-  /* Even on all four sides. */
-  padding: var(--s6);
-}
-
-/* ── Filling the first screen ──────────────────────────────────────────
-   The page is three short things and it starts at the top, which is where a
-   page starts. An auto top margin used to sit in here pushing the content
-   down to the foot: with a hero and a band below it, that turned the
-   leftover height into air between the two. The page is one block now, and
-   the same rule left a screen of nothing above the portrait.
-
-   The min-height stays, so the column still reaches the fold and the strip
-   at the foot has something to sit against.
-
-   Desktop only: the phone scrolls inside its own container, where 100vh is
-   both wrong and famously unstable as the address bar moves. */
-@media (min-width: 1024px) {
-  .about-page {
-    display: flex;
-    flex-direction: column;
-    /* 5rem is the main column's top padding; the strip is reserved below. */
-    min-height: calc(100vh - 5rem);
-  }
-
-  
-}
-
-@media (max-width: 1023px) {
-  .hero-statement {
-    max-width: none;
-  }
-}
-
-/* One column. Two panels hold their line down to about 560px of column; under
-   that the record's 46-character lines start breaking badly and the address is
-   squeezed to nothing, so they stack. */
-@container about (max-width: 560px) {
-  .about-band {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 /* ── The record ────────────────────────────────────────────────────────
    Work and study in one list, each entry the period with what happened
    under it. The two-column version this replaces spread the same content
@@ -2950,49 +1847,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 .record {
   display: grid;
   gap: var(--s4);
-}
-
-/* Study, set apart from work by space alone. A rule would draw a section
-   boundary the list does not need, and a heading would name a distinction
-   the dates have already made. */
-.record-apart {
-  margin-top: var(--s3);
-}
-
-/* The bio line, wherever it appears. `pretty` costs the browser a little
-   extra line-breaking work in exchange for not stranding the last word of a
-   short paragraph on its own line — which is what binding "things work"
-   together would otherwise have caused in a column this narrow. */
-/* The line under the name is a sentence about a person, not a field of data,
-   and it was the one paragraph in the sidebar the mono was making you decode.
-   Slightly larger than the interface text around it: Raleway sets narrower
-   than the mono at the same size, so matching on px would read as a step down. */
-.bio {
-  font-family: var(--family-read);
-  font-size: 15px;
-  line-height: 1.55;
-  letter-spacing: 0.004em;
-  text-wrap: pretty;
-}
-
-/* ─── The resize divider ──────────────────────────────────────────────────
-   No grip. A pill sitting halfway down a hairline is a control drawn for a
-   gesture the cursor already announces — col-resize is the one pointer shape
-   everybody reads as "this edge moves" — and it left a stray object floating
-   in the margin of every page. The line itself takes the hover instead: it
-   brightens and gains a hair of width, which is enough to say the edge is
-   live once the pointer has already told you what it does. */
-.nav-edge {
-  background: color-mix(in srgb, var(--foreground) 18%, transparent);
-  transition: background-color 160ms ease, width 160ms ease;
-  width: 1px;
-  height: 100%;
-}
-
-.group:hover > .nav-edge,
-.group:active > .nav-edge {
-  background: color-mix(in srgb, var(--foreground) 55%, transparent);
-  width: 2px;
 }
 
 /* ─── Scrollbars ──────────────────────────────────────────────────────────
@@ -3039,41 +1893,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   background: transparent;
 }
 
-/* ─── Case study list ─────────────────────────────────────────────────────
-   The same shape as a nav item: a mark in a plate on the left, title and
-   type stacked beside it. The index used to sit at 11px above the title
-   where it read as a stray piece of metadata; at plate size it becomes the
-   item's mark, and the two lines beside it become the item's content. */
-/* `auto`, not a fixed 40px. The 40 was the icon's own size back when the tiles
-   were drawn at 40, and it stayed behind when they came down to 26 — leaving
-   fourteen pixels of slack inside the column that the gap then added to. The
-   result was 26px between mark and title here against 12px in the nav above,
-   for two rows that are meant to read as the same kind of thing. Sizing the
-   column to its content means the gap is the only thing setting that distance,
-   so it cannot drift again the next time the tiles are resized. */
-.study-link {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--s3);
-  align-items: center;
-}
-
-.study-no {
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  /* Dimmed at rest so four saturated tiles do not shout down the titles they
-     belong to; full strength on the one you are pointing at. */
-  opacity: 0.62;
-  transition: opacity 200ms ease, transform 200ms ease;
-}
-
-.study-link:hover .study-no,
-.study-link[data-active='true'] .study-no {
-  opacity: 1;
-}
-
 /* The record's own leading, tighter than body copy because the entries are
    two short lines rather than paragraphs. The row carrying the institution
    mark takes proportionally more: an 18px mark on a 13px line overflows its
@@ -3087,52 +1906,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   grid-template-columns: auto minmax(0, 1fr);
   gap: var(--s3);
   align-items: start;
-}
-
-.entry-body {
-  display: grid;
-  gap: 1px;
-  min-width: 0;
-}
-
-/* ⊢ — the right-hand half of the plus the corner marks come from. */
-.entry-mark {
-  position: relative;
-  width: 5px;
-  height: 12px;
-  /* Sits on the date's cap height rather than its line box top. */
-  margin-top: 4px;
-  color: color-mix(in srgb, var(--foreground) 38%, transparent);
-}
-
-.entry-mark::before,
-.entry-mark::after {
-  content: '';
-  position: absolute;
-  background: currentColor;
-}
-
-.entry-mark::before {
-  left: 0;
-  top: 0;
-  width: 1px;
-  height: 100%;
-}
-
-.entry-mark::after {
-  left: 0;
-  top: 50%;
-  width: 100%;
-  height: 1px;
-}
-
-.record-line {
-  line-height: var(--lh-record);
-}
-
-.record-line[data-mark='true'] {
-  line-height: calc(var(--lh-record) * 1.27);
-  margin-top: 3px;
 }
 
 /* ─── The content floor, applied ──────────────────────────────────────────
@@ -3164,175 +1937,13 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   letter-spacing: 0.12em;
 }
 
-/* ─── Availability ────────────────────────────────────────────────────────
-   The one filled, coloured thing on the page, and it earns that by being the
-   single fact a visitor might have come to check. Green because the site
-   already uses this green for the phone tile, so the palette does not grow to
-   carry it — and dark text on the fill rather than light, which is what makes
-   it read as a lit chip instead of a tinted outline.
-
-   2px corner, matching every other corner on the site: --r is the radius the
-   cards, plates and wells all use. */
-.status-pill {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: var(--r);
-  /* #4FA871 was a desaturated forest green — a colour that reads as muted
-     even at full opacity, because most of what it is is grey. This one keeps
-     the same hue and takes the grey out: saturation up from roughly 36% to
-     85%, lightness up a little, which is what makes it read as lit against
-     near-black rather than merely present. */
-  background: #21e07a;
-  color: #04150b;
-  font-size: var(--fs-meta-content, 12px);
-  /* One weight in the face — see the note on .player-track. The dark ink on a
-     lit fill is already the strongest contrast on the page. */
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-/* ─── Chat, on the nav's terms ────────────────────────────────────────────
-   The panel sits opposite the sidebar and should be built from the same
-   parts. The tokens already matched; what did not was which token each thing
-   used — most of the chat sat at body size, so against a nav whose repeated
-   items are 12px it read as a larger, looser column.
-
-   The split the nav makes is between prose and controls: its bio is 14px, its
-   items are 12px. The chat now makes the same one. The intro and the messages
-   are prose and stay at 14px; the suggestions and the field are controls and
-   come down to 12px. */
-.chat-suggestion {
-  font-size: var(--fs-title);
-  line-height: 1.55;
-  color: color-mix(in srgb, var(--foreground) 74%, transparent);
-}
-
-.chat-suggestion:hover {
-  color: var(--foreground);
-}
-
-/* ── The composer ──────────────────────────────────────────────────────
-   One object: the field holds the border and the send control sits inside
-   it, so there is no second box floating beside the first. */
-.chat-composer {
-  position: relative;
-  display: flex;
-  align-items: center;
-  border: 1px solid var(--card-line);
-  border-radius: var(--r);
-  background: var(--card-fill);
-  transition: border-color 220ms ease, background-color 220ms ease;
-}
-
-.chat-composer:hover {
-  border-color: var(--card-line-strong);
-}
-
-/* The ring goes on the wrapper rather than the input, since the wrapper is
-   what now looks like the field. */
-.chat-composer:focus-within {
-  border-color: var(--card-line-strong);
-  background: var(--card-fill-hover);
-}
-
-.chat-input {
-  flex: 1;
-  min-width: 0;
-  /* Right padding clears the send control. */
-  padding: 9px 40px 9px 12px;
-  border: 0;
-  background: transparent;
-  color: var(--foreground);
-  font-family: inherit;
-  font-size: var(--fs-title);
-  line-height: 1.5;
-}
-
-.chat-input::placeholder {
-  color: color-mix(in srgb, var(--foreground) 38%, transparent);
-}
-
-.chat-input:focus {
-  outline: none;
-}
-
-/* White, and inside. No border or fill of its own — a second bordered box
-   inside a bordered box is what made the old one read as bolted on. */
-.chat-send {
-  position: absolute;
-  right: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 0;
-  border-radius: var(--r);
-  background: transparent;
-  color: var(--foreground);
-  cursor: pointer;
-  transition: background-color 180ms ease, opacity 180ms ease;
-}
-
-.chat-send:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--foreground) 12%, transparent);
-}
-
-.chat-send:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-/* ─── Presentation mode ───────────────────────────────────────────────────
-   The same frames the page already shows, one at a time and filling the
-   viewport, driven by the arrow keys.
-
-   The rule the whole thing is built on: say what the keys are. A viewer that
-   only reveals its controls on hover is a viewer most people step through
-   twice and abandon, so the keys are named along the bottom, the counter is
-   always where the eye lands first, and the way out is drawn as an ×. Once
-   you have started moving, all of it fades — because at that point you have
-   read it, and a slide deserves the whole screen. */
-
-/* ── The way in ────────────────────────────────────────────────────
-   Sits beside the frame count, where a reader is already looking to find out
-   how much of this there is. Styled as the nav styles its buttons: a hairline
-   that fills in on hover, nothing that moves. */
-.screens-meta {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--s4);
-}
-
-.present-open {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
-  border-radius: 2px;
-  background: transparent;
-  color: color-mix(in oklab, var(--foreground) 72%, transparent);
-  cursor: pointer;
-  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
-}
-
-.present-open:hover,
-.present-open:focus-visible {
-  background: color-mix(in oklab, var(--foreground) 10%, transparent);
-  border-color: color-mix(in oklab, var(--foreground) 38%, transparent);
-  color: var(--foreground);
-}
-
 /* A still frame is a way in at itself. The prototype frames carry no index
    and keep their own cursor, because they are there to be used. */
 .shot[data-slide] {
   cursor: zoom-in;
 }
 
-.shot[data-slide]:hover .plate {
+.shot[data-slide]:hover .frame-plate {
   border-color: color-mix(in oklab, var(--foreground) 34%, transparent);
 }
 
@@ -3355,285 +1966,9 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   overscroll-behavior: contain;
 }
 
-.deck-bar {
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: var(--s4) var(--s5);
-  /* The bar is not a surface, only the two things on it are. Without this it
-     would swallow every click along the top edge, and clicking the slide to
-     advance would stop working wherever the bar happens to lie over it. */
-  pointer-events: none;
-}
-
-.deck-bar > * {
-  pointer-events: auto;
-}
-
-/* Both marks invert against whatever is behind them. A slide that fills the
-   frame edge to edge leaves no black band to sit them on, and the alternative
-   — a scrim, or a box around each — is one more thing on screen than the deck
-   is allowed to have. Inverting costs nothing and reads on any slide. */
-.deck-rail,
-.deck-x {
-  mix-blend-mode: difference;
-  color: #fff;
-}
-
-/* ── How far through ───────────────────────────────────────────────
-   One dash a slide. Long decks compress the dashes rather than scroll them,
-   so the rail is always the whole deck at a glance — a proportion you take in
-   without reading, which a pair of numbers never is. */
-.deck-rail {
-  position: absolute;
-  inset: auto 0 0;
-  z-index: 2;
-  display: flex;
-  align-items: stretch;
-  gap: 3px;
-  height: 3px;
-  padding: 0 var(--s5) var(--s5);
-  box-sizing: content-box;
-  /* Same as the bar: only the dashes are a surface. The rail's padding runs
-     the width of the screen and would otherwise eat every click along the
-     bottom edge that was meant for the slide. */
-  pointer-events: none;
-}
-
-.deck-tick {
-  pointer-events: auto;
-  flex: 1 1 0;
-  min-width: 0;
-  position: relative;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  border-radius: 1px;
-  background: color-mix(in oklab, #fff 20%, transparent);
-  cursor: pointer;
-  transition: background 160ms ease;
-}
-
-.deck-tick.is-past {
-  background: color-mix(in oklab, #fff 42%, transparent);
-}
-
-.deck-tick.is-at {
-  background: #fff;
-}
-
-.deck-tick:hover,
-.deck-tick:focus-visible {
-  background: color-mix(in oklab, #fff 72%, transparent);
-  outline: none;
-}
-
-/* A hit area taller than the 3px it draws, so the rail can be aimed at.
-   Anchored to the dash, not the rail — anchored to the rail every segment's
-   target spans the whole width and only the last one is ever hit. */
-.deck-tick::after {
-  content: '';
-  position: absolute;
-  inset: -11px 0;
-}
-
-/* The way out: present the instant it is wanted, and all but invisible until
-   then. No box — a control that has to be summoned is a control people assume
-   is not there, and a bordered one is a second piece of chrome. */
-.deck-x {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  opacity: 0.3;
-  cursor: pointer;
-  transition: opacity 160ms ease;
-}
-
-.deck-x:hover,
-.deck-x:focus-visible {
-  opacity: 1;
-}
-
-/* ── The slide ─────────────────────────────────────────────────────
-   Contained rather than covered: these are 16:9 slides and cropping one to
-   fill a 4:3 window would cut the thing being presented. */
-.deck-stage {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  /* No padding at all. contain still keeps the whole slide on screen — it
-     simply touches two edges instead of none. */
-  padding: 0;
-  cursor: pointer;
-}
-
-.deck-img {
-  max-width: 100%;
-  max-height: 100%;
-  width: 100%;
-  height: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  border-radius: 2px;
-}
-
-/* Neighbours, fetched so a keypress never waits on the network. */
-.deck-warm {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Said once, on the way in. Sits over the slide rather than in a bar of its
-   own, because it is a remark rather than a control. */
-.deck-hint {
-  position: absolute;
-  left: 50%;
-  bottom: 42px;
-  z-index: 3;
-  translate: -50% 0;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin: 0;
-  padding: 9px 15px;
-  border: 1px solid color-mix(in oklab, #fff 14%, transparent);
-  border-radius: 3px;
-  background: color-mix(in oklab, #0b0c0d 88%, transparent);
-  backdrop-filter: blur(6px);
-  color: color-mix(in oklab, #fff 72%, transparent);
-  white-space: nowrap;
-  animation: deck-hint-in 260ms cubic-bezier(0.25, 0.9, 0.3, 1);
-}
-
 @keyframes deck-hint-in {
   from { opacity: 0; translate: -50% 8px; }
   to { opacity: 1; translate: -50% 0; }
-}
-
-.deck-hint kbd {
-  display: inline-grid;
-  place-items: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 5px;
-  border: 1px solid color-mix(in oklab, #fff 22%, transparent);
-  border-radius: 3px;
-  background: color-mix(in oklab, #fff 8%, transparent);
-  color: #fff;
-  font-family: var(--family-ui);
-  font-size: 12px;
-  line-height: 1;
-}
-
-.deck-hint-touch { display: none; }
-
-@media (hover: none) and (pointer: coarse) {
-  .deck-hint-fine { display: none; }
-  .deck-hint-touch { display: inline; }
-}
-
-
-@media (max-width: 767px) {
-  /* A landscape slide on a portrait phone is limited by its own proportions
-     long before it is limited by the stage, so the stage gives up its side
-     padding rather than shrink the thing being presented. */
-  .deck-stage {
-    padding: 0;
-  }
-
-  .deck-bar {
-    padding: var(--s3) var(--s4);
-  }
-
-  .deck-rail {
-    padding: 0 var(--s4) var(--s4);
-  }
-}
-
-/* The way out, on a screen that has no pointer to reveal it.
-   ──────────────────────────────────────────────────────────────────────
-   Two things were wrong and they compounded.
-
-   The cross was a 30px island held 12px in from two edges, and every pixel
-   around it belongs to the stage — the bar's own padding, the strip out to
-   the corner, the band below it — whose answer to a press is "next slide".
-   So a thumb aimed at the cross and landing a few pixels wide did not miss
-   a control, it hit a different one, and the deck advanced. That is what a
-   dead button looks like from the outside, and it is why it was reported as
-   one.
-
-   And it is drawn at 30% with only :hover to finish it, on the one class of
-   device that has no hover at all. The line on screen says "Tap x to exit"
-   while pointing at something all but invisible.
-
-   So on touch the control takes the corner outright: the bar gives up its
-   padding so there is nothing to fall through, the target goes to 56px, and
-   the safe-area inset is carried as padding — the glyph clears a notch while
-   the box still reaches the physical corner. Half-lit at rest, because
-   faint-until-hovered is a bargain a phone cannot keep its side of. */
-@media (hover: none) and (pointer: coarse) {
-  .deck-bar {
-    padding: 0;
-  }
-
-  .deck-x {
-    box-sizing: border-box;
-    width: 56px;
-    height: 56px;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
-    opacity: 0.55;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .deck-tick,
-  .present-open,
-  .deck-x {
-    transition: none;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   THE ABOUT PAGE — a portrait, a record, and a statement
-   ═══════════════════════════════════════════════════════════════════════════
-   Three pieces floating in the dark: the portrait down the left, the record
-   and the statement stacked on the right.
-
-   Nothing here is framed, filled or rounded. State is carried by the corner
-   marks and by opacity, and the only accent is the site's pink. That means
-   distance is the only separator on the page, so the gaps are load bearing —
-   tightening them collapses the three pieces into one block of text.
-
-   With the channel labels gone, type carries the hierarchy on its own:
-
-     name        the largest thing by a clear margin. It is the only heading
-                 the page has left, so it has to read as the title.
-     record      monospace, tabular figures. A column of dates against a column
-                 of names, read by scanning down.
-     statement   the reading face, at a reading size. The one piece of running
-                 prose here, and the only thing read sentence by sentence. */
-
-/* Settle's element, which would otherwise shrink-wrap the stage and break
-   the height chain between the page and the 1fr row inside it. */
-.about-settle {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
 }
 
 .stage {
@@ -3658,102 +1993,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      1fr row something to be a fraction of. */
   flex: 1;
   align-items: stretch;
-}
-
-/* The picture is the whole of the left column. It keeps a landscape shape of
-   its own rather than stretching to the column's height: the tube is a piece
-   of equipment, and equipment has a proportion. Centred, because the record
-   beside it starts at the top of the same row, and the two have to start
-   together: a picture floated to the middle of a taller column reads as having
-   drifted off the line the rest of the page is drawn on. */
-.stage-signal {
-  grid-column: 1;
-  grid-row: 2;
-  display: flex;
-  /* Hugging the picture, not filling the row. Stretched, the piece kept a
-     couple of hundred pixels of empty box below the tube — invisible until it
-     was pointed at, at which point the corner marks drew a container around a
-     picture and a stretch of nothing, and the hover reached far below the only
-     thing there is to hover. The piece is the picture. */
-  align-self: start;
-}
-
-/* The right column, spread to the same height. space-between is what fills it:
-   the name sits at the top, the statement at the foot, and the record takes
-   the middle however long it runs. */
-/* Top of the row, and a fixed distance between the record and the statement
-   rather than space-between. Spreading them would tie that distance to
-   whatever height was left over after the picture, which means the gap between
-   two paragraphs would change with the size of the window — and on a tall
-   screen it flings the statement to the floor, a long way below the picture it
-   is supposed to sit beside. Twice the row gap: enough that the record and the
-   statement read as two things, since on this page nothing else says so. */
-.stage-side {
-  grid-column: 2;
-  grid-row: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: calc(var(--s7, 48px) * 2);
-  min-width: 0;
-}
-
-/* ── The margins: headings and sign-offs ──────────────────────────────── */
-/* Four small blocks, one at each corner of the content. All are padded to the
-   same inset as the pieces they sit above and below, so four left edges run
-   straight down each column — none of them is a piece, so none gets that
-   padding for free.
-
-   The identity is deliberately not a piece either: dimming the name while
-   pointing at the record would be the page hiding whose record it is. */
-.stage-slug,
-.stage-id,
-.stage-end,
-.stage-more {
-  padding: 0 var(--s3);
-}
-
-.stage-slug {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.stage-id {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.stage-end {
-  grid-column: 1;
-  grid-row: 3;
-}
-
-.stage-more {
-  grid-column: 2;
-  grid-row: 3;
-}
-
-/* The slug and the two sign-offs are one voice — the page talking about itself
-   in the margins. One fixed size rather than a clamp: they are annotation, and
-   annotation that grows with the column starts competing with the thing it is
-   annotating. At a fifth of the foreground they are nearer the ground than the
-   content, which is what lets them sit at the corners without being read as
-   part of it. */
-.stage-slug,
-.stage-end,
-.stage-more {
-  margin: 0;
-  font-family: var(--family-ui);
-  font-size: 16px;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  line-height: 1;
-  color: color-mix(in srgb, var(--foreground) 20%, transparent);
-}
-
-.stage-end,
-.stage-more {
-  align-self: end;
 }
 
 /* ── A piece ──────────────────────────────────────────────────────────── */
@@ -3797,54 +2036,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 .piece[data-state='tuned'] .piece-foot {
   color: color-mix(in srgb, var(--foreground) 36%, transparent);
-}
-
-/* ── The portrait ─────────────────────────────────────────────────────── */
-.stage-shot {
-  width: 100%;
-  /* Landscape, and the tube's own proportion rather than the column's, so the
-     crop is a decision instead of a leftover. cover trims top and bottom;
-     focusY puts the trim below the eyes. */
-  aspect-ratio: 3 / 2;
-  max-height: 100%;
-}
-
-.stage-name {
-  margin: 0;
-  font-family: var(--family-ui);
-  /* Against the container, not the viewport — the column this sits in can be
-     under 800px with the chat panel open, and the name has to come down with
-     it rather than with the window. */
-  font-size: 32px;
-  font-weight: 400;
-  line-height: 1;
-  /* Tronica is already generously spaced by its own advance; at this size the
-     default tracking opens into gaps, so it closes a little. */
-  letter-spacing: -0.01em;
-  color: var(--foreground);
-}
-
-/* Three facts, spaced apart rather than punctuated. The middle dots this
-   replaces were doing a job a gap does better: a separator you can see is one
-   more mark competing with the three things it separates, and at this size
-   they read as belonging to the words. Wrapping is allowed, because the third
-   fact is the one that must not be cut off. */
-.stage-role {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4em var(--s5);
-  margin: 12px 0 0;
-  font-family: var(--family-ui);
-  font-size: 13.5px;
-  letter-spacing: 0.03em;
-  color: color-mix(in srgb, var(--foreground) 58%, transparent);
-}
-
-/* The one fact that is an offer rather than a description, so it takes the
-   site's pink — the same pink that marks every other live thing here. */
-.stage-role em {
-  font-style: normal;
-  color: var(--brand);
 }
 
 /* ── The record ───────────────────────────────────────────────────────── */
@@ -3944,30 +2135,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     row-gap: var(--s6);
     flex: 0 1 auto;
   }
-
-  .stage-slug,
-  .stage-id,
-  .stage-signal,
-  .stage-side,
-  .stage-end {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  .stage-more {
-    display: none;
-  }
-
-  /* Stacked, the two are no longer side by side, so there is no height to
-     match and nothing to spread against. */
-  .stage-side {
-    justify-content: flex-start;
-    gap: var(--s6);
-  }
-
-  .stage-shot {
-    max-width: 560px;
-  }
 }
 
 @container about (max-width: 680px) {
@@ -3995,76 +2162,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   .record-span {
     grid-column: 1 / -1;
   }
-}
-
-/* ── The About page's second half, on a phone ──────────────────────────
-   The work index runs on under the About stage in the same scroll, because a
-   phone has no rail to move between the two with any more. See app/page.tsx
-   for why the desktop keeps them as separate routes.
-
-   The rule at the top is the only thing marking the join. Anything heavier —
-   a band, a filled section, a second masthead — would say these are two
-   documents, and the whole point of putting them in one scroll is that on a
-   phone they are one. */
-.about-continues {
-  display: block;
-  padding: var(--s6) var(--s6) var(--s8);
-}
-
-/* No rule, and no sign-off above it.
-   ──────────────────────────────────────────────────────────────────────
-   Both were drawn for a page that ends here, and on a phone it does not —
-   the work runs straight on underneath. A line across the join says these are
-   two documents; "end of file" over a section that is plainly not the end
-   says something that is not true. Between them they turned one scroll back
-   into two pages with a border between them.
-
-   Scoped to the scroll root, which is the mobile tree and the only place the
-   continuation is ever mounted. A width query would have caught a narrow
-   desktop window too, where the page really does end at that line. */
-[data-scroll-root] .stage-end {
-  display: none;
-}
-
-/* The foot of the phone's scroll.
-   ──────────────────────────────────────────────────────────────────────
-   Contacts, then the rule, then the sign-off — in that order because the
-   contacts are the last useful thing on the page and the sign-off is the
-   thing that says there is nothing after them. Putting the rule above the
-   icons instead would close the document before offering the one action
-   anybody has left to take.
-
-   The gap above is a full step larger than the one between the work tiles.
-   Below four pictures, anything less reads as a fifth item in the list. */
-/* A clear step further off the tiles than the tiles are off each other.
-   At one step the icons read as a fifth item in the list rather than as the
-   foot of the page — the gap that separates a section from the next thing has
-   to be bigger than the one separating items inside it, or it is not saying
-   anything the row gap is not already saying. */
-.about-foot {
-  margin-top: calc(var(--s8) * 1.8);
-}
-
-.about-foot .contact-row {
-  margin-bottom: var(--s6);
-}
-
-/* Set off the rule the same distance the work index sets off its own, so the
-   two labels that bracket the list sit the same way against it. */
-.about-foot-end {
-  margin: var(--s3) 0 0;
-}
-
-/* ── The record bar, on a phone ────────────────────────────────────────
-   The bar is sticky, and sticky is measured against the scrollport — which on
-   a phone starts at the very top of the screen, behind the fixed masthead. So
-   at top: 0 it stuck itself underneath the header and sat there half hidden.
-   Offsetting it by the masthead's measured height lands its top edge exactly
-   on the header's bottom edge.
-
-   The measurement is published by MobileChrome; the fallback is only for the
-   first paint before that effect runs. */
-@media (max-width: 767px) {
 }
 
 /* The mark is a link, but not while the opening is still playing.
@@ -4293,12 +2390,880 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 @media (prefers-reduced-motion: reduce) {
   .live-dev,
-  .live-art-hit,
-  .live-x {
+.live-art-hit,
+.live-x {
     transition: none;
   }
 }
 
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE PAGE
+   ═══════════════════════════════════════════════════════════════════════════
+   One column of content with a wide left margin, a mark fixed at the top of
+   the window, and nothing else. There is no rail any more: no bio, no
+   transport, no chat, no list of projects standing beside the page they lead
+   to. What is left is the work and four lines about the person who made it.
+
+   The measures the whole page hangs off. --page-x is the margin every row
+   stands on; --mark-top is the line the mark sits on when it is at rest. */
+/* --drop is how much lower the front page starts than it finishes: the whole
+   of it, the name included, sits this far down until you scroll. A screen with
+   more room can spend more of it on the pause before the first line. */
+:root {
+  --page-x: var(--s4);
+  --mark-top: var(--s5);
+  --drop: var(--s8);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --page-x: var(--s6);
+    --mark-top: var(--s6);
+    --drop: calc(var(--s8) * 1.5);
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --page-x: var(--s7);
+    --mark-top: var(--s7);
+    --drop: calc(var(--s8) * 2);
+  }
+}
+
+.site-page {
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: calc(var(--mark-top) + 64px + var(--s8)) var(--page-x) 0;
+}
+
+/* The front page opens low. Nothing is above the fold that has to be, and the
+   pause before the first line is the point — a record gets straight on with
+   it, because by then you have chosen to be there. */
+.shell[data-home='true'] .site-page {
+  padding-top: calc(var(--mark-top) + 64px + var(--s8) + var(--drop));
+}
+
+.site-page {
+  /* The arrival, and all of it: up and in, once, on load. It plays on the
+     shell's own element, which outlives every navigation inside the site — so
+     it is an arrival at the site rather than a flourish on each page. */
+  animation: rise 620ms var(--ease-medium, cubic-bezier(0.2, 0.7, 0.2, 1)) 90ms both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── The mark ──────────────────────────────────────────────────────────
+   Fixed at the top of the window for the whole visit. During the opening it
+   stands in the middle of the screen at nearly twice the size; the same
+   element travels, so the name is never redrawn somewhere else — it moves. */
+/* The mark's own size, set here rather than through --fs-sig so it does not
+   move with the rail's scale. */
+.site-mark .sig {
+  font-size: 24px;
+}
+
+.site-mark-slot {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 60;
+  display: grid;
+  justify-items: center;
+  padding-top: var(--mark-top);
+  /* The band spans the window; only the mark in it takes the pointer. */
+  pointer-events: none;
+}
+
+/* ── The veil ──────────────────────────────────────────────────────────
+   What the page goes under on its way up to the mark.
+   ──────────────────────────────────────────────────────────────────────
+   It was a slab of the page's own colour cut to a trapezoid: full width at the
+   top, closing to the mark's span at the bottom. Two things were wrong with
+   it. A clip path has an edge — a straight one, with a kink where the two
+   sides met — so the moment the colour it painted differed from the colour
+   underneath, the shape drew itself on the page. And the taper put all of the
+   cover in the middle and none at the corners, which is backwards: the corners
+   are where a line of the record runs out from under the mark into nothing.
+
+   So: no clipping, and no single layer. Four panes of glass, each blurring
+   what the one before it left, each masked a little more tightly than the
+   last. A mask with a soft ramp does not stop covering the page at a boundary,
+   it stops blurring it gradually, and gradually is the whole trick.
+
+   A band, though, not a dome. The masks were ellipses narrow enough that their
+   own outline was the thing you saw: an arc across the top of the window,
+   sitting on the page like an object rather than reading as the page thinning
+   out. They are much wider now — every one of them is wider than the window —
+   so the part of the arc that lands on screen is nearly flat, and what is left
+   is a band across the whole width that simply runs deeper under the mark.
+   The heaviest blur came down with them: 24px was a lens, and you could see
+   where the lens ended.
+
+   And it reaches further down. The solid part used to stop about fifteen
+   pixels above the top of the mark, which left the name hanging under its own
+   backing instead of standing on it. The depth is measured off the mark now
+   rather than guessed at — see components/Veil.tsx.
+
+   Off at rest: at the top of a page nothing has gone under the mark yet, and
+   glass over the first screen would only fog what is on it. */
+.site-veil {
+  position: absolute;
+  inset: 0 0 auto;
+  height: calc(var(--mark-top) + 132px);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.shell[data-scrolled='true'] .site-veil {
+  opacity: 1;
+}
+
+/* Blur, and a pull toward the colour the page already is.
+   ──────────────────────────────────────────────────────────────────────
+   The second half is what fixes the dark acts. A wash is a flat colour at
+   some alpha, so over a white screen on an ink act it lays a grey film across
+   the picture and you can see precisely where the film stops. brightness and
+   contrast together are an affine map on what is behind — see toward() in
+   components/Veil.tsx — so on an ink act the whole thing collapses to very
+   nearly a multiply: black stays black, which means the pane does nothing
+   wherever the page is already ink, and a white screen comes down while
+   keeping its own structure. Something receding into the dark, rather than
+   something with a sheet over it.
+
+   Unprefixed only, and deliberately. Writing the -webkit- twin beside it made
+   the build collapse the pair to the prefixed one alone, which this browser
+   does not support — so the glass was not glass, it was nothing. Left on its
+   own the standard property survives and the build adds whatever prefix its
+   targets actually need. */
+.site-veil > span {
+  position: absolute;
+  inset: 0;
+  display: block;
+  backdrop-filter: blur(var(--b)) var(--veil-f, brightness(1));
+  mask-image: var(--profile);
+}
+
+/* Four ellipses standing on the top edge, centred on the mark, every one of
+   them wider than the window. The width is the whole point: at 150% the arc
+   that crosses the screen drops about a fifteenth of its depth from the middle
+   to the corner, so it reads as a level band; at 44% it dropped all of it, and
+   that is a dome. They tighten and blur harder in turn — but none of them
+   tightens past the edges of the window, so no pane ever has an outline on
+   screen. */
+.site-veil > span:nth-child(1) {
+  --b: 3px;
+  --veil-f: var(--veil-f1, brightness(1));
+  --profile: radial-gradient(
+    150% 100% at 50% 0%,
+    #000 0 40%,
+    rgba(0, 0, 0, 0.45) 64%,
+    transparent 92%
+  );
+}
+
+.site-veil > span:nth-child(2) {
+  --b: 6px;
+  --veil-f: var(--veil-f2, brightness(1));
+  --profile: radial-gradient(
+    120% 94% at 50% 0%,
+    #000 0 34%,
+    rgba(0, 0, 0, 0.45) 56%,
+    transparent 84%
+  );
+}
+
+.site-veil > span:nth-child(3) {
+  --b: 11px;
+  --veil-f: var(--veil-f3, brightness(1));
+  --profile: radial-gradient(
+    104% 86% at 50% 0%,
+    #000 0 28%,
+    rgba(0, 0, 0, 0.45) 48%,
+    transparent 76%
+  );
+}
+
+.site-veil > span:nth-child(4) {
+  --b: 16px;
+  --veil-f: var(--veil-f4, brightness(1));
+  --profile: radial-gradient(
+    92% 74% at 50% 0%,
+    #000 0 22%,
+    rgba(0, 0, 0, 0.45) 40%,
+    transparent 66%
+  );
+}
+
+/* The colour, if there is no shader. Glass keeps the mark off the detail
+   underneath but not off its contrast — six dark letters over a blurred dark
+   photograph are still six dark letters — so something has to be laid on. The
+   canvas does this better and does it instead; this is what is left when a
+   machine has no WebGL, and it is kept honest with the same shape: a band
+   across the whole width, swelling under the mark, solid past the foot of it.
+   See components/Veil.tsx. */
+.site-veil::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      124% 100% at 50% 0%,
+      var(--background) 0 48%,
+      color-mix(in srgb, var(--background) 50%, transparent) 72%,
+      transparent 96%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--background) 0 24%,
+      color-mix(in srgb, var(--background) 34%, transparent) 44%,
+      transparent 70%
+    );
+  transition: opacity 200ms ease;
+}
+
+/* The shader is up, so the gradient stands down. */
+.site-veil[data-gl='on']::after {
+  opacity: 0;
+}
+
+/* The field itself, over the glass and under the mark. */
+.site-veil-field {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Four sheets of live blur is a lot to ask of a phone, and at that width the
+   mark has far less to stand clear of. The heaviest one goes. */
+@media (max-width: 767px) {
+  .site-veil > span:nth-child(4) {
+    display: none;
+  }
+}
+
+/* What moves the name down the front page and back up as you scroll. The
+   fallback is the drop itself, so the very first paint has it in the right
+   place — before any scroll handler has run, and before React has mounted. */
+.site-mark-lift {
+  display: block;
+  transform: translateY(var(--mark-drop, 0px));
+}
+
+.shell[data-home='true'] .site-mark-lift {
+  transform: translateY(var(--mark-drop, var(--drop)));
+}
+
+/* The name, not the corner element. Called .site-mark for exactly that
+   reason: .mark is four small brackets on a box, and giving both the same
+   name put position: relative on all four of them. */
+.site-mark {
+  position: relative;
+  pointer-events: auto;
+  color: var(--foreground);
+  text-decoration: none;
+  /* The name carries its own ground.
+     ──────────────────────────────────────────────────────────────────
+     Three shadows of the page's own colour, stacked so each one falls on what
+     the last one left, which makes a halo that hugs the letterforms instead of
+     spreading. Against a page of that colour it is invisible — it is the page
+     — and against a white screen scrolling under it on an ink act it is the
+     entire reason the name stays readable.
+
+     This is what let the veil come down. It was carrying the legibility on its
+     own before, which is why it had to be heavy enough to see. A halo costs
+     the area of six letters; a wash costs the width of the window. */
+  /* One number for how dense the halo is. It was fully opaque, which over a
+     light screen on a dark act read as a drawn outline rather than as the
+     letters simply having something behind them. */
+  --halo: 50%;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--background) var(--halo), transparent))
+    drop-shadow(0 0 10px color-mix(in srgb, var(--background) var(--halo), transparent))
+    drop-shadow(0 1px 3px color-mix(in srgb, var(--background) var(--halo), transparent));
+  animation: rise 520ms var(--ease-medium, cubic-bezier(0.2, 0.7, 0.2, 1)) both;
+}
+
+/* ── About ─────────────────────────────────────────────────────────────
+   Three columns: the margin the page names itself in, the column it is read
+   in, and the contacts standing at the right edge. The first is empty on
+   purpose. The page opens on five lines and a sentence, and the air either
+   side is what makes them the only thing to look at. */
+.about {
+  display: grid;
+  /* The left column is exactly the distance from the page's edge to the left
+     edge of the mark — measured rather than guessed, because it depends on how
+     wide six letters are in that face at that size. See Shell. The gap is nil
+     for the same reason: a gap would push the column past the mark by the
+     width of it, and the point is that the first line read starts on the same
+     line the name starts on. */
+  grid-template-columns: var(--mark-col, 46%) minmax(0, 1fr);
+  column-gap: 0;
+  align-items: start;
+  padding-bottom: var(--s8);
+}
+
+/* A section naming itself, in the same hand both times. */
+.about-slug,
+.work-slug {
+  margin: 0;
+  font-family: var(--family-ui);
+  font-size: 16px;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  color: color-mix(in srgb, var(--foreground) 20%, transparent);
+}
+
+.about-slug {
+  grid-column: 1;
+  padding: 2px var(--s5) 0 0;
+}
+
+.about-col {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  /* Twice the row gap, so the record, the offer and the sentence read as
+     three things rather than one block of margin type. */
+  gap: var(--s7);
+  min-width: 0;
+}
+
+/* The offer at one end of the line, the document at the other, and the width
+   of the column between them. */
+.about-open {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s5);
+  margin: 0;
+  font-family: var(--family-ui);
+  font-size: 13.5px;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  color: var(--brand);
+}
+
+.about-cv {
+  font-size: var(--fs-label);
+  white-space: nowrap;
+}
+
+/* The sentence, and the four ways to reach him standing in a column at the
+   right edge of the box it is in — which is the line every role in the record
+   above ends on. Inside the box rather than in a column of the page's own,
+   which is where they were: four small icons holding a third of the grid. */
+.about-statement {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s6);
+}
+
+.statement-body {
+  min-width: 0;
+}
+
+.contact-rail {
+  flex: none;
+  margin-top: 0;
+}
+
+.contact-row[data-dir='down'] {
+  flex-direction: column;
+}
+
+/* ── The work ──────────────────────────────────────────────────────────── */
+.work {
+  padding-bottom: var(--s8);
+}
+
+/* No rule under it any more. A line drawn across the page was putting a
+   border around a list that already reads as one, and the two sections of the
+   page now say what they are the same way — once each, in the margin. */
+.work-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: var(--s3);
+}
+
+.work-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--s6);
+  row-gap: var(--s7);
+  margin-top: var(--s6);
+}
+
+/* ── The foot ──────────────────────────────────────────────────────────── */
+.foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s4);
+  padding: var(--s8) 0 calc(env(safe-area-inset-bottom, 0px) + var(--s8));
+}
+
+.foot .contact-row {
+  margin-top: 0;
+}
+
+.foot-cv {
+  font-size: var(--fs-label);
+}
+
+/* ── On a phone ────────────────────────────────────────────────────────
+   One column, in reading order: the page names itself, the record, the offer,
+   the sentence, and the four ways to reach him under it. The wide left margin
+   is a thing a wide screen can afford and a phone cannot. */
+@media (max-width: 767px) {
+  .about {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--s6);
+  }
+
+  .about-slug,
+.about-col {
+    grid-column: 1;
+  }
+
+  .about-slug {
+    padding-right: 0;
+  }
+
+  /* "Open to work" and "Curriculum vitae" meet in the middle at this width,
+     so they stop sharing a line. */
+  .about-open {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s4);
+  }
+
+  /* And the contacts lie down again: a column beside a sentence needs a margin
+     to stand in, and a phone has none. */
+  .about-statement {
+    display: block;
+  }
+
+  .contact-row[data-dir='down'] {
+    flex-direction: row;
+  }
+
+  .work-tiles {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--s6);
+  }
+
+  /* The date moves above its row rather than being squeezed beside it, and
+     the entries stand further apart to say which date belongs to which name
+     now that the row no longer does it. */
+  .record {
+    gap: var(--s5);
+  }
+
+  .record-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 3px;
+  }
+
+  .record-span {
+    grid-column: 1 / -1;
+  }
+}
 
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   A RECORD
+   ═══════════════════════════════════════════════════════════════════════════
+   Two columns for the whole page. The work and everything written about it
+   take the right three quarters; the left quarter is margin, and the index
+   that tracks your place in the record is what stands in it. Nothing runs
+   edge to edge and nothing is centred.
+
+   The gap between them is nil and the gutter is padding inside the margin
+   column, so the record's column is three quarters of the page exactly — with
+   a gap it would be three quarters of what was left after the gap, which is
+   not the same measurement and not the one that was asked for. */
+.case {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+  column-gap: 0;
+  align-items: start;
+}
+
+.case-head,
+.case-frames,
+.case-foot {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.case-head {
+  padding-bottom: var(--s8);
+}
+
+.case-foot {
+  margin-top: var(--s8);
+  padding-bottom: var(--s8);
+}
+
+/* The record's own transport, at the head of it. */
+.case-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding-bottom: var(--s6);
+}
+
+.case-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  color: var(--foreground);
+  transition: opacity 160ms ease;
+}
+
+.case-nav-btn:hover {
+  opacity: 0.75;
+}
+
+.case-nav-btn[aria-disabled='true'] {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.case-nav-no {
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+}
+
+/* ── The index ─────────────────────────────────────────────────────────
+   A tape running past a head, not a list with something picked out in it.
+   The line for the frame you are on always sits on the same mark, and the
+   rest of the record moves around it — so the column answers "where am I"
+   without being read. See components/CaseIndex.tsx. */
+.case-index {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  padding-right: var(--s7);
+  position: sticky;
+  top: calc(var(--mark-top) + 110px);
+  align-self: start;
+}
+
+.case-index-window {
+  position: relative;
+  /* An odd number of lines, so one of them is the middle. */
+  height: calc(var(--row) * 13);
+  overflow: hidden;
+  /* The ends of the tape fade rather than stop, so it reads as running past
+     rather than as a box with a list in it. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+}
+
+/* The head: the one mark on the column that does not move. */
+.case-index-window::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 5px;
+  height: 1px;
+  background: var(--brand);
+  z-index: 1;
+}
+
+.case-index-tape {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* Six lines above the middle of thirteen. */
+  transform: translateY(calc((6 - var(--at)) * var(--row)));
+  transition: transform 420ms var(--ease-medium, cubic-bezier(0.2, 0.7, 0.2, 1));
+}
+
+.case-index-row {
+  display: flex;
+  align-items: center;
+  height: var(--row);
+  padding-left: var(--s3);
+}
+
+.case-index-row button {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.case-index-no,
+.case-index-label {
+  font-family: var(--family-ui);
+  letter-spacing: 0.02em;
+  transition: color 240ms ease;
+}
+
+.case-index-no {
+  font-size: 9.5px;
+  color: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+
+.case-index-label {
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: color-mix(in srgb, var(--foreground) 28%, transparent);
+}
+
+.case-index-row[data-on='true'] .case-index-no {
+  color: var(--brand);
+}
+
+.case-index-row[data-on='true'] .case-index-label {
+  color: var(--foreground);
+}
+
+/* ── On a phone ────────────────────────────────────────────────────────
+   One column, and no index: there is no margin to put it in, and the number
+   in the corner of every plate says the same thing. */
+@media (max-width: 767px) {
+  .case {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .case-head,
+.case-frames,
+.case-foot {
+    grid-column: 1;
+  }
+
+  .case-index {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-index-tape {
+    transition: none;
+  }
+
+  /* Someone who has asked for less motion is not shown an arrival. */
+  .site-mark,
+  .site-page {
+    animation: none;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   A RECORD BUILT AS A LONG SCROLL
+   ═══════════════════════════════════════════════════════════════════════════
+   One record is not a sequence of frames but a piece built in acts, exported
+   from the file it was designed in and served as it was made — its own markup
+   and its own stylesheet, scoped under .story so none of it reaches the rest
+   of the site. See app/work/incentiwise.
+
+   What the site adds is the colour. */
+
+/* The act paints nothing; the page takes its colour instead. That is the whole
+   idea — the work has no ground of its own, and the site is the ground. The
+   element selector is what beats the export's own .ink, .cream and the rest. */
+/* Shown at the width it was drawn at, or at the fraction of it the window
+   can hold — see StoryFit. zoom scales the boxes too, so the page is as tall
+   as the scaled record and everything that measures it keeps working. */
+/* The export set a background on its own html and body, which scoping turned
+ into a background on the story itself — so the record painted ink over the
+ page colour it was supposed to be revealing. The wrapper is what beats it. */
+.site-page .story {
+  background: transparent;
+  /* The width the record was drawn at, which is the export own #cs box. Its
+     acts are plain block divs, so without it they take the width of whatever
+     column they are dropped into and everything inside them measured in
+     fractions or per cent is measured against the wrong number. The pages
+     inside are a fixed 1440 and looked right, which is what hid it. */
+  width: 1440px;
+  /* The export never sets one, so every line in it was measured against the
+     browser default. The site sets 1.5 on the document, which the record then
+     inherited: every row of text in it came out four to eight pixels taller
+     than it was drawn, and the error piled up to 170px down the length of the
+     page. */
+  line-height: normal;
+  zoom: var(--story-k, 1);
+}
+
+.story section.page {
+  background: transparent;
+  margin-inline: auto;
+}
+
+/* ── Full screen ───────────────────────────────────────────────────────
+   A picture in a record, at its own size. See components/Lightbox.tsx. The
+   ground is the page's own colour rather than a black scrim, so on the long
+   scroll it opens out of whatever act you were reading and closes back into
+   it — the picture is lifted off the page, not covered by a different one. */
+.story img,
+.case-frames img {
+  cursor: zoom-in;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  background: color-mix(in srgb, var(--background) 93%, #000);
+  animation: lightbox-in 200ms var(--ease-medium, cubic-bezier(0.2, 0.7, 0.2, 1)) both;
+}
+
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lightbox-stage {
+  place-self: stretch;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: var(--s6);
+  touch-action: none;
+}
+
+.lightbox-stage[data-grab='true'] {
+  cursor: grab;
+}
+
+.lightbox-stage[data-grab='true']:active {
+  cursor: grabbing;
+}
+
+.lightbox-shot {
+  /* Against the window, not against the box it sits in. The stage centres
+     its one child in an auto-sized row, which leaves the height it would
+     measure a percentage against indefinite — so max-height: 100% quietly
+     means none, and a tall screen opened at its full natural height and ran
+     off both ends of the window. */
+  max-width: calc(100vw - var(--s6) * 2);
+  max-height: calc(100dvh - var(--s6) * 2);
+  /* Zoom is at the pointer, and the arithmetic that keeps a point still
+     assumes the picture grows about its middle. */
+  transform-origin: center center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.lightbox-shut {
+  position: absolute;
+  top: var(--s5);
+  right: var(--s5);
+  z-index: 1;
+  display: inline-flex;
+  padding: 10px;
+  border: 0;
+  background: none;
+  color: color-mix(in srgb, var(--foreground) 45%, transparent);
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.lightbox-shut:hover {
+  color: var(--foreground);
+}
+
+.lightbox-hint {
+  position: absolute;
+  left: 50%;
+  bottom: var(--s5);
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: var(--family-ui);
+  font-size: var(--fs-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--foreground) 26%, transparent);
+  pointer-events: none;
+}
+
+/* Eased, so an act arrives rather than switches. Long enough to read as the
+   room changing, short enough not to lag the scroll that caused it.
+   ──────────────────────────────────────────────────────────────────────
+   One transition, on the two tokens, and the whole page comes with them: the
+   ground, the mark, the index, the rules, the margin type, the glass under the
+   mark. They used to be transitioned one property at a time — a
+   background-color here, a colour there — which looked right until two of them
+   were side by side, because a transition chasing a value that has already
+   jumped is not the same curve as the jump. Now one value moves and everything
+   is read off it, so there is nothing left to fall out of step. */
+html[data-story='on'] {
+  transition: --background 520ms ease, --foreground 520ms ease;
+}
+
+/* The same two columns every record has: the index in the left quarter, the
+   work in the right three quarters. The record is drawn at 1440 and scaled
+   into that column rather than reflowed into it, so what is on screen is the
+   design at a different size and not a different design — and it is only ever
+   scaled down, so nothing is ever shown larger than it was drawn. */
+.case-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+  column-gap: 0;
+  align-items: start;
+}
+
+.case-story .case-index {
+  grid-column: 1;
+  padding-right: var(--s7);
+  position: sticky;
+  top: calc(var(--mark-top) + 110px);
+  align-self: start;
+}
+
+.story-col {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.story-foot {
+  padding: var(--s8) 0;
+}
+
+/* One column on a phone, and no index: there is no margin to put it in, and
+   the act headings in the record say the same thing. */
+@media (max-width: 767px) {
+  .case-story {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .case-story .case-index {
+    display: none;
+  }
+
+  .story-col {
+    grid-column: 1;
+  }
+}
