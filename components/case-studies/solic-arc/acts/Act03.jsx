@@ -34,6 +34,29 @@ function Bars({ rows, first }) {
   )
 }
 
+/* One reading of the survey: the figure, what it says, the question behind it
+   and the bar it came out of. Three of these make the argument, so the number
+   is set smaller than a single hero figure would be and sits beside its
+   sentence rather than above it — otherwise the section runs to three screens
+   and the three stop reading as one sequence. */
+function Beat({ n, say, q, parts, mu = false }) {
+  return (
+    <div className="solic-beat">
+      <div
+        className="font-display font-bold tracking-[-0.055em] leading-[0.82] sa-t-num solic-beat-n"
+        style={mu ? { color: 'var(--mu)' } : undefined}
+      >
+        {n}<span className="text-mu">/{N}</span>
+      </div>
+      <div>
+        <p className="sa-t-sub">{say}</p>
+        <p className="sa-t-label text-mu mt-5">{q}</p>
+        <Stack className="mt-4" parts={parts} />
+      </div>
+    </div>
+  )
+}
+
 function Dots() {
   const cats = [['Advanced / professional, 5+ years', 70, 1], ['Intermediate, 2–5 years', 23, 0.45], ['Beginner, 0–2 years', 7, 0.18], ['Described it in their own words', 2, 0]]
   const dots = cats.flatMap(([l, v, o]) => Array.from({ length: v }, () => o))
@@ -158,29 +181,47 @@ export default function Act03() {
       </div>
 
       {/* The tension */}
+      {/* Three readings of the same 102 responses, in the order that makes the
+          argument: what players put up with, how many of them still pick the
+          traditional shape anyway, and how few pick the guitars built to fix
+          it. The middle figure is a cross-tabulation — the two answers counted
+          on the same respondent, not two separate percentages set side by side.
+
+          This replaced a pair of figures, 75 who wanted a contoured body
+          against 59 who preferred heritage guitars, which was not a
+          contradiction at all: a Stratocaster is contoured and heritage both.
+          Contouring does not divide the two camps. Discomfort does, and only
+          the raw sheet can say who reported both. */}
       <div className="sa-wrap mt-32 md:mt-48">
-        <Kind className="mb-10">Evidence · two separate questions</Kind>
-        <div className="solic-evidence">
-          <div>
-            <div className="font-display font-bold tracking-[-0.055em] leading-[0.82] text-[clamp(96px,13vw,220px)] sa-t-num">75<span className="text-mu">/102</span></div>
-            <p className="sa-t-sub mt-6">said yes to a contoured body.</p>
-            <p className="sa-t-label text-mu mt-6">Q · “Do you prefer a contoured body for comfort?”</p>
-            <Stack className="mt-4" parts={[['Yes', 75], ['Maybe', 18, 0.45], ['No', 9, 0.18]]} />
-          </div>
-          <div>
-            <div className="font-display font-bold tracking-[-0.055em] leading-[0.82] text-[clamp(96px,13vw,220px)] sa-t-num">59<span className="text-mu">/102</span></div>
-            <p className="sa-t-sub mt-6">chose heritage guitars as the type they prefer most.</p>
-            <p className="sa-t-label text-mu mt-6">Q · “Which type of electric guitar do you prefer the most?”</p>
-            <Stack className="mt-4" parts={[['Heritage (Fender, Gibson, PRS)', 59], ['No strong preference', 26, 0.45], ['Ergonomic', 12, 0.28], ['Artistic / custom', 5, 0.14]]} />
-          </div>
+        <Kind className="mb-10">Evidence · the same 102 responses, cross-tabulated</Kind>
+        <div className="solic-beats">
+          <Beat
+            n="95" say="named an ergonomic problem with their guitar, or a place it hurts them."
+            q="Q · ergonomic issues and pain or strain, counted together"
+            parts={[['Reported at least one', 95], ['Reported nothing', 7, 0.22]]}
+          />
+          <Beat
+            n="57" say="did that and still name heritage guitars as the type they prefer most."
+            /* Out of 102, like the figure above it. Drawn against the 59 who
+               prefer heritage the bar would be all but full, which beside a
+               figure reading /102 says the wrong thing at a glance. The 57
+               of 59 is the sharper number and it is in the line instead. */
+            q="only 2 of the 59 who prefer heritage report no discomfort at all"
+            parts={[['Heritage, reports a discomfort', 57], ['Everyone else', 45, 0.22]]}
+          />
+          <Beat
+            n="12" mu say="chose the guitars built to solve it."
+            q="Q · “Which type of electric guitar do you prefer the most?”"
+            parts={[['Heritage (Fender, Gibson, PRS)', 59, 0.3], ['No strong preference', 26, 0.18], ['Ergonomic', 12, 1], ['Artistic / custom', 5, 0.1]]}
+          />
         </div>
       </div>
       <div className="sa-wrap sa-g12 mt-20 md:mt-28">
         <div className="col-span-12 md:col-start-3 md:col-span-8">
-          <p className="sa-t-sec">Different questions. Both answers hold at the same time.</p>
+          <p className="sa-t-sec">Discomfort is not what decides the guitar.</p>
           <div className="mt-10 md:mt-12 grid grid-cols-1 md:grid-cols-[auto_1fr] gap-x-8 gap-y-3">
             <Kind className="md:pt-1.5">Interpretation</Kind>
-            <p className="sa-t-body">Players want the comfort that contouring promises. Most of them still choose the shapes they grew up with. Only 12 of 102 named ergonomic guitars as their favourite type. The gap between those answers is where this project sits.</p>
+            <p className="sa-t-body">Almost nobody is comfortable: 95 of 102 named something. That is not evidence that traditional shapes hurt more than the rest — players who prefer ergonomic guitars report problems too, at 9 of 12. What it says is that the discomfort is not what the choice turns on. 57 players carry a complaint and pick the traditional shape anyway; 12 pick the guitars designed to answer it. That gap is where this project sits.</p>
           </div>
         </div>
       </div>
@@ -195,10 +236,13 @@ export default function Act03() {
           </div>
           <div>
             <Label className="mb-6">Pain or strain while playing · where</Label>
-            <Bars first rows={[['No pain', 36], ['Wrist', 23], ['Back', 22], ['Shoulder', 17], ['Neck', 9]]} />
+            {/* 40, not the 36 who ticked the option: four more wrote "None"
+                in the free-text box, which is the same answer typed instead
+                of clicked. Counting them apart was an artifact of the form. */}
+            <Bars first rows={[['No pain', 40], ['Wrist', 23], ['Back', 22], ['Shoulder', 17], ['Neck', 9]]} />
           </div>
         </div>
-        <Cap className="max-w-[60ch]">Bars are drawn against all 102 respondents. Players could pick several answers, and a few wrote their own (shoulders, forearm edges, the thumb hitting the heel, a guitar sliding on the leg). Many report no pain at all. The rest describe a spread of compromises, and none of this says traditional guitars cause pain.</Cap>
+        <Cap className="max-w-[60ch]">Bars are drawn against all 102 respondents and show the listed options. Players could pick several, and a few wrote their own: fingers, a forearm against the body edge, the thumb hitting the heel, a guitar sliding off the leg. In all, 92 named at least one ergonomic issue and 62 at least one place they feel pain, and 95 named one or the other — the figure above. Ten named no issue and 40 no pain. None of this says traditional guitars cause pain.</Cap>
       </div>
 
       {/* Weight + sitting */}
@@ -216,6 +260,15 @@ export default function Act03() {
           <div>
             <Label className="mb-3">Most comfortable sitting position</Label>
             <Stack parts={[['on the right thigh, traditional', 71], ['on the left thigh, classical', 21, 0.45], ['both or other', 10, 0.18]]} />
+          </div>
+          {/* Contouring lives here, with the rest of what players want from a
+              body, rather than up in the evidence for the contradiction. It is
+              good evidence for the decision to contour and no evidence of a
+              tension: the guitars most of these players already own are
+              contoured. */}
+          <div>
+            <Label className="mb-3">Do you prefer a contoured body for comfort?</Label>
+            <Stack parts={[['yes', 75], ['maybe', 18, 0.45], ['no', 9, 0.18]]} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-x-6 gap-y-3 sa-rule pt-5">
             <Kind className="md:pt-1">Interpretation</Kind>
