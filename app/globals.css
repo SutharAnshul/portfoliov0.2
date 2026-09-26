@@ -81,6 +81,28 @@
   initial-value: oklch(0.985 0 0);
 }
 
+/* The colour of the name's halo, resolved once here rather than mixed inside
+   the filter that uses it.
+   ──────────────────────────────────────────────────────────────────────
+   It used to be written straight into the drop-shadows as
+   `color-mix(in srgb, var(--background) 50%, transparent)`, three times. That
+   asks a filter function to resolve a mix of a registered custom property
+   that a case study is animating underneath it, and iOS Safari does not: it
+   drew the name's halo as a hard rectangle the size of the element's box —
+   a white slab behind the name on the light acts, invisible on the dark ones
+   where it happened to match. Desktop browsers, including a phone-sized
+   desktop window, resolved it correctly, which is what made it look like a
+   layout problem rather than a paint one.
+
+   Registered as a colour, this computes to a real rgba before anything reads
+   it, so the filter never sees a mix — and because it is registered it still
+   interpolates with --background rather than snapping at an act boundary. */
+@property --halo-ink {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
 /* The palette. There is one.
 
    Three blocks used to live here — a light :root, a .dark class, and a
@@ -2410,16 +2432,24 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 /* --drop is how much lower the front page starts than it finishes: the whole
    of it, the name included, sits this far down until you scroll. A screen with
    more room can spend more of it on the pause before the first line. */
+/* --mark-top carries the top safe-area inset because the page now reaches the
+   bezel — see viewportFit in app/layout.tsx. The inset is 0 everywhere that
+   has no notch, so this is the same number it always was on a desktop, and on
+   a phone it is the distance that keeps the name clear of the clock. */
 :root {
   --page-x: var(--s4);
-  --mark-top: var(--s5);
-  --drop: var(--s8);
+  --mark-top: calc(env(safe-area-inset-top, 0px) + var(--s5));
+  /* A phone has less room to spend on the pause before the first line, and it
+     was spending the most: 216px of nothing above "//about me//", a quarter of
+     the screen, before the page said anything. Enough is kept that the name
+     still travels on the way up. */
+  --drop: var(--s5);
 }
 
 @media (min-width: 768px) {
   :root {
     --page-x: var(--s6);
-    --mark-top: var(--s6);
+    --mark-top: calc(env(safe-area-inset-top, 0px) + var(--s6));
     --drop: calc(var(--s8) * 1.5);
   }
 }
@@ -2427,7 +2457,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 @media (min-width: 1280px) {
   :root {
     --page-x: var(--s7);
-    --mark-top: var(--s7);
+    --mark-top: calc(env(safe-area-inset-top, 0px) + var(--s7));
     --drop: calc(var(--s8) * 2);
   }
 }
@@ -2686,11 +2716,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      the area of six letters; a wash costs the width of the window. */
   /* One number for how dense the halo is. It was fully opaque, which over a
      light screen on a dark act read as a drawn outline rather than as the
-     letters simply having something behind them. */
+     letters simply having something behind them. The mix happens in
+     --halo-ink, above, and not here — see the note there for why. */
   --halo: 50%;
-  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--background) var(--halo), transparent))
-    drop-shadow(0 0 10px color-mix(in srgb, var(--background) var(--halo), transparent))
-    drop-shadow(0 1px 3px color-mix(in srgb, var(--background) var(--halo), transparent));
+  --halo-ink: color-mix(in srgb, var(--background) var(--halo), transparent);
+  filter: drop-shadow(0 0 4px var(--halo-ink)) drop-shadow(0 0 10px var(--halo-ink))
+    drop-shadow(0 1px 3px var(--halo-ink));
   animation: rise 520ms var(--ease-medium, cubic-bezier(0.2, 0.7, 0.2, 1)) both;
 }
 
@@ -2860,9 +2891,97 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     flex-direction: row;
   }
 
+  /* One set of contacts, at the end.
+     ────────────────────────────────────────────────────────────────────
+     Wide, this rail stands in the margin beside the sentence and the foot
+     carries its own copy at the bottom of the page: two rows, but never both
+     in view, and each reading as part of the thing it sits in. Stacked, the
+     margin is gone, so the rail drops into the flow immediately under the
+     sign-off — hard against it, and then the same four icons again a
+     screenful later. The page is short enough that you see both.
+     The one at the foot is the one that stays: it is where you look for a way
+     to reach someone once you have read the work, and it is what gives the
+     page an ending rather than a last tile. */
+  .about-statement .contact-rail {
+    display: none;
+  }
+
+  /* One column, and further apart than two columns needed. Side by side, each
+     tile is bounded by its neighbour; stacked, the only thing between one
+     tile's caption and the next tile's picture is this gap, and at 32px the
+     caption read as a label on the picture below it as much as on its own. */
   .work-tiles {
     grid-template-columns: minmax(0, 1fr);
-    row-gap: var(--s6);
+    row-gap: var(--s7);
+  }
+
+  /* ── A scale for the hand ──────────────────────────────────────────
+     Every size on this page was the desktop's. Nothing scaled, so type drawn
+     for a 1440px canvas with a wide margin either side was being read at
+     390px: dates, roles, the case-file line, the item count and the CV link
+     all at 10.5px, organisations at 13px. Below about 12px a phone is asking
+     to be squinted at, and five of those lines were under it.
+
+     The slug comes DOWN, which looks like the odd one out and is the point:
+     at 16px "//about me//" was larger than the organisations it introduces,
+     so the label outranked the content. A label should be the quietest thing
+     in its own section.
+
+     Tokens where a token exists, so one number moves a family, and scoped to
+     the three sections of this page rather than :root — the records have
+     their own scale and their own margins and are not this problem. */
+  .about,
+  .work,
+  .foot {
+    --fs-label: 12px;
+    --fs-meta: 12.5px;
+    --fs-title: 14px;
+  }
+
+  .about-slug,
+  .work-slug {
+    font-size: 14px;
+  }
+
+  .record-span {
+    font-size: 12.5px;
+  }
+
+  .record-org {
+    font-size: 16px;
+  }
+
+  .record-role {
+    font-size: 13.5px;
+  }
+
+  .about-open {
+    font-size: 15px;
+  }
+
+  /* Back down from the offer it stands under: it is the quieter half of that
+     pair, and at the label size it had become a footnote. */
+  .about-cv {
+    font-size: 13.5px;
+  }
+
+  .statement {
+    font-size: 20px;
+  }
+
+  /* The foot came to 128px of nothing between the last caption and the icons —
+     the work's own bottom padding and the foot's top padding, each sized for a
+     page with a wide margin around it, stacked end to end. Together they are
+     now a little more than the 48px that separates everything else on the
+     page, which is enough to say the work has finished without leaving a
+     screenful of dark to scroll through to find out. */
+  .work {
+    padding-bottom: var(--s6);
+  }
+
+  .foot {
+    padding-top: var(--s7);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s7));
   }
 
   /* The date moves above its row rather than being squeezed beside it, and

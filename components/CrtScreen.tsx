@@ -261,9 +261,29 @@ void main() {
   // of the picture, so the bounds test happens here and cropping happens after.
   vec2 sUv = curve(vUv);
 
-  // Past the glass there is no picture, and no bezel painted either — the
-  // page shows through, so the tube keeps its own silhouette.
-  if (sUv.x < 0.0 || sUv.x > 1.0 || sUv.y < 0.0 || sUv.y > 1.0) {
+  /* Past the glass there is no picture, and no bezel painted either — the
+     page shows through, so the tube keeps its own silhouette.
+
+     How much of THIS pixel is glass, rather than whether its centre happens to
+     be. The test used to be a bare "outside, so draw nothing", one bit per
+     pixel, and a bowed edge answered one bit at a time is a staircase — so along
+     the sides of a thumbnail, where the curve is shallow and each step runs
+     for several pixels before it drops.
+
+     There is no fwidth() here: this is WebGL1 and the derivatives extension is
+     not asked for, so the pixel's size is measured rather than queried. curve()
+     is evaluated one device pixel along each axis and the difference is how far
+     a pixel carries you in uv — a manual derivative, two extra calls of half a
+     dozen multiplies. Distance to the edge over that gives coverage in pixels,
+     and the half-pixel offset centres the ramp on the boundary rather than
+     starting it there. The two axes multiply, which is what rounds the corners
+     where both edges cut the same pixel. */
+  vec2 px = 1.0 / uRes;
+  vec2 duv = abs(curve(vUv + vec2(px.x, 0.0)) - sUv)
+           + abs(curve(vUv + vec2(0.0, px.y)) - sUv);
+  vec2 cov = clamp(min(sUv, 1.0 - sUv) / max(duv, vec2(1e-6)) + 0.5, 0.0, 1.0);
+  float glass = cov.x * cov.y;
+  if (glass <= 0.0) {
     gl_FragColor = vec4(0.0);
     return;
   }
@@ -445,7 +465,10 @@ void main() {
   // Alpha is NOT modulated by the beam or the mask. Those darken the picture;
   // letting them touch alpha would punch the raster clean through the
   // silhouette and show the page in stripes.
-  gl_FragColor = vec4(toSrgb(col), alphaAt(uv));
+  // Both channels take the edge coverage, because the context is
+  // premultipliedAlpha: a half-covered pixel carries half the colour as well as
+  // half the alpha, or the ramp reads as a bright fringe around the tube.
+  gl_FragColor = vec4(toSrgb(col) * glass, alphaAt(uv) * glass);
 }`
 
 function compile(gl: WebGLRenderingContext, type: number, src: string) {
@@ -767,9 +790,17 @@ export function CrtScreen({
     gl.uniform1f(u.scan, -1)
 
     const size = () => {
-      // Capped at 2: past that the grille is finer than anyone can see and it
-      // is four times the fragments for it.
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      /* Match the device, up to 3.
+         ──────────────────────────────────────────────────────────────────
+         This was capped at 2 on the grounds that a finer grille is invisible,
+         which is true of the grille and false of the tube's outline. On a 3x
+         phone the canvas was drawn 716 wide and shown across 1074 device
+         pixels, so every step in that outline was blown up half again on the
+         way to the screen: the staircase you could see was as much the
+         upscale as the edge itself.
+         Three rather than uncapped, because the fragment count is the square
+         of this and some phones report 4. */
+      const dpr = Math.min(window.devicePixelRatio || 1, 3)
       const w = Math.max(1, Math.round(box.clientWidth * dpr))
       const h = Math.max(1, Math.round(box.clientHeight * dpr))
       if (cv.width !== w || cv.height !== h) {

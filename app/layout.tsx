@@ -87,6 +87,21 @@ export const viewport: Viewport = {
   // tab strip the icon sits in, not the page it points at.
   colorScheme: 'dark',
   themeColor: '#252525',
+
+  /* Paint to the edges of the glass.
+     ──────────────────────────────────────────────────────────────────────
+     Without this a phone lays the page out inside the safe area and fills the
+     rest — the strip behind the clock and the battery, and the strip behind
+     the home indicator — with a flat bar of its own. On a dark site that bar
+     read as a black band across the top of every screenshot, and on a case
+     study that paints itself cream it read as a black band above a cream page.
+     With `cover` the document itself reaches the bezel and there is no bar to
+     be a different colour from anything.
+     It is only safe to ask for because everything that sits at an edge already
+     keeps out of the way by itself: the mark adds the top inset to its own
+     offset (see --mark-top), and the foot and the prototype window add the
+     bottom one. */
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({
