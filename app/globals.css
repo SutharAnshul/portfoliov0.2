@@ -2635,27 +2635,46 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   );
 }
 
-/* The colour. Glass keeps the mark off the detail underneath but not off its
-   contrast — six dark letters over a blurred dark photograph are still six
-   dark letters — so something has to be laid on. A band across the whole
-   width, swelling under the mark, solid past the foot of it, mixed from
-   --background so it is whatever colour the page has gone. */
+/* The colour, and only a hint of it.
+   ──────────────────────────────────────────────────────────────────────
+   Glass keeps the mark off the detail underneath but not off its contrast —
+   six dark letters over a blurred dark photograph are still six dark letters —
+   so a little of the page's own colour is laid over the blur. A little.
+
+   This was written as the fallback for a machine with no WebGL, back when a
+   shader did the colour, and it was drawn to carry the whole job alone: solid
+   --background for the top half of the band. With the shader gone it became
+   what everyone sees, and an opaque slab of page colour is not a veil, it is a
+   lid — it hid the graduated blur that is the actual effect.
+
+   The shader's own weights were 7.9% under the mark and 4% out on the
+   shoulders; it could afford that because each pane also carried a
+   brightness/contrast pair that made the glass behave as nearly a multiply on
+   a dark act, and that went with it. So this sits above the shader's numbers
+   and far below the slab's: two gradients that cross rather than fade in step,
+   peaking together around a quarter under the mark and thinning to almost
+   nothing at the edges.
+
+   --veil-wash is the one number to turn if the name ever needs more ground
+   under it. --veil-edge is what the shoulders keep. */
 .site-veil::after {
+  --veil-wash: 20%;
+  --veil-edge: 10%;
   content: '';
   position: absolute;
   inset: 0;
   background:
     radial-gradient(
       124% 100% at 50% 0%,
-      var(--background) 0 48%,
-      color-mix(in srgb, var(--background) 50%, transparent) 72%,
+      color-mix(in srgb, var(--background) var(--veil-wash), transparent) 0 40%,
+      color-mix(in srgb, var(--background) calc(var(--veil-wash) * 0.45), transparent) 68%,
       transparent 96%
     ),
     linear-gradient(
       to bottom,
-      var(--background) 0 24%,
-      color-mix(in srgb, var(--background) 34%, transparent) 44%,
-      transparent 70%
+      color-mix(in srgb, var(--background) var(--veil-edge), transparent) 0 22%,
+      color-mix(in srgb, var(--background) calc(var(--veil-edge) * 0.4), transparent) 46%,
+      transparent 72%
     );
 }
 
