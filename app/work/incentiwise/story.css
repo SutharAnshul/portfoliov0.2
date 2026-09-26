@@ -133,7 +133,24 @@
 .story .act01 .q.s {font-size:19px;opacity:.55}
 .story .act01 .q.b {font-size:34px}
 .story .act02 .roles {border-top:1px solid var(--line-l)}
+/* The row is aligned on its content, and the eyebrows are lifted out of the
+   way of that.
+   ──────────────────────────────────────────────────────────────────────
+   align-items:baseline lines a row up on each cell's FIRST baseline, and in
+   two of these five cells the first line is not the content — it is the
+   MONEY and SEES label above it, set at 11px. So the row had three baselines
+   at once: 01 and the paragraph on one, the 52px role name on a second
+   because its line-height puts it lower, and "Funds it" and the star on a
+   third, below both, each at a different depth because one is 26px and the
+   other 18px.
+   Taking the labels out of flow leaves each cell's first line as its content,
+   so one baseline runs across the row: the number, the name, the money, the
+   description and what the role sees. The labels sit directly above the thing
+   they name, which is where they already looked like they were. */
 .story .act02 .role {display:grid;grid-template-columns:82px 424px 188px 1fr 106px;column-gap:24px;align-items:baseline;padding:34px 0 30px;border-bottom:1px solid var(--line-l)}
+.story .act02 .role .job,.story .act02 .role .sees {position:relative}
+.story .act02 .role .job em,.story .act02 .role .sees em {position:absolute;bottom:100%;left:0;margin:0 0 8px}
+.story .act02 .role .sees em {left:auto;right:0}
 .story .act02 .role .n {font:500 13px JB,monospace;opacity:.45}
 .story .act02 .role .nm {font-weight:600;font-size:52px;letter-spacing:-.035em;line-height:1.1}
 .story .act02 .role .job {font-weight:600;font-size:26px;letter-spacing:-.02em}

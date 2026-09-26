@@ -37,7 +37,13 @@ export default function Act01() {
         <Reveal
           name="headstock" eager parallax={4}
           alt="Black and white close-up of the Solic Arc headstock and tuners, shot with a shallow depth of field."
-          className="w-full h-[62vh] md:h-[86vh] max-h-[980px]" imgClass="object-cover object-[60%_40%]"
+          /* The photograph's own proportion, 1743x1213, rather than a box a
+             fraction of the window tall with object-cover trimming whatever
+             did not fit. At 86vh it was very nearly a square and the headstock
+             was being cut on both sides to make one. The only crop left is the
+             8% the parallax scales it by so it has somewhere to travel. */
+          className="w-full" wrapStyle={{ aspectRatio: '1743 / 1213' }}
+          imgClass="object-cover object-[60%_40%]"
         />
         <div className="sa-wrap"><Cap>The headstock of the finished guitar. The rest of it waits until the end of the page.</Cap></div>
       </div>

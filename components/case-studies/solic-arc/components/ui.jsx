@@ -26,7 +26,7 @@ export function Img({ name, alt, className = '', imgClass = '', eager = false, s
 }
 
 /* Image that uncovers from a mask as it enters. Always visible at rest. */
-export function Reveal({ name, alt, className = '', imgClass = 'object-cover', from = 'bottom', eager, imgStyle, parallax = 0 }) {
+export function Reveal({ name, alt, className = '', imgClass = 'object-cover', from = 'bottom', eager, imgStyle, wrapStyle, parallax = 0 }) {
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const src = useSrc()
@@ -38,7 +38,15 @@ export function Reveal({ name, alt, className = '', imgClass = 'object-cover', f
   const y = useTransform(sp, [0, 1], [`${-parallax}%`, `${parallax}%`])
   const [w, h] = manifest[name] || [1600, 1000]
   return (
-    <motion.div ref={ref} className={`overflow-hidden ${className}`} style={reduce ? undefined : { clipPath: clip }}>
+    <motion.div
+      ref={ref}
+      className={`overflow-hidden ${className}`}
+      /* wrapStyle is how a frame gets a shape that is not a Tailwind class —
+         an aspect ratio taken from the file's own dimensions, say, which no
+         precompiled stylesheet can know. It is merged rather than replaced, so
+         the reveal's own clip still rides on top. */
+      style={{ ...(wrapStyle || {}), ...(reduce ? {} : { clipPath: clip }) }}
+    >
       <motion.img
         src={src(name)} alt={alt} width={w} height={h}
         loading={eager ? 'eager' : 'lazy'} decoding="async"

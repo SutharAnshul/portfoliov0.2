@@ -129,10 +129,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="shell" data-scrolled={scrolled} data-home={home}>
       <div className="site-mark-slot">
-        {/* What the page goes under on its way up to the mark: four panes of
-            glass, and a shader for the colour on them. It only runs while it
-            is on screen, which is what the flag is for. */}
-        <Veil active={scrolled} />
+        {/* What the page goes under on its way up to the mark: one pane of
+            glass and a wash of the page's own colour. Whether it is shown is
+            the shell's business — .shell[data-scrolled] fades it — so it takes
+            nothing and knows nothing. */}
+        <Veil />
 
         {/* What carries the name down and back up. It is its own element
             because the name already animates its own arrival with a transform,

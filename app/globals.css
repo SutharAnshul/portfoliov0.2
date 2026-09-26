@@ -2553,72 +2553,50 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    does not support — so the glass was not glass, it was nothing. Left on its
    own the standard property survives and the build adds whatever prefix its
    targets actually need. */
+/* One pane of glass, and a wash of the page's own colour over it.
+   ──────────────────────────────────────────────────────────────────────
+   This was four panes and a WebGL canvas: four stacked backdrop-filters, each
+   with its own blur radius, its own radial mask and a brightness/contrast pair
+   written from script per act, and above them a shader drawing the colour with
+   a noise-warped boundary and a dither. Six compositing layers under a fixed
+   mark, to fade the top of a page out.
+
+   It cost more than it was worth and it was the other half of the mark's
+   rectangle on WebKit: an element with a filter, sitting above a stack of
+   backdrop-filters inside a position: fixed container, is exactly the
+   arrangement that gets an opaque backing store there. Pinch-zooming cleared
+   it because that forces a re-raster; the next colour change brought it back
+   because that repaints the layer.
+
+   What is left does the same job. One blur, masked with the same wide radial
+   profile the four shared — 150% wide so the arc drops about a fifteenth of
+   its depth from the middle of the window to the corner and reads as a level
+   band rather than a dome. Over it, the colour wash that was already written
+   here as the shader's fallback, and which has been what non-WebGL browsers
+   have seen all along.
+
+   Given up with the canvas: the warped boundary and the dither. The mask is a
+   plain arc now, and a ramp of one colour over 130px can band on a flat act.
+   It has not, because the ramp is over a blur rather than over a solid, and
+   because the two gradients below cross rather than run in step. */
 .site-veil > span {
   position: absolute;
   inset: 0;
   display: block;
-  backdrop-filter: blur(var(--b)) var(--veil-f, brightness(1));
-  mask-image: var(--profile);
-}
-
-/* Four ellipses standing on the top edge, centred on the mark, every one of
-   them wider than the window. The width is the whole point: at 150% the arc
-   that crosses the screen drops about a fifteenth of its depth from the middle
-   to the corner, so it reads as a level band; at 44% it dropped all of it, and
-   that is a dome. They tighten and blur harder in turn — but none of them
-   tightens past the edges of the window, so no pane ever has an outline on
-   screen. */
-.site-veil > span:nth-child(1) {
-  --b: 3px;
-  --veil-f: var(--veil-f1, brightness(1));
-  --profile: radial-gradient(
+  /* Unprefixed only, and deliberately. Writing the -webkit- twin beside it
+     made the build collapse the pair to the prefixed one alone, which this
+     browser does not support — so the glass was not glass, it was nothing.
+     Left on its own the standard property survives and the build adds
+     whatever prefix its targets actually need. */
+  backdrop-filter: blur(9px);
+  mask-image: radial-gradient(
     150% 100% at 50% 0%,
-    #000 0 40%,
-    rgba(0, 0, 0, 0.45) 64%,
-    transparent 92%
-  );
-}
-
-.site-veil > span:nth-child(2) {
-  --b: 6px;
-  --veil-f: var(--veil-f2, brightness(1));
-  --profile: radial-gradient(
-    120% 94% at 50% 0%,
     #000 0 34%,
-    rgba(0, 0, 0, 0.45) 56%,
-    transparent 84%
+    rgba(0, 0, 0, 0.45) 58%,
+    transparent 88%
   );
 }
 
-.site-veil > span:nth-child(3) {
-  --b: 11px;
-  --veil-f: var(--veil-f3, brightness(1));
-  --profile: radial-gradient(
-    104% 86% at 50% 0%,
-    #000 0 28%,
-    rgba(0, 0, 0, 0.45) 48%,
-    transparent 76%
-  );
-}
-
-.site-veil > span:nth-child(4) {
-  --b: 16px;
-  --veil-f: var(--veil-f4, brightness(1));
-  --profile: radial-gradient(
-    92% 74% at 50% 0%,
-    #000 0 22%,
-    rgba(0, 0, 0, 0.45) 40%,
-    transparent 66%
-  );
-}
-
-/* The colour, if there is no shader. Glass keeps the mark off the detail
-   underneath but not off its contrast — six dark letters over a blurred dark
-   photograph are still six dark letters — so something has to be laid on. The
-   canvas does this better and does it instead; this is what is left when a
-   machine has no WebGL, and it is kept honest with the same shape: a band
-   across the whole width, swelling under the mark, solid past the foot of it.
-   See components/Veil.tsx. */
 .site-veil::after {
   content: '';
   position: absolute;
@@ -2636,34 +2614,8 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
       color-mix(in srgb, var(--background) 34%, transparent) 44%,
       transparent 70%
     );
-  transition: opacity 200ms ease;
 }
 
-/* The shader is up, so the gradient stands down. */
-.site-veil[data-gl='on']::after {
-  opacity: 0;
-}
-
-/* The field itself, over the glass and under the mark. */
-.site-veil-field {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* Four sheets of live blur is a lot to ask of a phone, and at that width the
-   mark has far less to stand clear of. The heaviest one goes. */
-@media (max-width: 767px) {
-  .site-veil > span:nth-child(4) {
-    display: none;
-  }
-}
-
-/* What moves the name down the front page and back up as you scroll. The
-   fallback is the drop itself, so the very first paint has it in the right
-   place — before any scroll handler has run, and before React has mounted. */
 .site-mark-lift {
   display: block;
   transform: translateY(var(--mark-drop, 0px));
