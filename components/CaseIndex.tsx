@@ -30,12 +30,24 @@ const ROW = 22
 /** Where the head sits: the line the current frame is read against. */
 const HEAD = 0.42
 
-export function CaseIndex({ labels }: { labels: string[] }) {
+export function CaseIndex({
+  labels,
+  selector = '[data-frame]',
+  marks,
+}: {
+  labels: string[]
+  /* What the tape tracks. A record's frames by default; Solic Arc brings its
+     own sections, marked [data-act], and is read the same way. */
+  selector?: string
+  /* What stands in the number column. Positions by default; an act list wants
+     its own, because the last one is called Coda rather than 08. */
+  marks?: string[]
+}) {
   const [at, setAt] = useState(0)
   const frames = useRef<HTMLElement[]>([])
 
   useEffect(() => {
-    frames.current = [...document.querySelectorAll<HTMLElement>('[data-frame]')]
+    frames.current = [...document.querySelectorAll<HTMLElement>(selector)]
     if (!frames.current.length) return
 
     let queued = 0
@@ -74,7 +86,7 @@ export function CaseIndex({ labels }: { labels: string[] }) {
       ro.disconnect()
       if (queued) cancelAnimationFrame(queued)
     }
-  }, [labels.length])
+  }, [labels.length, selector])
 
   const go = (i: number) => {
     const el = frames.current[i]
@@ -90,7 +102,7 @@ export function CaseIndex({ labels }: { labels: string[] }) {
           {labels.map((label, i) => (
             <li key={i} className="case-index-row" data-on={i === at}>
               <button type="button" onClick={() => go(i)}>
-                <span className="case-index-no">{String(i + 1).padStart(2, '0')}</span>
+                <span className="case-index-no">{marks?.[i] ?? String(i + 1).padStart(2, '0')}</span>
                 <span className="case-index-label">{label}</span>
               </button>
             </li>

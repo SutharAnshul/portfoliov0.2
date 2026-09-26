@@ -1,0 +1,92 @@
+/* Source for solic.css. Do not import this file directly: run `node tools/build-solic-css.mjs`.
+   Everything is scoped to .solic so the case study can sit inside any host site. */
+
+@tailwind base;       /* preflight is disabled in tailwind.solic.config.js: this only emits --tw-* defaults */
+/* reset first, so the editorial classes and utilities below override it */
+/* ---------- scoped reset (replaces Tailwind preflight inside .solic) ---------- */
+.solic, .solic *, .solic ::before, .solic ::after { box-sizing: border-box; border: 0 solid; }
+.solic :where(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, ol, ul, table) { margin: 0; padding: 0; }
+.solic :where(h1, h2, h3, h4, h5, h6) { font-size: inherit; font-weight: inherit; }
+.solic :where(ol, ul) { list-style: none; }
+.solic :where(img, svg, video) { display: block; vertical-align: middle; }
+.solic :where(img, video) { max-width: 100%; height: auto; }
+.solic :where(table) { border-collapse: collapse; text-indent: 0; }
+.solic :where(th) { text-align: inherit; }
+/* neutralise host element styles (h1 { color }, p { font-size }, section { padding } …) inside the case study */
+.solic :where(h1, h2, h3, h4, h5, h6, p, a, li, dt, dd, th, td, figcaption, blockquote, footer, span) {
+  color: inherit; font-family: inherit; font-size: inherit; line-height: inherit; letter-spacing: inherit; text-transform: inherit;
+}
+.solic :where(section, main, header, footer, figure, div) { margin: 0; padding: 0; }
+.solic :where(img) { border-radius: 0; box-shadow: none; }
+
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- root ---------- */
+.solic {
+  --fg: #16140f;
+  --mu: rgba(22, 20, 15, 0.58);
+  --rule: rgba(22, 20, 15, 0.16);
+  --blue: #2438e8;
+  --red: #b02a20;
+  --acc: #16140f;
+  --sa-gutter: max(16px, 5vw);
+  color: #16140f;
+  font-family: 'SA Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.55;
+  text-align: left;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+.solic ::selection { background: var(--fg); color: #f1ece3; }
+.solic a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+.solic a:focus-visible, .solic button:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+/* ---------- editorial system ---------- */
+@layer components {
+  .sa-wrap { width: 100%; max-width: 1600px; margin-inline: auto; padding-inline: var(--sa-gutter); }
+  .sa-g12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(12px, 1.6vw, 28px); }
+
+  .sa-t-hero {
+    font-family: 'SA Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 700; font-size: clamp(54px, 8.4vw, 150px);
+    line-height: 0.86; letter-spacing: -0.045em; text-wrap: balance;
+  }
+  .sa-t-act {
+    font-family: 'SA Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 700; font-size: clamp(46px, 6.2vw, 112px);
+    line-height: 0.9; letter-spacing: -0.042em; text-wrap: balance;
+  }
+  .sa-t-sec {
+    font-family: 'SA Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 600; font-size: clamp(32px, 4vw, 72px);
+    line-height: 0.98; letter-spacing: -0.033em; text-wrap: balance;
+  }
+  .sa-t-sub {
+    font-family: 'SA Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 600; font-size: clamp(24px, 2.3vw, 38px);
+    line-height: 1.08; letter-spacing: -0.022em; text-wrap: balance;
+  }
+  .sa-t-body { font-size: clamp(17px, 1.25vw, 20px); line-height: 1.58; max-width: 36em; text-wrap: pretty; }
+  .sa-t-body + .sa-t-body { margin-top: 1em; }
+  .sa-t-cap { font-size: 13.5px; line-height: 1.5; color: var(--mu); max-width: 46em; text-wrap: pretty; }
+  .sa-t-label {
+    font-family: 'SA Plex Mono', ui-monospace, Menlo, monospace;
+    font-size: 11px; line-height: 1.4; letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .sa-t-num { font-variant-numeric: tabular-nums; }
+  .sa-t-mono { font-family: 'SA Plex Mono', ui-monospace, Menlo, monospace; }
+
+  .sa-nc {
+    font-family: 'SA Plex Mono', ui-monospace, Menlo, monospace;
+    font-size: 10.5px; letter-spacing: 0.06em; line-height: 1.5;
+    color: var(--mu); border: 1px dashed currentColor; border-radius: 3px;
+    padding: 0 5px; white-space: normal; display: inline;
+    box-decoration-break: clone; -webkit-box-decoration-break: clone;
+  }
+  .sa-rule { border-top: 1px solid var(--rule); }
+  .sa-pause { height: clamp(160px, 34vh, 360px); }
+}

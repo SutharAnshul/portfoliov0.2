@@ -21,9 +21,21 @@ import { Veil } from '@/components/Veil'
  * travelling up into its slot. It worked, and it was two seconds between the
  * reader and the work every single time.
  */
+/**
+ * Records that bring their own chrome, and so must not be given ours.
+ *
+ * Solic Arc is a self-contained piece: it carries a fixed top bar with its own
+ * act marker, progress line and way back, and it paints the document's colour
+ * as you read. Our mark over the top of that would be two headers, and
+ * .site-page's max-width and padding would box in a layout drawn to the window.
+ * So the shell stands aside and hands it the page.
+ */
+const BARE = new Set(['/work/solic-arc'])
+
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const home = pathname === '/'
+  const bare = BARE.has(pathname)
 
   const [scrolled, setScrolled] = useState(false)
   const [pointer, setPointer] = useState(false)
@@ -125,6 +137,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
       window.removeEventListener('resize', sized)
     }
   }, [pathname, home])
+
+  /* Nothing of ours around it — not the mark, not the page box. The record is
+     the page. */
+  if (bare) return <>{children}</>
 
   return (
     <div className="shell" data-scrolled={scrolled} data-home={home}>

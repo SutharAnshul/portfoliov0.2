@@ -3267,3 +3267,89 @@ html[data-story='on'] {
     grid-column: 1;
   }
 }
+
+/* ── Solic Arc ─────────────────────────────────────────────────────────
+   A record that arrived finished, put into the shape the other records have:
+   the index in the left quarter, the work in the right three quarters.
+
+   The case study is a self-contained piece with its own compiled CSS, scoped
+   under .solic, and its own fixed chrome. Nothing here edits it. What is here
+   is the frame around it.
+
+   ── Why it is not scaled ───────────────────────────────────────────────
+
+   The obvious way to put a full-window design into a narrower column is to lay
+   it out at the window's width and paint it smaller — `zoom`, the way StoryFit
+   fits the Incentiwise scroll. It was built that way first, and it does not
+   work here, for a reason worth writing down so nobody tries it again.
+
+   The Act 04 shape system is driven by framer-motion's useScroll against its
+   own 720vh track. Under `zoom` that measurement and the window's scroll
+   position stop being in the same coordinate space, so scrollYProgress never
+   leaves 0: the morph freezes on R01 for the whole of a seven-screen section
+   whose only job is to move. Measured at 1440×900, five samples through the
+   track, all five R01 — against R01 → R02 → R04 → R07 unzoomed. The `svh`
+   panes shrink with it, so the sticky stage stood 675px tall in a 900px
+   window with the rest left empty.
+
+   So the piece keeps its own scale and takes the column as its width. It is
+   built responsively and 1080px is far above the breakpoint it changes layout
+   at, so what is in the column is the desktop design it was drawn as, set
+   narrower — not a different one. Every effect measures the window, and the
+   window is what it still measures.
+
+   ── The piece's top bar ────────────────────────────────────────────────
+
+   Chrome.jsx is `position: fixed` across `left: 0; right: 0`, which resolves
+   against the window rather than the column, so left alone the bar lies across
+   the index too. A quarter of the window pushes it back over its own work. */
+.solic-record {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  align-items: start;
+}
+
+/* The index is the site's, not the piece's. The ink has to follow whatever act
+   the page has become, or it is dark type on ink for three of the eight —
+   see SolicTint, which reads the colour the piece paints and answers with the
+   foreground that act was drawn against. */
+.solic-record .case-index {
+  position: sticky;
+  top: 96px;
+  padding: 0 var(--s6) 0 var(--page-x);
+  color: var(--solic-ink, var(--foreground));
+  /* Over the piece's own fixed bar, which spans the window. */
+  z-index: 50;
+}
+
+.solic-record .case-index-row button {
+  color: inherit;
+}
+
+/* min-width: 0 so the track may be narrower than the content wants to be,
+   which is what stops the piece shouldering the index off the page. */
+.solic-stage {
+  min-width: 0;
+}
+
+.solic-stage .solic > .fixed {
+  left: 25vw;
+}
+
+/* A phone has no quarter to give. The index is a pointer's tool — it is not
+   drawn on the frame records either — so below the width where two columns
+   stop being two columns, the piece takes the window back and is shown exactly
+   as it was made. */
+@media (max-width: 900px) {
+  .solic-record {
+    display: block;
+  }
+
+  .solic-record .case-index {
+    display: none;
+  }
+
+  .solic-stage .solic > .fixed {
+    left: 0;
+  }
+}
