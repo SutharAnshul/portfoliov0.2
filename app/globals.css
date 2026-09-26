@@ -3540,10 +3540,28 @@ html[data-story='on'] {
 .solic-stage .solic .text-\[clamp\(96px\2c 13vw\2c 220px\)\]{font-size:clamp(96px,13cqw,220px)}
 .solic-stage .solic .text-\[clamp\(96px\2c 17vw\2c 330px\)\]{font-size:clamp(96px,17cqw,330px)}
 .solic-stage .solic{--fg:#16140f;--mu:rgba(22,20,15,.58);--rule:rgba(22,20,15,.16);--blue:#2438e8;--red:#b02a20;--acc:#16140f;--sa-gutter:max(16px,5cqw);color:#16140f;font-family:SA Plex Sans,Helvetica Neue,Arial,sans-serif;font-size:18px;line-height:1.55;text-align:left;overflow-x:clip;-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
-.solic-stage .solic .sm\:w-\[34vw\]{width:34cqw}
-.solic-stage .solic .sm\:w-\[46vw\]{width:46cqw}
-.solic-stage .solic .md\:pt-\[clamp\(0px\2c 14vw\2c 260px\)\]{padding-top:clamp(0px,14cqw,260px)}
-.solic-stage .solic .md\:pt-\[clamp\(0px\2c 9vw\2c 180px\)\]{padding-top:clamp(0px,9cqw,180px)}
+/* The four rebased rules that carry a breakpoint prefix keep the breakpoint.
+   ──────────────────────────────────────────────────────────────────────
+   They were emitted bare, which broke them twice over. A bare .sm\:w-[46vw]
+   applies at every width, not from 640px up, so a phone got the small-screen
+   width instead of the large one. And the rebase adds a class to the selector,
+   so at three classes these beat `.solic .md\:w-auto` at two — a rule that
+   used to win on source order and now never wins at all. That is what put the
+   sketch plates hard against each other: the grid track was 442px with a 22px
+   gap between the tracks, and the item inside it stayed 46cqw, 464px, so it
+   overhung the track and closed the gap up.
+
+   Each rule goes back inside the query it came from, and the md widths are
+   restated at the rebase's own specificity so they can win again. */
+@media (min-width: 640px) {
+  .solic-stage .solic .sm\:w-\[34vw\]{width:34cqw}
+  .solic-stage .solic .sm\:w-\[46vw\]{width:46cqw}
+}
+@media (min-width: 768px) {
+  .solic-stage .solic .md\:w-auto{width:auto}
+  .solic-stage .solic .md\:pt-\[clamp\(0px\2c 14vw\2c 260px\)\]{padding-top:clamp(0px,14cqw,260px)}
+  .solic-stage .solic .md\:pt-\[clamp\(0px\2c 9vw\2c 180px\)\]{padding-top:clamp(0px,9cqw,180px)}
+}
 
 /* The three readings of the survey.
    ──────────────────────────────────────────────────────────────────────
