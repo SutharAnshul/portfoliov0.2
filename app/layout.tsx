@@ -86,36 +86,24 @@ export const viewport: Viewport = {
   // The favicon above keeps its media queries on purpose: those describe the
   // tab strip the icon sits in, not the page it points at.
   colorScheme: 'dark',
-  /* No themeColor, deliberately, and nothing writes one at runtime either.
+  /* One colour for the strip behind the clock, and it does not move.
      ──────────────────────────────────────────────────────────────────────
-     Safari reads theme-color once, when the page loads, and holds the top
-     band on that colour for the rest of the visit — so on a record that
-     repaints itself act by act the band stayed on whatever the page happened
-     to be when you arrived. Changing the tag afterwards, however it is
-     written, does not move it.
-     With no theme-color at all Safari has nothing to hold, and falls back to
-     sampling the page's own painted colour — which is already what it does
-     for the toolbar at the foot of the screen, demonstrably: on a mustard act
-     that bar is mustard while the band above was still the old static grey.
-     Both html and body carry the act's colour, so there is the right thing
-     to sample.
-     The cost is Android: Chrome tints its toolbar from theme-color and does
-     not sample, so there it takes a default instead of following the page.
-     Traded knowingly — the phones this was reported from are Apple's. */
+     Not for want of trying. A static theme-color, a live one rewritten as the
+     page repainted, and none at all so the browser would sample the page
+     instead: all three ended the same way on iOS, with the strip fixed to
+     whatever the page was at the moment it loaded and never revisited. Safari
+     decides it once. Nothing a page does afterwards reaches it.
 
-  /* There is no viewportFit: 'cover' here, and that is deliberate.
-     ──────────────────────────────────────────────────────────────────────
-     It was added to get rid of the flat bar the browser draws behind the
-     clock, which against a dark site read as a black band. It worked, and
-     what it left was worse: once the page is under the status bar, Safari
-     draws its own blurred backdrop there so the clock stays legible, and that
-     backdrop is chrome painted above the page — nothing in a stylesheet
-     reaches it. On a page that already has a veil under a fixed mark it read
-     as two competing bands of blur.
-     The bar is coloured instead of covered. themeColor below is the static
-     answer; ThemeColor keeps it in step with whatever colour the page has
-     actually gone, which is what makes the strip read as the top of the page
-     rather than as something above it. */
+     So it is chosen rather than left to chance. This is the front page's own
+     dark — the colour the site is, and the colour of the records' dark acts.
+     It will not match Solic Arc's cream opening or the Incentiwise scroll's
+     pale ones, and that is the trade: one considered colour everywhere beats a
+     colour that depends on which page you happened to arrive through.
+
+     Static also gives Android back what sampling took: Chrome tints from this
+     and does not sample, so there the toolbar is this rather than a default
+     grey. */
+  themeColor: '#0a0a0a',
 }
 
 export default function RootLayout({

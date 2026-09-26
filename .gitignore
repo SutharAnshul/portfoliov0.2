@@ -18,3 +18,7 @@ node_modules
 
 # Source deck for the Incentiwise record; the slides live in public/images/incentiwise/deck
 /Incentiwise presentation/
+
+# Rendered exports of the records. Built on demand from the live pages by
+# tools/, and large — the two of them are 15MB of JPEG frames.
+/exports/
