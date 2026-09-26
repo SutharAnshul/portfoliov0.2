@@ -1,4 +1,4 @@
-import { Act, Opener, Kind, Cap, Reveal, NC } from '../components/ui'
+import { Act, Opener, Kind, Cap, Reveal, NC, SHOW_NC } from '../components/ui'
 
 const P = (name, cls, alt, aspect) => ({ name, cls, alt, aspect })
 const MOSAIC = [
@@ -88,10 +88,17 @@ export default function Act07() {
               <dd className="text-[16px] leading-snug">{v}</dd>
             </div>
           ))}
+          {/* The whole row, not just the tag. Weight's only value here is the
+              tag, so hiding the tag on its own would leave a spec line with a
+              label and nothing beside it — which reads as a bug rather than as
+              a number nobody has taken yet. It is still named as an open
+              question in the Coda. */}
+          {SHOW_NC && (
           <div className="grid grid-cols-[9rem_1fr] sm:grid-cols-[11rem_1fr] gap-4 sa-rule py-3">
             <dt className="sa-t-label text-mu pt-[3px]">Weight</dt>
             <dd className="text-[16px] leading-snug"><NC>final weight</NC></dd>
           </div>
+          )}
         </dl>
       </div>
 

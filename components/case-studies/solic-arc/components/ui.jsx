@@ -61,7 +61,20 @@ export const Kind = ({ children, className = '' }) => (
   </div>
 )
 
-export const NC = ({ children }) => <span className="sa-nc">NEEDS CONFIRMATION{children ? `: ${children}` : ''}</span>
+/**
+ * Whether the open facts are shown on the page.
+ *
+ * The export ships four of these — the scallops on the finished guitar, the
+ * final weight in two places — drawn deliberately, so nobody forgets they are
+ * unanswered. They are working marks, and the record is published now, so they
+ * are off. The tags stay in the acts rather than being deleted, and the
+ * questions stay in Coda's open list where they read as work still to do
+ * rather than as a gap in the page. Set this to true to see them again.
+ */
+export const SHOW_NC = false
+
+export const NC = ({ children }) =>
+  SHOW_NC ? <span className="sa-nc">NEEDS CONFIRMATION{children ? `: ${children}` : ''}</span> : null
 
 export const Cap = ({ children, className = '' }) => <p className={`sa-t-cap mt-4 ${className}`}>{children}</p>
 

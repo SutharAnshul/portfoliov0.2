@@ -86,9 +86,15 @@ export default function Act06() {
         <Label className="mb-8">Materials · all quartersawn</Label>
         <dl className="grid grid-cols-1 sm:grid-cols-3 gap-x-[clamp(16px,3vw,48px)] gap-y-8">
           {[['Body', 'Swamp ash'], ['Neck', 'Maple'], ['Fretboard', 'Rosewood']].map(([k, v]) => (
-            <div key={k} className="sa-rule pt-4">
+            /* Sized against the third of a row it occupies rather than
+               against the window — at 5vw "Rosewood", the longest of the
+               three, hung off the right of the page. */
+            <div key={k} className="sa-rule pt-4" style={{ containerType: 'inline-size' }}>
               <dt className="sa-t-label text-mu">{k}</dt>
-              <dd className="font-display font-semibold tracking-[-0.035em] leading-none text-[clamp(40px,5vw,84px)] mt-3">{v}</dd>
+              <dd
+                className="font-display font-semibold tracking-[-0.035em] leading-none mt-3"
+                style={{ fontSize: 'clamp(32px, 21cqi, 84px)' }}
+              >{v}</dd>
             </div>
           ))}
         </dl>

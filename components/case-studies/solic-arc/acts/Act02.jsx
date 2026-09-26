@@ -13,9 +13,17 @@ const ERGO = [
   ['hyper', 'Headless ergonomic design'],
 ]
 
+/* The word is sized against its own column, not the window. At 6.4vw it was
+   a share of something more than twice the box it sits in once the record is
+   read in three quarters of the page: "Ergonomics" ran 79px off the right of
+   the page at 1920. 21cqi is the same share of the cell that 6.4vw was of the
+   window in the layout this was drawn for. */
 const Column = ({ word, items, gives, costs }) => (
-  <div>
-    <div className="font-display font-bold tracking-[-0.045em] leading-[0.9] text-[clamp(44px,6.4vw,118px)]">{word}</div>
+  <div style={{ containerType: 'inline-size' }}>
+    <div
+      className="font-display font-bold tracking-[-0.045em] leading-[0.9]"
+      style={{ fontSize: 'clamp(44px, 21cqi, 118px)' }}
+    >{word}</div>
     <div className="mt-10 md:mt-14 flex flex-col gap-8 md:gap-10">
       {items.map(([k, n]) => <AxisGuitar key={k} k={k} name={n} />)}
     </div>
