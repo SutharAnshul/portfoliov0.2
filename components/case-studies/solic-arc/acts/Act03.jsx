@@ -118,7 +118,7 @@ export default function Act03() {
           <p className="sa-t-sec">Then I went where guitarists talk.</p>
         </div>
         <div className="col-span-12 md:col-start-7 md:col-span-6 md:pt-14">
-          <p className="sa-t-body">Reddit threads and guitar communities first, then a survey about ergonomics and preferences, then conversations with 15+ individual players.</p>
+          <p className="sa-t-body">Reddit threads and guitar communities first, then a <a href="https://docs.google.com/spreadsheets/d/1Jmmf73yHNHhqS87HgiYPhIn3pBl-K_4dYjHfxSl7f50/edit?usp=sharing" target="_blank" rel="noreferrer">survey about ergonomics and preferences</a>, then conversations with 15+ individual players.</p>
         </div>
       </div>
 
@@ -143,6 +143,12 @@ export default function Act03() {
         <div className="col-span-12 md:col-span-6">
           <div className="font-display font-bold tracking-[-0.06em] leading-[0.8] text-[clamp(150px,24vw,380px)] sa-t-num">102</div>
           <p className="sa-t-sub mt-6 max-w-[16em]">people answered the guitar ergonomics survey.</p>
+          {/* The figures on this page are all drawn from one sheet. Here is
+              the sheet — beside the number it is the total of, which is where
+              anyone who wants to check it will look first. */}
+          <p className="sa-t-label mt-5">
+            <a href="https://docs.google.com/spreadsheets/d/1Jmmf73yHNHhqS87HgiYPhIn3pBl-K_4dYjHfxSl7f50/edit?usp=sharing" target="_blank" rel="noreferrer">Read the 102 responses ↗</a>
+          </p>
         </div>
         <div className="col-span-12 md:col-start-8 md:col-span-5">
           <Label className="mb-4">Who answered · experience</Label>
@@ -154,15 +160,35 @@ export default function Act03() {
       {/* The tension */}
       <div className="sa-wrap mt-32 md:mt-48">
         <Kind className="mb-10">Evidence · two separate questions</Kind>
+        {/* The two figures are sized against the box they have to fit in, not
+            against the window.
+            ────────────────────────────────────────────────────────────────
+            They were set at clamp(96px, 13vw, 220px). A vw is a share of the
+            window, and on the site the piece is read in three quarters of it,
+            split in two — so each figure was asked to be 13% of something
+            nearly three times its own column and ran 154px past the edge, the
+            "/102" of the right-hand one falling off the page entirely.
+
+            A cqi is a share of the containing box, which is what the figure
+            was always really a share of: at 30% it is the same size relative
+            to its cell that 13vw gave it in the layout this was drawn for, and
+            it stays that size wherever the cell goes. Inline, because these
+            are arbitrary values and the piece's CSS is precompiled. */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[clamp(24px,5vw,96px)] gap-y-16">
-          <div>
-            <div className="font-display font-bold tracking-[-0.055em] leading-[0.82] text-[clamp(96px,13vw,220px)] sa-t-num">75<span className="text-mu">/102</span></div>
+          <div style={{ containerType: 'inline-size' }}>
+            <div
+              className="font-display font-bold tracking-[-0.055em] leading-[0.82] sa-t-num"
+              style={{ fontSize: 'clamp(96px, 30cqi, 220px)' }}
+            >75<span className="text-mu">/102</span></div>
             <p className="sa-t-sub mt-6">said yes to a contoured body.</p>
             <p className="sa-t-label text-mu mt-6">Q · “Do you prefer a contoured body for comfort?”</p>
             <Stack className="mt-4" parts={[['Yes', 75], ['Maybe', 18, 0.45], ['No', 9, 0.18]]} />
           </div>
-          <div className="md:pt-[clamp(0px,9vw,180px)]">
-            <div className="font-display font-bold tracking-[-0.055em] leading-[0.82] text-[clamp(96px,13vw,220px)] sa-t-num">59<span className="text-mu">/102</span></div>
+          <div className="md:pt-[clamp(0px,9vw,180px)]" style={{ containerType: 'inline-size' }}>
+            <div
+              className="font-display font-bold tracking-[-0.055em] leading-[0.82] sa-t-num"
+              style={{ fontSize: 'clamp(96px, 30cqi, 220px)' }}
+            >59<span className="text-mu">/102</span></div>
             <p className="sa-t-sub mt-6">chose heritage guitars as the type they prefer most.</p>
             <p className="sa-t-label text-mu mt-6">Q · “Which type of electric guitar do you prefer the most?”</p>
             <Stack className="mt-4" parts={[['Heritage (Fender, Gibson, PRS)', 59], ['No strong preference', 26, 0.45], ['Ergonomic', 12, 0.28], ['Artistic / custom', 5, 0.14]]} />

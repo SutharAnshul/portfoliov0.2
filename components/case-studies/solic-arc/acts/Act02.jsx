@@ -118,7 +118,7 @@ export default function Act02() {
           >
             <Img name="diego" alt="Diego Fabián's classification of electric guitar bodies: static, tilted forward, tilted back, irregular, inverted fan and fan, each shown on an example guitar with its axes drawn." />
           </div>
-          <Cap>Six body families, sorted by how their axes lean. Classification by Diego Fabián Guitars, collected on my research board.</Cap>
+          <Cap>Six body families, sorted by how their axes lean. Classification by <a href="https://diegofabianguitars.blogspot.com/" target="_blank" rel="noreferrer">Diego Fabián Guitars</a>, collected on my research board.</Cap>
         </figure>
         {/* alignSelf inline: .self-center is not in the piece's compiled CSS,
             and a className the build never saw is a class that does nothing. */}

@@ -47,7 +47,7 @@ export default function Coda() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6 sa-rule pt-6 text-[14px] leading-relaxed">
           <div><Label className="mb-1.5">Design, research, prototyping, build</Label><div>Anshul Suthar · 2025</div></div>
           <div><Label className="mb-1.5">Body-shape framework</Label><div><a href="https://diegofabianguitars.blogspot.com/" target="_blank" rel="noreferrer">Diego Fabián Guitars</a></div></div>
-          <div><Label className="mb-1.5">Survey</Label><div>102 responses, guitar ergonomics survey</div></div>
+          <div><Label className="mb-1.5">Survey</Label><div><a href="https://docs.google.com/spreadsheets/d/1Jmmf73yHNHhqS87HgiYPhIn3pBl-K_4dYjHfxSl7f50/edit?usp=sharing" target="_blank" rel="noreferrer">102 responses, guitar ergonomics survey</a></div></div>
           <div><Label className="mb-1.5">Players</Label><div>Octaves, the music club of IIT Guwahati</div></div>
         </div>
       </footer>
