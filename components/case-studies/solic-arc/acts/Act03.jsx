@@ -1,4 +1,4 @@
-import { Act, Opener, Label, Kind, Cap, Reveal, NC } from '../components/ui'
+import { Act, Opener, Label, Kind, Cap, Reveal } from '../components/ui'
 
 const N = 102
 
@@ -118,7 +118,7 @@ export default function Act03() {
           <p className="sa-t-sec">Then I went where guitarists talk.</p>
         </div>
         <div className="col-span-12 md:col-start-7 md:col-span-6 md:pt-14">
-          <p className="sa-t-body">Reddit threads and guitar communities first, then a survey about ergonomics and preferences, then conversations with individual players. <NC>number of interviews</NC></p>
+          <p className="sa-t-body">Reddit threads and guitar communities first, then a survey about ergonomics and preferences, then conversations with 15+ individual players.</p>
         </div>
       </div>
 

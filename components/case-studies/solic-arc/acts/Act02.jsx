@@ -103,13 +103,29 @@ export default function Act02() {
 
       {/* Diego Fabián bridge */}
       <div className="sa-wrap sa-g12 mt-32 md:mt-48 gap-y-10 items-start">
-        <figure className="col-span-12 md:col-span-7 order-2 md:order-1">
-          <div className="bg-[#F4F1EA] p-[clamp(12px,2.4vw,36px)] rounded-[3px]">
+        {/* A column wider than it was, and much less mount around the print.
+            The plate is six guitars with their axes drawn on, and the axes are
+            the whole reason it is here — at seven columns inside 36px of
+            padding the lines were a few pixels long and you took them on
+            trust. The image itself was cropped to its content as well; it used
+            to carry a band of white and a credit line, which the caption
+            already gives. Inline because the padding is an arbitrary value and
+            the piece's CSS is precompiled. */}
+        <figure className="col-span-12 md:col-span-8 order-2 md:order-1">
+          <div
+            className="bg-[#F4F1EA] rounded-[3px]"
+            style={{ padding: 'clamp(6px, 0.7vw, 12px)' }}
+          >
             <Img name="diego" alt="Diego Fabián's classification of electric guitar bodies: static, tilted forward, tilted back, irregular, inverted fan and fan, each shown on an example guitar with its axes drawn." />
           </div>
           <Cap>Six body families, sorted by how their axes lean. Classification by Diego Fabián Guitars, collected on my research board.</Cap>
         </figure>
-        <div className="col-span-12 md:col-start-9 md:col-span-4 order-1 md:order-2">
+        {/* alignSelf inline: .self-center is not in the piece's compiled CSS,
+            and a className the build never saw is a class that does nothing. */}
+        <div
+          className="col-span-12 md:col-start-9 md:col-span-4 order-1 md:order-2"
+          style={{ alignSelf: 'center' }}
+        >
           <Kind className="mb-6">Borrowed method</Kind>
           <p className="sa-t-body">
             The axes come from <a href="https://diegofabianguitars.blogspot.com/" target="_blank" rel="noreferrer">Diego Fabián Guitars</a>. His guide to designing electric guitars draws lines across the body, perpendicular to the strings, and sorts bodies by how those lines lean: static, tilted forward, tilted back, irregular, inverted fan, fan.

@@ -60,22 +60,29 @@ export default function Act01() {
           <p className="sa-t-body text-mu">That stayed with me. A guitar someone makes for themselves can end up with an identity nobody else could have given it.</p>
         </div>
         <figure className="col-span-12 md:col-start-7 md:col-span-6">
-          <div className="relative overflow-hidden aspect-[1.18] bg-white/0">
-            <img
-              src={src('ref_redspecial')} alt="The Red Special's neck and headstock, from a reference photo."
-              width="1600" height="685" loading="lazy"
-              className="absolute h-full max-w-none mix-blend-multiply"
-              style={{ width: `${(1600 / 685) * 100 / 1.18}%`, right: 0, top: 0 }}
-            />
-          </div>
-          <Cap>Red Special, neck and headstock. Reference image from my research board.</Cap>
+          {/* The whole instrument. This used to be framed to 1.18 with the
+              photograph blown up to 197% and pinned right, which showed the
+              neck and the headstock and cut the body off — the part of the
+              Red Special anyone would recognise it by. */}
+          <img
+            src={src('ref_redspecial')} alt="The Red Special, whole, from a reference photo."
+            width="1600" height="685" loading="lazy"
+            className="w-full h-auto mix-blend-multiply"
+          />
+          <Cap>The Red Special. Reference image from my research board.</Cap>
         </figure>
       </div>
 
       {/* Three guitars */}
       <div className="sa-wrap sa-g12 mt-32 md:mt-52 items-end gap-y-6">
-        <div className="col-span-12 md:col-span-6 font-display font-bold leading-[0.78] tracking-[-0.06em] text-[clamp(200px,34vw,520px)] sa-t-num" aria-hidden="true">3</div>
-        <div className="col-span-12 md:col-span-6 pb-4">
+        {/* The numeral is set against the right of its column rather than the
+            left. A 3 is a good deal narrower than the six columns it used to
+            be given, and all of that difference fell between it and the
+            sentence it belongs to. Anchored right, the pair reads as one
+            thing, and the glyph — which is larger than any column — overhangs
+            to the left, away from the words, where it cannot collide. */}
+        <div className="col-span-12 md:col-span-4 text-right font-display font-bold leading-[0.78] tracking-[-0.06em] text-[clamp(200px,34vw,520px)] sa-t-num" aria-hidden="true">3</div>
+        <div className="col-span-12 md:col-span-8 pb-4">
           <p className="sa-t-sec">Three guitars. None of them felt like mine.</p>
           <p className="sa-t-body mt-8">I had owned three guitars and never felt properly connected to any of them. They didn’t feel right in my hands.</p>
         </div>

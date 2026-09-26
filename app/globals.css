@@ -3270,11 +3270,13 @@ html[data-story='on'] {
 
 /* ── Solic Arc ─────────────────────────────────────────────────────────
    A record that arrived finished, put into the shape the other records have:
-   the index in the left quarter, the work in the right three quarters.
+   the index in the left quarter, the work in the right three quarters, under
+   the site's own mark. The grid is the one .case-story uses, for the same
+   reason — this is the same kind of page.
 
    The case study is a self-contained piece with its own compiled CSS, scoped
-   under .solic, and its own fixed chrome. Nothing here edits it. What is here
-   is the frame around it.
+   under .solic, and its own chrome. Nothing here restyles it. What is here is
+   the frame around it, and the two places the two have to be introduced.
 
    ── Why it is not scaled ───────────────────────────────────────────────
 
@@ -3295,51 +3297,79 @@ html[data-story='on'] {
    So the piece keeps its own scale and takes the column as its width. It is
    built responsively and 1080px is far above the breakpoint it changes layout
    at, so what is in the column is the desktop design it was drawn as, set
-   narrower — not a different one. Every effect measures the window, and the
-   window is what it still measures.
+   narrower — not a different one.
 
-   ── The piece's top bar ────────────────────────────────────────────────
+   ── Colour ─────────────────────────────────────────────────────────────
 
-   Chrome.jsx is `position: fixed` across `left: 0; right: 0`, which resolves
-   against the window rather than the column, so left alone the bar lies across
-   the index too. A quarter of the window pushes it back over its own work. */
+   The piece paints the document as it goes. SolicTint puts the same act's
+   pair into --foreground and --background, so the mark, the halo it carries,
+   the veil and the index are all dressed for whichever act is on screen —
+   nothing here has to know about colour at all. */
 .solic-record {
   display: grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+  column-gap: 0;
   align-items: start;
 }
 
-/* The index is the site's, not the piece's. The ink has to follow whatever act
-   the page has become, or it is dark type on ink for three of the eight —
-   see SolicTint, which reads the colour the piece paints and answers with the
-   foreground that act was drawn against. */
 .solic-record .case-index {
+  grid-column: 1;
+  padding-right: var(--s7);
   position: sticky;
-  top: 96px;
-  padding: 0 var(--s6) 0 var(--page-x);
-  color: var(--solic-ink, var(--foreground));
-  /* Over the piece's own fixed bar, which spans the window. */
+  top: calc(var(--mark-top) + 110px);
+  align-self: start;
+  /* Above the piece's own bar, which is fixed across the window. */
   z-index: 50;
 }
 
-.solic-record .case-index-row button {
-  color: inherit;
-}
-
-/* min-width: 0 so the track may be narrower than the content wants to be,
-   which is what stops the piece shouldering the index off the page. */
 .solic-stage {
+  grid-column: 2;
+  /* So the track may be narrower than the content wants to be, which is what
+     stops the piece shouldering the index off the page. */
   min-width: 0;
 }
 
+/* The piece's top bar.
+   ──────────────────────────────────────────────────────────────────────
+   Chrome.jsx is `position: fixed` across `left: 0; right: 0` at the very top
+   of the window. Two things are wrong with that here and both are ours to fix,
+   because the bar is right about the page it was written for.
+
+   It spans the window rather than the column, so it lies across the index: a
+   quarter of the window puts it back over its own work.
+
+   And the top of the window is where the site's name already is. The bar is
+   dropped below the mark's band — the same height .site-page clears for it —
+   so the two read as chrome and sub-chrome rather than as a collision. The
+   !important is not a shortcut: `top` is written as an inline style on the
+   element, for the safe-area inset, and an inline style cannot be answered
+   from a stylesheet any other way. The inset is added back here. */
+/* .site-page carries the site's arrival — `animation: rise ... both` — and a
+   fill-mode of both leaves its final transform applied for the life of the
+   page. A transformed element is the containing block for everything fixed
+   inside it, so the bar stopped being fixed to the window and became fixed to
+   a box 46,000px tall: it scrolled away with the page and was 32,000px above
+   the screen by Act 06. The arrival is a half-second of movement on load; the
+   bar is the whole way you know where you are. The record gives up the
+   former. (LivePrototype documents the same trap from the other side.) */
+html[data-solic] .site-page {
+  animation: none;
+}
+
 .solic-stage .solic > .fixed {
-  left: 25vw;
+  /* Measured rather than 25vw: .site-page is capped at 1680px and centred, so
+     past that width a quarter of the window is no longer where the column
+     starts. SolicTint publishes the stage's own two edges, so the bar is the
+     column's width exactly rather than running on to the window. */
+  left: var(--solic-col, 25vw);
+  right: var(--solic-col-r, 0px);
+  top: calc(env(safe-area-inset-top, 0px) + var(--mark-top) + 64px) !important;
 }
 
 /* A phone has no quarter to give. The index is a pointer's tool — it is not
    drawn on the frame records either — so below the width where two columns
-   stop being two columns, the piece takes the window back and is shown exactly
-   as it was made. */
+   stop being two columns, the piece takes the window back and is shown as it
+   was made. */
 @media (max-width: 900px) {
   .solic-record {
     display: block;
@@ -3351,5 +3381,6 @@ html[data-story='on'] {
 
   .solic-stage .solic > .fixed {
     left: 0;
+    right: 0;
   }
 }
