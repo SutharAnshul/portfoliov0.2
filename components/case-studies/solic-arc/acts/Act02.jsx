@@ -95,16 +95,6 @@ export default function Act02() {
         </div>
       </div>
 
-      {/* In between */}
-      <div className="sa-wrap sa-g12 mt-28 md:mt-36 gap-y-8 items-end">
-        <div className="col-span-12 md:col-span-4">
-          <Label className="mb-4">In between</Label>
-          <p className="sa-t-body">Modern super-Strats sit between the two. I grouped them separately: familiar outlines, pushed a little further.</p>
-        </div>
-        <AxisGuitar k="prs" name="PRS" className="col-span-12 sm:col-span-6 md:col-span-4" />
-        <AxisGuitar k="suhr" name="Suhr" className="col-span-12 sm:col-span-6 md:col-span-4" />
-      </div>
-
       {/* Diego Fabián bridge */}
       <div className="sa-wrap sa-g12 mt-32 md:mt-48 gap-y-10 items-start">
         {/* A column wider than it was, and much less mount around the print.
@@ -140,8 +130,17 @@ export default function Act02() {
 
       <div className="h-[30vh] md:h-[42vh]" />
       <div className="sa-wrap">
-        <p className="font-display font-bold tracking-[-0.05em] leading-[0.84] text-[clamp(64px,12.5vw,240px)]">
-          Can we<br />have both?
+        {/* Broken at the phrase, not the measure: the two things being asked
+            for are named, and each gets its own line. The floor comes down
+            from 64px to 52px inline — the question is half again as long as
+            it was, and at 64 the longest line ran past the gutter on a phone.
+            Inline because the size is an arbitrary class and the piece's CSS
+            is precompiled, and in cqw because the column is not the window. */}
+        <p
+          className="font-display font-bold tracking-[-0.05em] leading-[0.84]"
+          style={{ fontSize: 'clamp(52px, 12.5cqw, 240px)' }}
+        >
+          Can we have<br />both Heritage<br />and Ergonomics?
         </p>
       </div>
       <div className="h-[48vh] md:h-[62vh]" />
