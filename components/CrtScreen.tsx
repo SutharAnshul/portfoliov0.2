@@ -806,17 +806,27 @@ export function CrtScreen({
     gl.uniform1f(u.scan, -1)
 
     const size = () => {
-      /* Match the device, up to 3.
+      /* Draw at twice the device, and let the browser take it back down.
          ──────────────────────────────────────────────────────────────────
-         This was capped at 2 on the grounds that a finer grille is invisible,
-         which is true of the grille and false of the tube's outline. On a 3x
-         phone the canvas was drawn 716 wide and shown across 1074 device
-         pixels, so every step in that outline was blown up half again on the
-         way to the screen: the staircase you could see was as much the
-         upscale as the edge itself.
-         Three rather than uncapped, because the fragment count is the square
-         of this and some phones report 4. */
-      const dpr = Math.min(window.devicePixelRatio || 1, 3)
+         The tube's raster is stepped in device pixels on purpose, so on a
+         plain 1x display the aperture grille is one screen pixel wide and the
+         chromatic offset is one screen pixel either way. At that pitch they
+         stop reading as a tube and start reading as damage: every smooth
+         diagonal in a thumbnail — the edges of the cards in the Incentiwise
+         shot — comes out as a hard staircase with a coloured fringe on it.
+         Nothing is aliased in the source; the effect is doing it.
+
+         Rendering at twice the device and letting the browser scale the
+         canvas down averages four samples into every screen pixel. The grille
+         survives as texture, the staircase does not. It is the one fix that
+         changes none of the look: no effect is softened or switched off, it
+         is simply sampled properly.
+
+         Capped at 3 all the same, which is where this already was, so the
+         worst case costs exactly what it did before. The doubling is spent
+         where the crunch is — a 1x display renders at 2, a 2x at 3 — and a 3x
+         screen, where the grille is already finer than the eye, gets none. */
+      const dpr = Math.min((window.devicePixelRatio || 1) * 2, 3)
       const w = Math.max(1, Math.round(box.clientWidth * dpr))
       const h = Math.max(1, Math.round(box.clientHeight * dpr))
       if (cv.width !== w || cv.height !== h) {
