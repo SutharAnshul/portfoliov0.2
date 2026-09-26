@@ -2410,13 +2410,9 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 /* --drop is how much lower the front page starts than it finishes: the whole
    of it, the name included, sits this far down until you scroll. A screen with
    more room can spend more of it on the pause before the first line. */
-/* --mark-top carries the top safe-area inset because the page now reaches the
-   bezel — see viewportFit in app/layout.tsx. The inset is 0 everywhere that
-   has no notch, so this is the same number it always was on a desktop, and on
-   a phone it is the distance that keeps the name clear of the clock. */
 :root {
   --page-x: var(--s4);
-  --mark-top: calc(env(safe-area-inset-top, 0px) + var(--s5));
+  --mark-top: var(--s5);
   /* A phone has less room to spend on the pause before the first line, and it
      was spending the most: 216px of nothing above "//about me//", a quarter of
      the screen, before the page said anything. Enough is kept that the name
@@ -2427,7 +2423,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 @media (min-width: 768px) {
   :root {
     --page-x: var(--s6);
-    --mark-top: calc(env(safe-area-inset-top, 0px) + var(--s6));
+    --mark-top: var(--s6);
     --drop: calc(var(--s8) * 1.5);
   }
 }
@@ -2435,7 +2431,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 @media (min-width: 1280px) {
   :root {
     --page-x: var(--s7);
-    --mark-top: calc(env(safe-area-inset-top, 0px) + var(--s7));
+    --mark-top: var(--s7);
     --drop: calc(var(--s8) * 2);
   }
 }
@@ -2553,50 +2549,97 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    does not support — so the glass was not glass, it was nothing. Left on its
    own the standard property survives and the build adds whatever prefix its
    targets actually need. */
-/* One pane of glass, and a wash of the page's own colour over it.
+/* Four panes of glass, and a wash of the page's own colour over them.
    ──────────────────────────────────────────────────────────────────────
-   This was four panes and a WebGL canvas: four stacked backdrop-filters, each
-   with its own blur radius, its own radial mask and a brightness/contrast pair
-   written from script per act, and above them a shader drawing the colour with
-   a noise-warped boundary and a dither. Six compositing layers under a fixed
-   mark, to fade the top of a page out.
+   The blur deepens as the mask tightens — 3px across a wide, shallow arc, then
+   6, 11 and 16 over arcs drawn progressively closer in around the mark. Four
+   layers of glass, each doing less area and more work, which is what makes the
+   top of the page thin out rather than end at a line. One pane at one radius
+   is a band; four are a gradient of blur, and the difference is the whole
+   effect.
 
-   It cost more than it was worth and it was the other half of the mark's
-   rectangle on WebKit: an element with a filter, sitting above a stack of
-   backdrop-filters inside a position: fixed container, is exactly the
-   arrangement that gets an opaque backing store there. Pinch-zooming cleared
-   it because that forces a re-raster; the next colour change brought it back
-   because that repaints the layer.
+   ── What was here, and is not ───────────────────────────────────────────
+   A WebGL canvas over these four, drawing the colour with fractal noise
+   warping its boundary and a dither on the ramp, plus a brightness/contrast
+   pair written onto each pane per act from script — kept alive by a
+   context-loss handler, a visibility listener, a ResizeObserver and a
+   MutationObserver.
 
-   What is left does the same job. One blur, masked with the same wide radial
-   profile the four shared — 150% wide so the arc drops about a fifteenth of
-   its depth from the middle of the window to the corner and reads as a level
-   band rather than a dome. Over it, the colour wash that was already written
-   here as the shader's fallback, and which has been what non-WebGL browsers
-   have seen all along.
+   That came out with the mark's halo, and for the same reason: an element with
+   a filter, above this stack, inside a position: fixed container, is what
+   WebKit hands an opaque backing store — which is the rectangle that was
+   appearing behind the name on iOS and iPadOS. The halo was the filter and it
+   is gone; the canvas was six hundred lines and a compositing layer for a
+   gradient, and it is gone too.
 
-   Given up with the canvas: the warped boundary and the dither. The mask is a
-   plain arc now, and a ramp of one colour over 130px can band on a flat act.
-   It has not, because the ramp is over a blur rather than over a solid, and
-   because the two gradients below cross rather than run in step. */
+   The glass is not. Nothing about backdrop-filter was the fault, and the
+   graduated falloff is the part worth having.
+
+   Unprefixed only, and deliberately. Writing the -webkit- twin beside it made
+   the build collapse the pair to the prefixed one alone, which this browser
+   does not support — so the glass was not glass, it was nothing. Left on its
+   own the standard property survives and the build adds whatever prefix its
+   targets actually need. */
 .site-veil > span {
   position: absolute;
   inset: 0;
   display: block;
-  /* Unprefixed only, and deliberately. Writing the -webkit- twin beside it
-     made the build collapse the pair to the prefixed one alone, which this
-     browser does not support — so the glass was not glass, it was nothing.
-     Left on its own the standard property survives and the build adds
-     whatever prefix its targets actually need. */
-  backdrop-filter: blur(9px);
-  mask-image: radial-gradient(
+  backdrop-filter: blur(var(--b));
+  mask-image: var(--profile);
+}
+
+/* Four ellipses standing on the top edge, centred on the mark, every one of
+   them wider than the window. The width is the whole point: at 150% the arc
+   that crosses the screen drops about a fifteenth of its depth from the middle
+   to the corner, so it reads as a level band; at 44% it dropped all of it, and
+   that is a dome. They tighten and blur harder in turn — but none of them
+   tightens past the edges of the window, so no pane ever has an outline on
+   screen. */
+.site-veil > span:nth-child(1) {
+  --b: 3px;
+  --profile: radial-gradient(
     150% 100% at 50% 0%,
-    #000 0 34%,
-    rgba(0, 0, 0, 0.45) 58%,
-    transparent 88%
+    #000 0 40%,
+    rgba(0, 0, 0, 0.45) 64%,
+    transparent 92%
   );
 }
 
+.site-veil > span:nth-child(2) {
+  --b: 6px;
+  --profile: radial-gradient(
+    120% 94% at 50% 0%,
+    #000 0 34%,
+    rgba(0, 0, 0, 0.45) 56%,
+    transparent 84%
+  );
+}
+
+.site-veil > span:nth-child(3) {
+  --b: 11px;
+  --profile: radial-gradient(
+    104% 86% at 50% 0%,
+    #000 0 28%,
+    rgba(0, 0, 0, 0.45) 48%,
+    transparent 76%
+  );
+}
+
+.site-veil > span:nth-child(4) {
+  --b: 16px;
+  --profile: radial-gradient(
+    92% 74% at 50% 0%,
+    #000 0 22%,
+    rgba(0, 0, 0, 0.45) 40%,
+    transparent 66%
+  );
+}
+
+/* The colour. Glass keeps the mark off the detail underneath but not off its
+   contrast — six dark letters over a blurred dark photograph are still six
+   dark letters — so something has to be laid on. A band across the whole
+   width, swelling under the mark, solid past the foot of it, mixed from
+   --background so it is whatever colour the page has gone. */
 .site-veil::after {
   content: '';
   position: absolute;

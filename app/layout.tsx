@@ -54,6 +54,7 @@ import { Shell } from '@/components/Shell'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { CustomCursor } from '@/components/CustomCursor'
 import { CrtGlass } from '@/components/CrtGlass'
+import { ThemeColor } from '@/components/ThemeColor'
 
 export const metadata: Metadata = {
   title: 'Anshul Suthar - Product Designer',
@@ -88,20 +89,19 @@ export const viewport: Viewport = {
   colorScheme: 'dark',
   themeColor: '#252525',
 
-  /* Paint to the edges of the glass.
+  /* There is no viewportFit: 'cover' here, and that is deliberate.
      ──────────────────────────────────────────────────────────────────────
-     Without this a phone lays the page out inside the safe area and fills the
-     rest — the strip behind the clock and the battery, and the strip behind
-     the home indicator — with a flat bar of its own. On a dark site that bar
-     read as a black band across the top of every screenshot, and on a case
-     study that paints itself cream it read as a black band above a cream page.
-     With `cover` the document itself reaches the bezel and there is no bar to
-     be a different colour from anything.
-     It is only safe to ask for because everything that sits at an edge already
-     keeps out of the way by itself: the mark adds the top inset to its own
-     offset (see --mark-top), and the foot and the prototype window add the
-     bottom one. */
-  viewportFit: 'cover',
+     It was added to get rid of the flat bar the browser draws behind the
+     clock, which against a dark site read as a black band. It worked, and
+     what it left was worse: once the page is under the status bar, Safari
+     draws its own blurred backdrop there so the clock stays legible, and that
+     backdrop is chrome painted above the page — nothing in a stylesheet
+     reaches it. On a page that already has a veil under a fixed mark it read
+     as two competing bands of blur.
+     The bar is coloured instead of covered. themeColor below is the static
+     answer; ThemeColor keeps it in step with whatever colour the page has
+     actually gone, which is what makes the strip read as the top of the page
+     rather than as something above it. */
 }
 
 export default function RootLayout({
@@ -129,6 +129,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-background">
         <CrtGlass />
+        <ThemeColor />
         <SmoothScroll />
         <CustomCursor />
         <Shell>{children}</Shell>
