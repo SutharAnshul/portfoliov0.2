@@ -41,19 +41,23 @@ export default function Act02() {
         <Label className="mb-10 max-w-[60ch]">
           My research board. Each body reduced to a silhouette, with three axes drawn across it: at the tail, the waist and the horns.
         </Label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[clamp(24px,5vw,96px)] gap-y-24">
+        {/* Both columns start at the top. The right one used to be pushed down
+            by a padding of up to 260px, which set the two words at different
+            heights and, because the drop was a fraction of the width, at a
+            different offset on every screen — the pair are a comparison and
+            they have to be read side by side. Wider gutter with them level, so
+            the two sets of silhouettes do not run together. */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[clamp(24px,5vw,96px)] gap-y-24 items-start" style={{ columnGap: 'clamp(40px, 7cqw, 140px)' }}>
           <Column
             word="Heritage" items={HERITAGE}
             gives="Familiarity, a visual language people recognise, proven proportions, a musical and cultural history."
             costs="Compromises in weight, balance, posture, body contact and fret access, sitting or standing."
           />
-          <div className="md:pt-[clamp(0px,14vw,260px)]">
-            <Column
-              word="Ergonomics" items={ERGO}
-              gives="Lighter bodies, deep contours, balance, shapes built around the player."
-              costs="Often the familiar outline, and with it much of the identity of a guitar."
-            />
-          </div>
+          <Column
+            word="Ergonomic" items={ERGO}
+            gives="Lighter bodies, deep contours, balance, shapes built around the player."
+            costs="Often the familiar outline, and with it much of the identity of a guitar."
+          />
         </div>
       </div>
 

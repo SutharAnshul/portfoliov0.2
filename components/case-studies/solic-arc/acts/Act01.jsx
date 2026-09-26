@@ -18,11 +18,16 @@ export default function Act01() {
             The guitar<br />I couldn’t find.
           </h1>
         </div>
-        <div className="sa-g12 mt-10 md:mt-14 gap-y-8">
-          <p className="col-span-12 md:col-span-6 lg:col-span-5 sa-t-body">
+        {/* The standfirst gets the page to itself, and the four facts run
+            underneath it as one row of rules. They used to sit beside it in a
+            two by two block starting at column 8, which put a second column of
+            reading matter level with the first and left the four rules broken
+            across two rows at two different heights. */}
+        <div className="mt-10 md:mt-14">
+          <p className="sa-t-body">
             Solic Arc is an electric guitar I designed and built around the player’s body. This page follows how it got its shape: from other players, a system for drawing bodies, foam prototypes and a workshop.
           </p>
-          <dl className="col-span-12 md:col-start-8 md:col-span-5 grid grid-cols-2 gap-x-6 gap-y-5">
+          <dl className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8 mt-16 md:mt-24">
             {META.map(([k, v]) => (
               <div key={k} className="sa-rule pt-3">
                 <dt className="sa-t-label text-mu">{k}</dt>
@@ -80,17 +85,21 @@ export default function Act01() {
       </div>
 
       {/* Three guitars */}
-      <div className="sa-wrap sa-g12 mt-32 md:mt-52 items-end gap-y-6">
-        {/* The numeral is set against the right of its column rather than the
-            left. A 3 is a good deal narrower than the six columns it used to
-            be given, and all of that difference fell between it and the
-            sentence it belongs to. Anchored right, the pair reads as one
-            thing, and the glyph — which is larger than any column — overhangs
-            to the left, away from the words, where it cannot collide. */}
-        <div className="col-span-12 md:col-span-4 text-right font-display font-bold leading-[0.78] tracking-[-0.06em] text-[clamp(200px,34vw,520px)] sa-t-num" aria-hidden="true">3</div>
-        <div className="col-span-12 md:col-span-8 pb-4">
-          <p className="sa-t-sec">Three guitars. None of them felt like mine.</p>
-          <p className="sa-t-body mt-8">I had owned three guitars and never felt properly connected to any of them. They didn’t feel right in my hands.</p>
+      {/* Two cells that size themselves: the numeral takes the width of the
+          numeral and the sentence takes the rest, with a gap set between them
+          rather than left over. It was a four and an eight of the twelve-column
+          grid, which gave the glyph a third of the page whatever size it was
+          drawn at, and cast the difference as empty space — against the right
+          of that column the 3 then stood a head and shoulders above the two
+          sentences beside it. See .solic-three in app/globals.css for the size,
+          which is set to the height of those sentences. */}
+      <div className="sa-wrap mt-32 md:mt-52">
+        <div className="solic-three">
+          <div className="solic-three-n font-display font-bold sa-t-num" aria-hidden="true">3</div>
+          <div>
+            <p className="sa-t-sec">Three guitars. None of them felt like mine.</p>
+            <p className="sa-t-body mt-8">I had owned three guitars and never felt properly connected to any of them. They didn’t feel right in my hands.</p>
+          </div>
         </div>
       </div>
 

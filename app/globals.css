@@ -3577,6 +3577,43 @@ html[data-story='on'] {
   }
 }
 
+/* The 3, sized to the sentences beside it.
+   ──────────────────────────────────────────────────────────────────────
+   The numeral was set at 34cqw, which is a third of the column and a good
+   deal taller than the heading and paragraph it is paired with — it read as
+   the subject of the spread rather than as a figure attached to a sentence.
+
+   Its size is now the height of that pair, near enough: the heading takes two
+   lines of .sa-t-sec (4cqw, line-height .98) and the paragraph two of
+   .sa-t-body with 2rem between them, so the block is about 7.8cqw + 117px
+   tall. A 3 in this face measures .735em from top to bottom, which puts the
+   font size at 11cqw + 113px — fitted to the height measured at the widths the
+   column actually takes, where the ink of the glyph and the block beside it
+   now come out within a pixel or two of each other.
+
+   The columns size themselves rather than taking four and eight of twelve, so
+   the space between them is the gap and nothing else; at 4/12 the glyph used
+   only as much of its column as it needed and the remainder fell into the
+   space between it and the words. */
+.solic-stage .solic .solic-three {
+  display: grid;
+  row-gap: 2rem;
+}
+
+.solic-stage .solic .solic-three-n {
+  font-size: clamp(120px, 11cqw + 113px, 260px);
+  line-height: 0.76;
+  letter-spacing: -0.06em;
+}
+
+@media (min-width: 768px) {
+  .solic-stage .solic .solic-three {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: clamp(40px, 7cqw, 128px);
+    align-items: center;
+  }
+}
+
 /* A phone has no quarter to give. The index is a pointer's tool — it is not
    drawn on the frame records either — so below the width where two columns
    stop being two columns, the piece takes the window back and is shown as it
