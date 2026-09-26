@@ -281,7 +281,23 @@ void main() {
   vec2 px = 1.0 / uRes;
   vec2 duv = abs(curve(vUv + vec2(px.x, 0.0)) - sUv)
            + abs(curve(vUv + vec2(0.0, px.y)) - sUv);
-  vec2 cov = clamp(min(sUv, 1.0 - sUv) / max(duv, vec2(1e-6)) + 0.5, 0.0, 1.0);
+
+  /* Two device pixels of ramp, not one.
+     ────────────────────────────────────────────────────────────────────
+     A one-pixel ramp is the textbook width and it is not enough here. The
+     tube's sides are very nearly vertical, so the edge crosses into the next
+     column only every dozen rows or so — and a ramp that narrow puts a single
+     part-lit pixel at the crossing and nothing either side of it, which does
+     not blend the step, it just moves it. Down a long shallow edge that reads
+     as a staircase, and it shows most where bright picture meets dark page.
+     Measured at 1440 on a plain display: tile at luma 2, page at 11, and one
+     pixel of 8 between them, jumping a column at a time.
+     Two pixels give the crossing a shoulder on both sides, so the step is
+     spread over three values rather than one. It costs a little crispness at
+     the silhouette, which at this size nobody can see, and it is still under
+     one CSS pixel on a 3x screen. */
+  const float AA = 2.0;
+  vec2 cov = clamp(min(sUv, 1.0 - sUv) / max(duv * AA, vec2(1e-6)) + 0.5, 0.0, 1.0);
   float glass = cov.x * cov.y;
   if (glass <= 0.0) {
     gl_FragColor = vec4(0.0);
