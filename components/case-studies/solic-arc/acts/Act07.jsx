@@ -1,4 +1,4 @@
-import { Act, Opener, Kind, Cap, Reveal, NC, SHOW_NC } from '../components/ui'
+import { Act, Opener, Kind, Cap, Reveal, NC, SHOW_NC, useSrc } from '../components/ui'
 
 const P = (name, cls, alt, aspect) => ({ name, cls, alt, aspect })
 const MOSAIC = [
@@ -34,6 +34,7 @@ const SPEC = [
 ]
 
 export default function Act07() {
+  const src = useSrc()
   return (
     <Act i={6} id="players">
       <Opener i={6} lede="Octaves is IIT Guwahati’s music club. Its guitarists sat down with Solic Arc, stood up with it, and played." />
@@ -59,8 +60,24 @@ export default function Act07() {
       <div className="h-[36vh] md:h-[50vh]" />
       <div className="sa-wrap">
         <p className="sa-t-label text-mu mb-6">The instrument</p>
-        <h2 className="font-serif leading-[0.8] tracking-[-0.02em] text-[clamp(96px,17vw,330px)]">
-          Solic <span className="italic" style={{ color: 'var(--acc)' }}>Arc</span>
+        {/* The wordmark, not a setting of the name in the page's serif. This
+            is the mark drawn for the instrument, so the one place the name is
+            given at size is the one place it should be the real thing.
+
+            The cream and gold cut, for the navy this act is painted in;
+            logo_onlight.webp is the grey cut for a pale field, unused so far.
+            Still an h2 with the name as alt text, so the heading is in the
+            outline and read aloud as before.
+
+            Width in cqw against the column, not the window, and the height
+            follows from the file's own proportion — 713x213 — so nothing has
+            to be restated if the mark is ever redrawn. */}
+        <h2>
+          <img
+            src={src('logo_ondark')} alt="Solic Arc"
+            width="713" height="213" loading="lazy"
+            style={{ width: 'clamp(260px, 60cqw, 820px)', height: 'auto' }}
+          />
         </h2>
         <p className="font-serif italic text-[clamp(24px,2.6vw,44px)] leading-tight mt-6 md:mt-8 text-mu">An extension of the player’s body.</p>
       </div>
