@@ -54,7 +54,6 @@ import { Shell } from '@/components/Shell'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { CustomCursor } from '@/components/CustomCursor'
 import { CrtGlass } from '@/components/CrtGlass'
-import { ThemeColor } from '@/components/ThemeColor'
 
 export const metadata: Metadata = {
   title: 'Anshul Suthar - Product Designer',
@@ -87,12 +86,22 @@ export const viewport: Viewport = {
   // The favicon above keeps its media queries on purpose: those describe the
   // tab strip the icon sits in, not the page it points at.
   colorScheme: 'dark',
-  /* No themeColor here, deliberately. ThemeColor owns that tag outright, and
-     two owners is not a tidiness problem: React keeps its own head tags in a
-     tree it reconciles, so removing one from underneath it made Next throw
-     `removeChild of null` on the next client navigation — which killed the
-     render, left the URL changed and the previous page on screen, and made
-     clicking into a record do nothing at all. */
+  /* No themeColor, deliberately, and nothing writes one at runtime either.
+     ──────────────────────────────────────────────────────────────────────
+     Safari reads theme-color once, when the page loads, and holds the top
+     band on that colour for the rest of the visit — so on a record that
+     repaints itself act by act the band stayed on whatever the page happened
+     to be when you arrived. Changing the tag afterwards, however it is
+     written, does not move it.
+     With no theme-color at all Safari has nothing to hold, and falls back to
+     sampling the page's own painted colour — which is already what it does
+     for the toolbar at the foot of the screen, demonstrably: on a mustard act
+     that bar is mustard while the band above was still the old static grey.
+     Both html and body carry the act's colour, so there is the right thing
+     to sample.
+     The cost is Android: Chrome tints its toolbar from theme-color and does
+     not sample, so there it takes a default instead of following the page.
+     Traded knowingly — the phones this was reported from are Apple's. */
 
   /* There is no viewportFit: 'cover' here, and that is deliberate.
      ──────────────────────────────────────────────────────────────────────
@@ -134,7 +143,6 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-background">
         <CrtGlass />
-        <ThemeColor />
         <SmoothScroll />
         <CustomCursor />
         <Shell>{children}</Shell>
