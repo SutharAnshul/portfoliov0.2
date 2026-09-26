@@ -1,4 +1,4 @@
-import { Act, Opener, Label, Kind, Cap, Img, Reveal, NC } from '../components/ui'
+import { Act, Opener, Label, Kind, Cap, Img, Reveal } from '../components/ui'
 
 const REFINE = [
   ['sk_neck', 'Neck profile', 'A flat, angled neck profile. Meant to give the thumb a more restful grip and keep the wrist straighter.', 'aspect-[1741/671]'],
@@ -71,24 +71,13 @@ export default function Act06() {
             </figure>
           ))}
         </div>
-        <div className="sa-g12 mt-12 gap-y-6">
-          <Kind className="col-span-12 md:col-span-3">Design intent · not measured</Kind>
-          <p className="col-span-12 md:col-span-9 text-[16px] leading-relaxed">These are the intentions behind each detail. None of them has been measured on players yet.</p>
-        </div>
-        <div className="sa-g12 mt-10 gap-y-6 sa-rule pt-6">
-          <Kind className="col-span-12 md:col-span-3">Evidence · the scallop split</Kind>
-          <div className="col-span-12 md:col-span-9">
-            <p className="text-[16px] leading-relaxed">The survey was divided on scalloped frets. Among players describing their experience, 7 said they don’t like them at all and 4 found them too demanding or uncomfortable. 4 said bending and vibrato got easier, and 3 felt less finger fatigue.</p>
-            <p className="text-[16px] leading-relaxed mt-3 text-mu">It is the most divisive decision in the design. <NC>scalloped fretboard on the finished guitar</NC></p>
-          </div>
-        </div>
       </div>
 
       {/* Materials */}
       <div className="sa-wrap mt-28 md:mt-40">
         <Label className="mb-8">Materials · all quartersawn</Label>
         <dl className="grid grid-cols-1 sm:grid-cols-3 gap-x-[clamp(16px,3vw,48px)] gap-y-8">
-          {[['Body', 'Swamp ash'], ['Neck', 'Maple'], ['Fretboard', 'Rosewood']].map(([k, v]) => (
+          {[['Body', 'Ash'], ['Neck', 'Maple'], ['Fretboard', 'Rosewood']].map(([k, v]) => (
             <div key={k} className="sa-rule pt-4">
               <dt className="sa-t-label text-mu">{k}</dt>
               <dd className="font-display font-semibold tracking-[-0.035em] leading-none text-[clamp(40px,5vw,84px)] mt-3">{v}</dd>
@@ -100,7 +89,7 @@ export default function Act06() {
 
       {/* CNC */}
       <figure className="mt-20 md:mt-28">
-        <Reveal name="cnc" parallax={3} alt="A CNC router cutting the Solic Arc body outline and pickup cavities from a swamp ash blank, with sawdust around it." className="w-full aspect-[1743/984] max-h-[92vh]" imgClass="object-cover" />
+        <Reveal name="cnc" parallax={3} alt="A CNC router cutting the Solic Arc body outline and pickup cavities from an ash blank, with sawdust around it." className="w-full aspect-[1743/984] max-h-[92vh]" imgClass="object-cover" />
         <div className="sa-wrap sa-g12 mt-6 gap-y-3">
           <Kind className="col-span-12 md:col-span-3">Fabrication</Kind>
           <p className="col-span-12 md:col-span-7 text-[16px] leading-relaxed">I had access to a broken CNC. I fixed it, loaded the toolpath and pushed the right buttons.</p>
@@ -112,11 +101,21 @@ export default function Act06() {
         <blockquote className="col-span-12 md:col-start-2 md:col-span-11">
           {/* A joined hand rather than the serif italic, which sets this as a
               row of separate letters and reads as type pretending to be
-              handwriting. Wider column and a smaller size so it lands in four
-              lines instead of six. See --font-hand in app/layout.tsx. */}
+              handwriting. See --font-hand in app/layout.tsx.
+
+              The size is inline. It was written as text-[clamp(28px,3.2cqw,56px)]
+              and leading-[1.28], and neither class exists: the piece's CSS is
+              precompiled and was built before the rebase, so nothing was ever
+              emitted for a cqw size. Both were silently doing nothing and the
+              quote had been setting at the .solic body size of 18px — a hand
+              with this small an x-height is barely readable at 18, which is why
+              it needed zooming into. */}
           <p
-            className="text-[clamp(28px,3.2cqw,56px)] leading-[1.28]"
-            style={{ fontFamily: 'var(--font-hand), cursive' }}
+            style={{
+              fontFamily: 'var(--font-hand), cursive',
+              fontSize: 'clamp(30px, 4cqw, 64px)',
+              lineHeight: 1.34,
+            }}
           >
             “I spent the next month in a workshop. Coils of wood shavings covered the floor. Tiny particles of ash hung in the sunlight shining through the little window.”
           </p>

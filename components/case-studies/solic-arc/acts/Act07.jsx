@@ -22,7 +22,7 @@ const Tile = ({ p, i }) => (
 )
 
 const SPEC = [
-  ['Body', 'Swamp ash, quartersawn'],
+  ['Body', 'Ash, quartersawn'],
   ['Neck', 'Maple, quartersawn · flat, angled profile'],
   ['Fretboard', 'Rosewood, quartersawn'],
   ['Scale length', '25.5 in'],
@@ -68,7 +68,7 @@ export default function Act07() {
       <figure className="mt-16 md:mt-24">
         <Reveal
           name="body_studio" parallax={2}
-          alt="Render of the Solic Arc body: natural swamp ash, carbon-fibre pickguard, two cream humbuckers, a vintage-style tremolo bridge and a rosewood fretboard."
+          alt="Render of the Solic Arc body: natural ash, carbon-fibre pickguard, two cream humbuckers, a vintage-style tremolo bridge and a rosewood fretboard."
           /* 1743x1309, its own proportion. It was in a box a screenful tall
              with object-cover trimming whatever did not fit, which at that
              height meant the top and bottom of the body — so the one picture
