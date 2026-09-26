@@ -3329,41 +3329,44 @@ html[data-story='on'] {
   min-width: 0;
 }
 
-/* The piece's top bar.
+/* The piece's top bar, and the one pane that stays put.
    ──────────────────────────────────────────────────────────────────────
-   Chrome.jsx is `position: fixed` across `left: 0; right: 0` at the very top
-   of the window. Two things are wrong with that here and both are ours to fix,
-   because the bar is right about the page it was written for.
+   Chrome.jsx is written `position: fixed` across the top of the window, for
+   a page that is the whole window and has no chrome of its own. Here it is
+   the second thing pinned to the top of the screen, under a name that is
+   already pinned there, and the two of them together took a strip out of
+   every screenful. So the bar joins the flow: it is read once at the head of
+   the record and then it goes, and the act it names is carried from there on
+   by the index in the margin, which says the same thing and can be steered.
 
-   It spans the window rather than the column, so it lies across the index: a
-   quarter of the window puts it back over its own work.
-
-   And the top of the window is where the site's name already is. The bar is
-   dropped below the mark's band — the same height .site-page clears for it —
-   so the two read as chrome and sub-chrome rather than as a collision. The
-   !important is not a shortcut: `top` is written as an inline style on the
-   element, for the safe-area inset, and an inline style cannot be answered
-   from a stylesheet any other way. The inset is added back here. */
-/* .site-page carries the site's arrival — `animation: rise ... both` — and a
-   fill-mode of both leaves its final transform applied for the life of the
-   page. A transformed element is the containing block for everything fixed
-   inside it, so the bar stopped being fixed to the window and became fixed to
-   a box 46,000px tall: it scrolled away with the page and was 32,000px above
-   the screen by Act 06. The arrival is a half-second of movement on load; the
-   bar is the whole way you know where you are. The record gives up the
-   former. (LivePrototype documents the same trap from the other side.) */
-html[data-solic] .site-page {
-  animation: none;
+   With nothing in the piece fixed any more, .site-page keeps the site's
+   arrival animation — it was turned off here only because its fill-mode
+   leaves a transform behind, and a transformed element is the containing
+   block for anything fixed inside it. Sticky does not care. */
+.solic-stage .solic > .fixed {
+  position: static;
 }
 
-.solic-stage .solic > .fixed {
-  /* Measured rather than 25vw: .site-page is capped at 1680px and centred, so
-     past that width a quarter of the window is no longer where the column
-     starts. SolicTint publishes the stage's own two edges, so the bar is the
-     column's width exactly rather than running on to the window. */
-  left: var(--solic-col, 25vw);
-  right: var(--solic-col-r, 0px);
-  top: calc(env(safe-area-inset-top, 0px) + var(--mark-top) + 64px) !important;
+/* Where the shape system comes to rest.
+   ──────────────────────────────────────────────────────────────────────
+   Act 04 is a 720vh track with one pane held at the top of the window while
+   you scroll it. `top: 0` put that pane behind the site's name: the study's
+   number and its sentence — R02, "Extrema slide toward the tail" — were the
+   part of it covered, which is the part that says what you are looking at.
+
+   So it rests below the name instead, and gives up exactly that much height
+   rather than keeping a screenful and hanging off the bottom. The 78px of
+   padding inside it was there to clear the bar that used to be fixed above
+   it; with the bar in the flow that space is nothing but a gap, so it comes
+   back down to an ordinary one. */
+.solic-record {
+  --solic-rest: calc(var(--mark-top) + 64px + var(--s4));
+}
+
+.solic-stage .solic [aria-label^='Interactive'] > .sticky {
+  top: var(--solic-rest);
+  height: calc(100svh - var(--solic-rest));
+  padding-top: var(--s3);
 }
 
 /* A phone has no quarter to give. The index is a pointer's tool — it is not
@@ -3377,10 +3380,5 @@ html[data-solic] .site-page {
 
   .solic-record .case-index {
     display: none;
-  }
-
-  .solic-stage .solic > .fixed {
-    left: 0;
-    right: 0;
   }
 }

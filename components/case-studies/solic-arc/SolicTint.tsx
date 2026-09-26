@@ -56,16 +56,6 @@ export function SolicTint() {
     const measure = () => {
       acts = [...document.querySelectorAll<HTMLElement>('[data-act]')]
 
-      /* Where the piece's column begins, for its own fixed bar to line up
-         with. It cannot be written in CSS: the page is capped at 1680px and
-         centred, so past that width the column no longer starts a quarter of
-         the way across the window. */
-      const stage = document.querySelector<HTMLElement>('.solic-stage')
-      if (stage) {
-        const r = stage.getBoundingClientRect()
-        root.style.setProperty('--solic-col', `${Math.round(r.left)}px`)
-        root.style.setProperty('--solic-col-r', `${Math.round(window.innerWidth - r.right)}px`)
-      }
     }
 
     const read = () => {
@@ -114,8 +104,6 @@ export function SolicTint() {
       ro.disconnect()
       if (queued) cancelAnimationFrame(queued)
       delete root.dataset.solic
-      root.style.removeProperty('--solic-col')
-      root.style.removeProperty('--solic-col-r')
       if (prevFg) root.style.setProperty('--foreground', prevFg)
       else root.style.removeProperty('--foreground')
       if (prevBg) root.style.setProperty('--background', prevBg)
