@@ -9,8 +9,8 @@ import { ACTS } from './lib/acts'
  * Solic Arc paints the document as you read — eight acts, cream to ink to a
  * deep blue and back — but it paints `background-color` directly, which tells
  * the rest of the site nothing. Everything of ours around it is mixed from
- * two tokens, so left alone the mark, its halo, the veil and the index all
- * stay dressed for a dark page and three of the eight acts swallow them.
+ * two tokens, so left alone the mark, the veil under it and the index would
+ * all stay dressed for a dark page, and three of the eight acts swallow them.
  *
  * So this does for Solic Arc what StoryBackground does for the Incentiwise
  * scroll: it writes the act's own foreground and background into --foreground

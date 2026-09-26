@@ -34,11 +34,17 @@ import { useEffect, useRef } from 'react'
 /**
  * How much the wash weighs.
  *
- * Much less than it did, and it can be: the mark is no longer relying on it.
- * The name carries a halo of the page's own colour now — see .site-mark in
- * globals.css — which is invisible against a matching ground and does the
- * whole job against a white screen on an ink act. So the wash went back to
- * being what it should have been, which is a hint that something is above you.
+ * Much less than it did. It was cut to this when the mark was given a halo of
+ * its own and stopped relying on the wash; the halo has since been taken out
+ * again — it could not be drawn on WebKit without painting a rectangle, see
+ * .site-mark in globals.css — so this is once more the only thing holding a
+ * light screen off the name as it scrolls under it on a dark act.
+ *
+ * It has been left where it is rather than put back up, because the case it
+ * has to survive is narrow: the mark always contrasts with the page, since
+ * both are mixed from the same pair of tokens, and what can go under it is a
+ * picture rather than the page. If the name ever does get lost over one, this
+ * is the number to raise — and the only one.
  */
 const PEAK = 0.0788
 /** Out on the shoulders, where nothing needs holding off anything. The blur
@@ -152,9 +158,9 @@ void main() {
   /* And a ceiling on it, which is the whole difference between a veil and a
      lid. Full weight is spent where the letters are and nowhere else. It is a
      third of what it was, because the glass under it is now pulling the page
-     toward the page's own colour rather than waiting to be painted over, and
-     because the mark brought its own halo. Opaque everywhere was what made it
-     visible in the first place: 1.0 is not air, it is paint. */
+     toward the page's own colour rather than waiting to be painted over.
+     Opaque everywhere was what made it visible in the first place: 1.0 is not
+     air, it is paint. */
   a *= mix(uTop, uPeak, 1.0 - smoothstep(0.08, 0.62, d));
 
   /* A surface where there is veil, and nothing where there is not. */
