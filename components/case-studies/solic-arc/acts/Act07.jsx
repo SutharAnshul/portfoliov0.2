@@ -69,7 +69,12 @@ export default function Act07() {
         <Reveal
           name="body_studio" parallax={2}
           alt="Render of the Solic Arc body: natural swamp ash, carbon-fibre pickguard, two cream humbuckers, a vintage-style tremolo bridge and a rosewood fretboard."
-          className="w-full h-[70vh] md:h-[100vh] max-h-[1300px]" imgClass="object-cover object-[45%_50%]"
+          /* 1743x1309, its own proportion. It was in a box a screenful tall
+             with object-cover trimming whatever did not fit, which at that
+             height meant the top and bottom of the body — so the one picture
+             of the finished instrument was showing the middle of it. */
+          className="w-full" wrapStyle={{ aspectRatio: '1743 / 1309' }}
+          imgClass="object-cover"
         />
         <div className="sa-wrap sa-g12 mt-6 gap-y-3">
           <Kind className="col-span-12 md:col-span-3">Render</Kind>

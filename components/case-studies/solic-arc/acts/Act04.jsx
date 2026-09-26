@@ -62,11 +62,21 @@ export default function Act04() {
           </div>
         </div>
         <div className="mt-14 -mx-[var(--sa-gutter)] px-[var(--sa-gutter)] overflow-x-auto snap-x snap-mandatory [scrollbar-width:thin]">
-          <ol className="flex md:grid md:grid-cols-4 gap-4 md:gap-6 min-w-max md:min-w-0">
+          {/* Two by two. The gap is an inline style and not a class, because the
+              piece's CSS is precompiled: md:gap-x-6 and md:gap-y-10 were never
+              built, so writing them did nothing and the two plates in a row sat
+              against each other as one slab of white. The rows need more air
+              than the columns — side by side the plates are told apart by the
+              gap alone, one above the other they also have a caption between
+              them. */}
+            <ol
+              className="flex md:grid md:grid-cols-2 min-w-max md:min-w-0"
+              style={{ columnGap: 'clamp(16px, 2.2cqw, 40px)', rowGap: 'clamp(24px, 4cqw, 64px)' }}
+            >
             {SKETCHES.map(([n, t], i) => (
               <li key={n} className="snap-start w-[78vw] sm:w-[46vw] md:w-auto">
                 <div className="sa-t-mono sa-t-num text-[13px] mb-3 flex justify-between"><span>{t}</span><span className="text-mu">{['early', '', '', 'late'][i]}</span></div>
-                <Img name={n} alt={`${t} sketch of the body outline.`} imgClass="object-contain" className="aspect-[853/368]" />
+                <Img name={n} alt={`${t} sketch of the body outline.`} imgClass="mix-blend-multiply object-contain" className="aspect-[853/368]" />
               </li>
             ))}
           </ol>

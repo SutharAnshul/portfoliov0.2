@@ -3510,6 +3510,12 @@ html[data-story='on'] {
   container-type: inline-size;
 }
 
+.solic-stage .sa-g12{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));-moz-column-gap:clamp(12px,1.6cqw,28px);column-gap:clamp(12px,1.6cqw,28px)}
+.solic-stage .sa-t-hero{font-size:clamp(54px,8.4cqw,150px);line-height:.86;letter-spacing:-.045em}
+.solic-stage .sa-t-act{font-size:clamp(46px,6.2cqw,112px);line-height:.9;letter-spacing:-.042em}
+.solic-stage .sa-t-sec{font-size:clamp(32px,4cqw,72px);line-height:.98;letter-spacing:-.033em}
+.solic-stage .sa-t-sub{font-size:clamp(24px,2.3cqw,38px);line-height:1.08;letter-spacing:-.022em}
+.solic-stage .sa-t-body{font-size:clamp(17px,1.25cqw,20px);line-height:1.58;max-width:36em;text-wrap:pretty}
 .solic-stage .solic .w-\[58vw\]{width:58cqw}
 .solic-stage .solic .w-\[78vw\]{width:78cqw}
 .solic-stage .solic .gap-x-\[clamp\(12px\2c 1\.6vw\2c 28px\)\]{-moz-column-gap:clamp(12px,1.6cqw,28px);column-gap:clamp(12px,1.6cqw,28px)}
