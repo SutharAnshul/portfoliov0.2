@@ -160,14 +160,14 @@ export default function Act03() {
       {/* The tension */}
       <div className="sa-wrap mt-32 md:mt-48">
         <Kind className="mb-10">Evidence · two separate questions</Kind>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[clamp(24px,5vw,96px)] gap-y-16">
+        <div className="solic-evidence">
           <div>
             <div className="font-display font-bold tracking-[-0.055em] leading-[0.82] text-[clamp(96px,13vw,220px)] sa-t-num">75<span className="text-mu">/102</span></div>
             <p className="sa-t-sub mt-6">said yes to a contoured body.</p>
             <p className="sa-t-label text-mu mt-6">Q · “Do you prefer a contoured body for comfort?”</p>
             <Stack className="mt-4" parts={[['Yes', 75], ['Maybe', 18, 0.45], ['No', 9, 0.18]]} />
           </div>
-          <div className="md:pt-[clamp(0px,9vw,180px)]">
+          <div>
             <div className="font-display font-bold tracking-[-0.055em] leading-[0.82] text-[clamp(96px,13vw,220px)] sa-t-num">59<span className="text-mu">/102</span></div>
             <p className="sa-t-sub mt-6">chose heritage guitars as the type they prefer most.</p>
             <p className="sa-t-label text-mu mt-6">Q · “Which type of electric guitar do you prefer the most?”</p>

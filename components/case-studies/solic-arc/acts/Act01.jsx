@@ -96,10 +96,16 @@ export default function Act01() {
 
       {/* The idea, then the turn */}
       <div className="sa-wrap sa-g12 mt-32 md:mt-48">
-        <p className="sa-t-act col-span-12 md:col-span-11">What if I designed a guitar around the way I actually play?</p>
+        {/* The whole column, so the question sets in three lines rather than
+            four — it was given eleven of twelve, and the twelfth is the line
+            the fourth was breaking for. */}
+        <p className="sa-t-act col-span-12">What if I designed a guitar around the way I actually play?</p>
       </div>
+      {/* Under the question and on its own left edge, rather than indented to
+          the middle of the page behind a rule. The rule was drawing a line
+          between a question and its own answer. */}
       <div className="sa-wrap sa-g12 mt-12 md:mt-16">
-        <div className="col-span-12 md:col-start-6 md:col-span-7 sa-rule pt-6">
+        <div className="col-span-12 md:col-span-7">
           <p className="sa-t-body">
             A guitar that fits one person is a custom order. I wanted something that could work for other guitarists too, and maybe become a product one day.
           </p>

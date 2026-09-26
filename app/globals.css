@@ -3545,6 +3545,38 @@ html[data-story='on'] {
 .solic-stage .solic .md\:pt-\[clamp\(0px\2c 14vw\2c 260px\)\]{padding-top:clamp(0px,14cqw,260px)}
 .solic-stage .solic .md\:pt-\[clamp\(0px\2c 9vw\2c 180px\)\]{padding-top:clamp(0px,9cqw,180px)}
 
+/* The two survey figures, set corner to corner.
+   ──────────────────────────────────────────────────────────────────────
+   They were two cells of one row, the second pushed down by a padding in vw —
+   a number that had to be guessed at and was never the height of the cell
+   beside it, so the two floated at an arbitrary offset from each other.
+
+   Two rows and two columns instead, with the second figure placed in the
+   second of each. A grid row ends exactly where the next begins, so the top
+   of the right-hand figure is the bottom of the left-hand one by construction,
+   at every width and whatever either of them is carrying. With no gap in
+   either axis the two meet at a point: the bottom right corner of the first
+   is the top left corner of the second, which is the diagonal the pair was
+   reaching for.
+
+   Stacked on a phone, where there is no second column to step into. */
+.solic-stage .solic .solic-evidence {
+  display: grid;
+  row-gap: var(--s8);
+}
+
+@media (min-width: 768px) {
+  .solic-stage .solic .solic-evidence {
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .solic-stage .solic .solic-evidence > :nth-child(2) {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
 /* A phone has no quarter to give. The index is a pointer's tool — it is not
    drawn on the frame records either — so below the width where two columns
    stop being two columns, the piece takes the window back and is shown as it
