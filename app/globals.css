@@ -3605,6 +3605,102 @@ html[data-story='on'] {
   }
 }
 
+/* Act 05 on a phone.
+   ──────────────────────────────────────────────────────────────────────
+   Two things that worked across five columns did not survive being stacked
+   into one.
+
+   The title. "Draw → Build → Feel" does not fit a phone at the act size, and
+   wrapping it put the break after the first arrow — an arrow pointing at the
+   end of a line, and the pair it joins split across two. Each step is a span,
+   so below 768 it sets a step to a line with the arrow leading into the next,
+   and above it they run inline exactly as before. The arrows are <i> so they
+   need the italic taken back off.
+
+   The loop. Stacked, it was five words each with a small down arrow beside it
+   and an even gap above and below, so nothing grouped: the space inside a step
+   read the same as the space between two. It is a rail now — a line down the
+   left, a node at each step, the return closing it at the bottom — which is
+   the same figure the desktop draws with its SVG return path, at the one
+   width where that path is hidden.
+
+   The node sits at 15px because the word is pinned to the 38px floor of its
+   clamp everywhere this query applies: the floor gives out at 4.4cqw = 38px,
+   a container of 863px, and the query stops at 767px. */
+.solic-stage .solic .solic-flow > span {
+  display: block;
+}
+
+.solic-stage .solic .solic-flow i {
+  font-style: normal;
+  opacity: 0.6;
+}
+
+@media (min-width: 768px) {
+  .solic-stage .solic .solic-flow > span {
+    display: inline;
+  }
+}
+
+@media (max-width: 767px) {
+  .solic-stage .solic .solic-loop > li {
+    padding-left: 38px;
+    padding-bottom: 40px;
+  }
+
+  /* One line the whole way down with the nodes sitting on it, rather than a
+     separate segment under each node — segments leave a break above every dot
+     and the rail stops reading as one continuous thing. It starts at the first
+     node and runs unbroken from there. */
+  .solic-stage .solic .solic-loop > li::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid var(--rule);
+  }
+
+  .solic-stage .solic .solic-loop > li:first-child::before {
+    top: 17px;
+  }
+
+  /* 17.1px is where the cap of a 38px word centres, measured: line box 34.2,
+     baseline 30.6, cap top 3.6. The node is put on that rather than on the top
+     of the line box, which is 3.6px of nothing above the letter. */
+  .solic-stage .solic .solic-loop > li::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--fg);
+  }
+
+  /* An open node, to say the loop returns rather than stops. */
+  .solic-stage .solic .solic-loop > li:last-child::after {
+    background: transparent;
+    border: 1px solid var(--fg);
+  }
+
+  .solic-stage .solic .solic-loop-close {
+    position: relative;
+    padding-left: 38px;
+    margin-top: 4px;
+  }
+
+  .solic-stage .solic .solic-loop-close::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: -44px;
+    height: 44px;
+    border-left: 1px solid var(--rule);
+  }
+}
+
 /* Outbound link as a button.
    ──────────────────────────────────────────────────────────────────────
    Set as an underlined line of .sa-t-label it was the same mono caption the

@@ -17,12 +17,17 @@ function Loop() {
   const draw = useTransform(scrollYProgress, [0.2, 1], [0, 1])
   return (
     <div ref={ref} className="relative">
-      <ol className="grid grid-cols-1 md:grid-cols-5 gap-y-8 md:gap-x-4">
+      {/* On a phone this is a rail: a line down the left with a node at each
+          step, closed at the bottom by the return. The arrow that used to sit
+          beside each word is gone with it — a 20px glyph next to a 38px word
+          read as an afterthought rather than as the thing carrying you to the
+          next step, and five of them made no shape on the page. The desktop
+          five-across, with its drawn return path, is untouched. */}
+      <ol className="solic-loop grid grid-cols-1 md:grid-cols-5 md:gap-x-4">
         {LOOP.map(([w, d], i) => (
           <li key={w} className="relative md:pr-4">
             <div className="flex items-baseline gap-3">
               <span className="font-display font-bold tracking-[-0.045em] leading-[0.9] text-[clamp(38px,4.4vw,80px)]">{w}</span>
-              {i < 4 && <span aria-hidden="true" className="sa-t-mono text-[clamp(20px,2vw,32px)] opacity-70 md:hidden">↓</span>}
               {i < 4 && <span aria-hidden="true" className="sa-t-mono text-[clamp(20px,2vw,32px)] opacity-70 hidden md:inline absolute right-0 top-[0.35em]">→</span>}
             </div>
             <p className="text-[15px] leading-relaxed mt-3 md:mt-4 max-w-[22em] text-mu">{d}</p>
@@ -39,7 +44,7 @@ function Loop() {
         <path d="M 92 26 L 100 10 L 108 26" fill="none" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" />
       </svg>
       <div className="hidden md:flex justify-center -mt-[52px]"><span className="sa-t-label px-3" style={{ background: 'transparent' }}>Next version</span></div>
-      <p className="md:hidden sa-t-label mt-6">↺ Back to Draw</p>
+      <p className="solic-loop-close md:hidden sa-t-label">↺ Back to Draw</p>
     </div>
   )
 }
@@ -50,7 +55,16 @@ export default function Act05() {
       <div className="sa-wrap sa-g12">
         <div className="col-span-12">
           <div className="sa-t-label text-mu mb-6 md:mb-8">Act 05</div>
-          <h2 className="sa-t-act">Draw <span className="opacity-60">→</span> Build <span className="opacity-60">→</span> Feel</h2>
+          {/* One line where it fits, three where it does not. Left to wrap it
+              broke as "Draw →" over "Build → Feel", which leaves an arrow
+              pointing at the end of a line and splits the pair it belongs to.
+              Each step is its own span, so the phone gets a step per line with
+              the arrow leading into the next, and nothing changes above 768. */}
+          <h2 className="sa-t-act solic-flow">
+            <span>Draw <i aria-hidden="true">→</i></span>{' '}
+            <span>Build <i aria-hidden="true">→</i></span>{' '}
+            <span>Feel</span>
+          </h2>
         </div>
       </div>
 
