@@ -86,6 +86,26 @@ export const NC = ({ children }) =>
 
 export const Cap = ({ children, className = '' }) => <p className={`sa-t-cap mt-4 ${className}`}>{children}</p>
 
+/**
+ * An outbound link that is a target rather than a run of text.
+ *
+ * A link to the source sheet is a thing to press, but set as an underlined
+ * line of the same mono caption the page uses for its labels it read as one
+ * more caption — the arrow was doing all the work of saying otherwise. This
+ * gives it a border, a box to press and a hover that fills with the act's
+ * foreground and reverses the label out of it, so it is a button at rest and
+ * not only under the pointer. See .sa-out in app/globals.css.
+ *
+ * For a link inside a sentence, keep the plain <a>: a button in the middle of
+ * a paragraph breaks the line it is set in.
+ */
+export const OutLink = ({ href, children, className = '' }) => (
+  <a href={href} target="_blank" rel="noreferrer" className={`sa-out sa-t-label ${className}`}>
+    <span>{children}</span>
+    <span aria-hidden="true" className="sa-out-arrow">↗</span>
+  </a>
+)
+
 /* An act owns its text colours; the fixed background layer handles the field colour. */
 export function Act({ i, id, children, className = '' }) {
   return (

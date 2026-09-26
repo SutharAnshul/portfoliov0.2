@@ -12,7 +12,11 @@ export const ACTS = [
 
 export const actVars = (i) => {
   const a = ACTS[i]
-  return { '--fg': a.fg, '--mu': a.mu, '--rule': a.rule, '--blue': a.blue, '--red': a.red, '--acc': a.acc, color: a.fg }
+  /* --bg is the act's field colour. The fixed layer behind the page paints it,
+     so nothing here sets a background — but anything that has to reverse out
+     of the page, such as a button filling on hover, needs to know what colour
+     it is reversing into. */
+  return { '--fg': a.fg, '--bg': a.bg, '--mu': a.mu, '--rule': a.rule, '--blue': a.blue, '--red': a.red, '--acc': a.acc, color: a.fg }
 }
 
 const hex = (h) => [1, 3, 5].map((k) => parseInt(h.slice(k, k + 2), 16))

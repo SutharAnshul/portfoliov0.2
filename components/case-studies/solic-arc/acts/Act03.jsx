@@ -1,4 +1,4 @@
-import { Act, Opener, Label, Kind, Cap, Reveal } from '../components/ui'
+import { Act, Opener, Label, Kind, Cap, Reveal, OutLink } from '../components/ui'
 
 const N = 102
 
@@ -146,9 +146,9 @@ export default function Act03() {
           {/* The figures on this page are all drawn from one sheet. Here is
               the sheet — beside the number it is the total of, which is where
               anyone who wants to check it will look first. */}
-          <p className="sa-t-label mt-5">
-            <a href="https://docs.google.com/spreadsheets/d/1Jmmf73yHNHhqS87HgiYPhIn3pBl-K_4dYjHfxSl7f50/edit?usp=sharing" target="_blank" rel="noreferrer">Read the 102 responses ↗</a>
-          </p>
+          <div className="mt-8">
+            <OutLink href="https://docs.google.com/spreadsheets/d/1Jmmf73yHNHhqS87HgiYPhIn3pBl-K_4dYjHfxSl7f50/edit?usp=sharing">Read the 102 responses</OutLink>
+          </div>
         </div>
         <div className="col-span-12 md:col-start-8 md:col-span-5">
           <Label className="mb-4">Who answered · experience</Label>

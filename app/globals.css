@@ -3577,6 +3577,64 @@ html[data-story='on'] {
   }
 }
 
+/* Outbound link as a button.
+   ──────────────────────────────────────────────────────────────────────
+   Set as an underlined line of .sa-t-label it was the same mono caption the
+   page uses for every other label, and read as one — the arrow was the only
+   thing saying it could be pressed. A border and a box give it a target, and
+   the fill on hover reverses the label out of the act's own foreground, so
+   the colours follow the field the act is painted in rather than being fixed
+   to the one act that carries a button today. --bg comes from actVars().
+
+   Specificity has to clear `.solic a`, which sets colour and underline, hence
+   the three classes; the piece's own stylesheet is precompiled and cannot be
+   added to. The radius is the 3px the images and the open-question tag use —
+   a pill would be the only round-ended thing on the page. */
+.solic-stage .solic .sa-out {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9em;
+  /* 1.35em of an 11px label clears 44px in height, which is the smallest a
+     finger can be asked to find. The border is the act's foreground and not
+     its rule colour: a rule is a hairline at 17% meant to separate two things
+     that are already there, and at that weight the box round a button reads
+     as a faint container rather than as an edge to press. */
+  padding: 1.35em 1.5em;
+  border: 1px solid var(--fg);
+  border-radius: 3px;
+  color: var(--fg);
+  background: transparent;
+  text-decoration: none;
+  transition: background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+}
+
+.solic-stage .solic .sa-out:hover,
+.solic-stage .solic .sa-out:focus-visible {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+  text-decoration: none;
+}
+
+.solic-stage .solic .sa-out .sa-out-arrow {
+  transition: transform 0.22s ease;
+}
+
+.solic-stage .solic .sa-out:hover .sa-out-arrow {
+  transform: translate(2px, -2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .solic-stage .solic .sa-out,
+  .solic-stage .solic .sa-out .sa-out-arrow {
+    transition: none;
+  }
+
+  .solic-stage .solic .sa-out:hover .sa-out-arrow {
+    transform: none;
+  }
+}
+
 /* The 3, sized to the sentences beside it.
    ──────────────────────────────────────────────────────────────────────
    The numeral was set at 34cqw, which is a third of the column and a good
