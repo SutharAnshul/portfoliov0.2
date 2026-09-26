@@ -40,28 +40,35 @@ import { useEffect } from 'react'
  */
 export function ThemeColor() {
   useEffect(() => {
-    let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
-    if (!meta) {
-      meta = document.createElement('meta')
-      meta.name = 'theme-color'
-      document.head.appendChild(meta)
-    }
-
-    /* Next renders its own theme-color from the viewport export, and there can
-       be more than one — a media-scoped pair, say. Any others are removed, or
-       the browser picks by its own rules and this one may not be the one it
-       reads. */
-    for (const other of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
-      if (other !== meta) other.remove()
-    }
-
     const pad = document.createElement('canvas')
     pad.width = 1
     pad.height = 1
     const ctx = pad.getContext('2d', { willReadFrequently: true })
 
     let queued = 0
-    let last = ''
+
+    /* Written by replacing the tag rather than by setting content on it,
+       because Safari is unreliable about noticing a content attribute that
+       changes under it where a tag that appears is a tag it parses.
+       ────────────────────────────────────────────────────────────────────
+       Only ever OUR tag, marked as ours. The first version of this removed
+       every theme-color in the head so there could be no argument about which
+       one the browser reads — including the one Next renders from the viewport
+       export. React keeps its head tags in a tree it reconciles, so pulling
+       one out from underneath it made Next throw `removeChild of null` on the
+       next client navigation: the render died, the URL changed, the previous
+       page stayed on screen, and clicking a work tile did nothing. Next
+       renders none now, so there is nothing to argue with. */
+    const MINE = 'data-theme-color-live'
+
+    const apply = (hex: string) => {
+      for (const m of document.querySelectorAll(`meta[${MINE}]`)) m.remove()
+      const m = document.createElement('meta')
+      m.name = 'theme-color'
+      m.content = hex
+      m.setAttribute(MINE, '')
+      document.head.appendChild(m)
+    }
 
     const read = () => {
       queued = 0
@@ -74,9 +81,15 @@ export function ThemeColor() {
       const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data
       const hex = `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`
 
-      if (hex === last) return
-      last = hex
-      meta.setAttribute('content', hex)
+      /* Compared against what is actually in the head, never against a colour
+         remembered from last time. A remembered one was the bug: moving from
+         the front page to a record through a link put Next's static #252525
+         back, this had the page's real colour cached, decided nothing had
+         changed and never wrote again — so the bar stayed grey for the rest of
+         the visit, and only a hard reload ever fixed it. */
+      const tags = document.querySelectorAll<HTMLMetaElement>(`meta[${MINE}]`)
+      if (tags.length === 1 && tags[0].getAttribute('content') === hex) return
+      apply(hex)
     }
 
     const onScroll = () => {
@@ -94,10 +107,23 @@ export function ThemeColor() {
     mo.observe(document.body, { attributes: true, attributeFilter: ['style', 'class'] })
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ['style', 'class'] })
 
+    /* And the head, for the moment Next puts its own tag back. Our own writes
+       trip this too; the next read finds the head already correct and stops,
+       so it settles in a frame rather than looping. */
+    const head = new MutationObserver((records) => {
+      for (const r of records) {
+        for (const n of [...r.addedNodes, ...r.removedNodes]) {
+          if (n instanceof HTMLMetaElement && n.name === 'theme-color') return onScroll()
+        }
+      }
+    })
+    head.observe(document.head, { childList: true })
+
     return () => {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
       mo.disconnect()
+      head.disconnect()
       if (queued) cancelAnimationFrame(queued)
     }
   }, [])

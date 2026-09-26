@@ -87,7 +87,12 @@ export const viewport: Viewport = {
   // The favicon above keeps its media queries on purpose: those describe the
   // tab strip the icon sits in, not the page it points at.
   colorScheme: 'dark',
-  themeColor: '#252525',
+  /* No themeColor here, deliberately. ThemeColor owns that tag outright, and
+     two owners is not a tidiness problem: React keeps its own head tags in a
+     tree it reconciles, so removing one from underneath it made Next throw
+     `removeChild of null` on the next client navigation — which killed the
+     render, left the URL changed and the previous page on screen, and made
+     clicking into a record do nothing at all. */
 
   /* There is no viewportFit: 'cover' here, and that is deliberate.
      ──────────────────────────────────────────────────────────────────────
