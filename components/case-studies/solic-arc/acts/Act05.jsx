@@ -54,32 +54,8 @@ export default function Act05() {
         </div>
       </div>
 
-      <div className="sa-wrap sa-g12 mt-16 md:mt-24 gap-y-8">
-        <p className="sa-t-sec col-span-12 md:col-span-9">A guitar can look right on screen and still feel wrong the moment it meets the body.</p>
-      </div>
 
-      <div className="sa-wrap mt-20 md:mt-28"><Loop /></div>
-
-      {/* In his words */}
-      <div className="sa-wrap sa-g12 mt-28 md:mt-40 gap-y-8">
-        <blockquote className="col-span-12 md:col-start-3 md:col-span-9">
-          <p className="font-serif italic text-[clamp(34px,4.4vw,76px)] leading-[1.02] tracking-[-0.01em]">
-            “This was the first time I could see my guitar taking shape in my hands.”
-          </p>
-          <footer className="sa-t-label mt-6 opacity-80">From my project notes · printed sketch, thermocol, a cutter, sandpaper</footer>
-        </blockquote>
-      </div>
-
-      {/* Prototypes, growing */}
-      <div className="sa-wrap mt-28 md:mt-40">
-        <div className="sa-g12 gap-y-6 items-end">
-          <div className="col-span-12 md:col-span-6">
-            <Kind className="mb-6">Physical prototypes</Kind>
-            <p className="sa-t-sec">Five full-scale thermocol bodies. That’s all of them.</p>
-          </div>
-          <p className="sa-t-body col-span-12 md:col-start-8 md:col-span-5">Each one tested depth, comfort and feel against a real body: size, contact, sitting position, proportion, how it sat in the hands. None of this was a formal test. It was physical prototyping and ergonomic evaluation, one version at a time.</p>
-        </div>
-      </div>
+      <div className="sa-wrap mt-16 md:mt-24"><Loop /></div>
 
       <div className="sa-wrap sa-g12 mt-16 md:mt-24 gap-y-10 md:gap-y-16 items-end">
         <figure className="col-span-8 md:col-span-4">

@@ -8,10 +8,6 @@ const SKETCHES = [
   ['sk_v7', 'Version 7'],
   ['sk_v12', 'Version 12'],
 ]
-const HEADS = [
-  ['tele', 'Tele'], ['strat', 'Strat'], ['suhr', 'Suhr'],
-  ['custom1', 'Custom 1'], ['custom2', 'Custom 2'], ['custom3', 'Custom 3'],
-]
 
 function Legend() {
   const items = [
@@ -50,7 +46,7 @@ export default function Act04() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-[clamp(16px,2.4vw,40px)] gap-y-10 mt-14">
           {[['fw_strat', 'Stratocaster'], ['fw_strandberg', 'Headless ergonomic design'], ['fw_own', 'My outline']].map(([n, t]) => (
             <figure key={n}>
-              <Img name={n} alt={`${t} with blue axes and red extrema columns drawn over it, and the same framework extracted below.`} imgClass="mix-blend-multiply object-contain" className="aspect-[1.38] flex items-start" />
+              <Img name={n} alt={`${t} with blue axes and red extrema columns drawn over it, and the same framework extracted below.`} imgClass="object-contain" className="aspect-[1.38] flex items-start" />
               <figcaption className="sa-t-label text-mu mt-3">{t}</figcaption>
             </figure>
           ))}
@@ -70,7 +66,7 @@ export default function Act04() {
             {SKETCHES.map(([n, t], i) => (
               <li key={n} className="snap-start w-[78vw] sm:w-[46vw] md:w-auto">
                 <div className="sa-t-mono sa-t-num text-[13px] mb-3 flex justify-between"><span>{t}</span><span className="text-mu">{['early', '', '', 'late'][i]}</span></div>
-                <Img name={n} alt={`${t} sketch of the body outline.`} imgClass="mix-blend-multiply object-contain" className="aspect-[853/368]" />
+                <Img name={n} alt={`${t} sketch of the body outline.`} imgClass="object-contain" className="aspect-[853/368]" />
               </li>
             ))}
           </ol>
@@ -124,34 +120,6 @@ export default function Act04() {
         <Cap>Angles measured from my own axis drawings: the reference guitars on the research board and the R07 framework. Tail · waist · horns.</Cap>
       </div>
 
-      {/* Headstocks */}
-      <div className="sa-wrap mt-32 md:mt-48">
-        <div className="sa-g12 gap-y-6 items-end">
-          <div className="col-span-12 md:col-span-7">
-            <Kind className="mb-6">Iteration · headstock</Kind>
-            <p className="sa-t-sec">The same question at the other end of the neck.</p>
-          </div>
-          <p className="sa-t-body col-span-12 md:col-start-9 md:col-span-4">Which parts should stay familiar, and which should change? I drew the chosen body with three established headstocks and three of my own.</p>
-        </div>
-        <div className="mt-14 grid grid-cols-2 md:grid-cols-3 gap-x-[clamp(12px,2.4vw,40px)] gap-y-8">
-          {HEADS.map(([k, t], i) => (
-            <figure key={k} className={`sa-rule pt-3 ${i === 3 ? 'md:col-start-1' : ''}`}>
-              <div className="flex justify-between sa-t-label"><span>{t}</span><span className="text-mu">{i < 3 ? 'Established' : 'Mine'}</span></div>
-              <Img name={`hs_${k}`} alt={`${t} headstock outline on the Solic Arc neck.`} className="mt-2 aspect-[800/360]" imgClass="object-contain" />
-            </figure>
-          ))}
-        </div>
-        <div className="sa-g12 mt-12 gap-y-8">
-          <div className="col-span-12 md:col-span-6 grid grid-cols-1 md:grid-cols-[auto_1fr] gap-x-6 gap-y-3 sa-rule pt-5">
-            <Kind className="md:pt-1">Evidence</Kind>
-            <p className="text-[16px] leading-relaxed">12 of the 14 survey players who answered the headstock question preferred a headstock, for the traditional look and feel.</p>
-          </div>
-          <div className="col-span-12 md:col-start-8 md:col-span-5 grid grid-cols-1 md:grid-cols-[auto_1fr] gap-x-6 gap-y-3 sa-rule pt-5">
-            <Kind className="md:pt-1">Decision</Kind>
-            <p className="text-[16px] leading-relaxed">The finished guitar keeps a Strat-style headstock. The ergonomic work stays in the body and the neck.</p>
-          </div>
-        </div>
-      </div>
       <div className="sa-pause" />
     </Act>
   )

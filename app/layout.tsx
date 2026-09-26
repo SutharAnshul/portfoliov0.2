@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Raleway } from 'next/font/google'
+import { Raleway, Dancing_Script } from 'next/font/google'
 import localFont from 'next/font/local'
 import './globals.css'
 
@@ -47,6 +47,25 @@ const read = Raleway({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-read',
+  display: 'swap',
+})
+
+/**
+ * The hand.
+ *
+ * One quotation in the Solic Arc record is a line from the project notes, and
+ * it was set in the reading face's italic — which is a serif leaning over, not
+ * a hand: every letter stands apart, and at sixty points that reads as type
+ * doing an impression of handwriting rather than as something written down.
+ * Dancing Script actually joins, so the line looks written.
+ *
+ * Loaded here rather than inside the record because the record's own faces are
+ * inlined into its stylesheet, and adding to that means regenerating it.
+ */
+const hand = Dancing_Script({
+  subsets: ['latin'],
+  weight: ['500'],
+  variable: '--font-hand',
   display: 'swap',
 })
 
@@ -112,7 +131,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${ui.variable} ${read.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${ui.variable} ${read.variable} ${hand.variable}`} suppressHydrationWarning>
       <head>
         {/*
           Holds settle-able content before hydration, so the boot animation

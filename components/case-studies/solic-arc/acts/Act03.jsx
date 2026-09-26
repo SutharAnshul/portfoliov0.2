@@ -160,35 +160,15 @@ export default function Act03() {
       {/* The tension */}
       <div className="sa-wrap mt-32 md:mt-48">
         <Kind className="mb-10">Evidence · two separate questions</Kind>
-        {/* The two figures are sized against the box they have to fit in, not
-            against the window.
-            ────────────────────────────────────────────────────────────────
-            They were set at clamp(96px, 13vw, 220px). A vw is a share of the
-            window, and on the site the piece is read in three quarters of it,
-            split in two — so each figure was asked to be 13% of something
-            nearly three times its own column and ran 154px past the edge, the
-            "/102" of the right-hand one falling off the page entirely.
-
-            A cqi is a share of the containing box, which is what the figure
-            was always really a share of: at 30% it is the same size relative
-            to its cell that 13vw gave it in the layout this was drawn for, and
-            it stays that size wherever the cell goes. Inline, because these
-            are arbitrary values and the piece's CSS is precompiled. */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[clamp(24px,5vw,96px)] gap-y-16">
-          <div style={{ containerType: 'inline-size' }}>
-            <div
-              className="font-display font-bold tracking-[-0.055em] leading-[0.82] sa-t-num"
-              style={{ fontSize: 'clamp(96px, 30cqi, 220px)' }}
-            >75<span className="text-mu">/102</span></div>
+          <div>
+            <div className="font-display font-bold tracking-[-0.055em] leading-[0.82] text-[clamp(96px,13vw,220px)] sa-t-num">75<span className="text-mu">/102</span></div>
             <p className="sa-t-sub mt-6">said yes to a contoured body.</p>
             <p className="sa-t-label text-mu mt-6">Q · “Do you prefer a contoured body for comfort?”</p>
             <Stack className="mt-4" parts={[['Yes', 75], ['Maybe', 18, 0.45], ['No', 9, 0.18]]} />
           </div>
-          <div className="md:pt-[clamp(0px,9vw,180px)]" style={{ containerType: 'inline-size' }}>
-            <div
-              className="font-display font-bold tracking-[-0.055em] leading-[0.82] sa-t-num"
-              style={{ fontSize: 'clamp(96px, 30cqi, 220px)' }}
-            >59<span className="text-mu">/102</span></div>
+          <div className="md:pt-[clamp(0px,9vw,180px)]">
+            <div className="font-display font-bold tracking-[-0.055em] leading-[0.82] text-[clamp(96px,13vw,220px)] sa-t-num">59<span className="text-mu">/102</span></div>
             <p className="sa-t-sub mt-6">chose heritage guitars as the type they prefer most.</p>
             <p className="sa-t-label text-mu mt-6">Q · “Which type of electric guitar do you prefer the most?”</p>
             <Stack className="mt-4" parts={[['Heritage (Fender, Gibson, PRS)', 59], ['No strong preference', 26, 0.45], ['Ergonomic', 12, 0.28], ['Artistic / custom', 5, 0.14]]} />
@@ -248,10 +228,38 @@ export default function Act03() {
       <div className="h-[22vh] md:h-[30vh]" />
       <div className="sa-wrap">
         <Kind className="mb-10">Design thesis</Kind>
-        <div className="font-display font-bold tracking-[-0.05em] leading-[0.86] text-[clamp(56px,10.6vw,200px)]">
-          <div className="flex items-baseline gap-[0.12em] flex-wrap">Heritage</div>
-          <div className="flex items-baseline gap-[0.18em] flex-wrap"><span style={{ color: 'var(--blue)' }}>+</span>Ergonomics</div>
-          <div className="flex items-baseline gap-[0.18em] flex-wrap"><span style={{ color: 'var(--red)' }}>−</span>Strain</div>
+        {/* The formula, set as a formula.
+            ──────────────────────────────────────────────────────────────
+            It was three flex rows of `flex-wrap` at 10.6vw. A vw is a share
+            of the window and these lines are read in three quarters of one,
+            so the longest of them no longer fitted — and flex-wrap answers
+            not fitting by breaking, which put the + on a line of its own with
+            Ergonomics beneath it. At leading 0.86 that dropped the g of
+            Ergonomics straight through Strain. Three lines became a pile.
+
+            Sized against its own column now, so there is nothing to wrap, and
+            the operators are lifted into a gutter of their own — which is
+            what makes it read as an equation rather than as three sentences
+            that happen to start with punctuation. The leading opens just
+            enough for the descenders to clear the line below. */}
+        <div
+          className="font-display font-bold tracking-[-0.05em]">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '0.62em 1fr',
+              columnGap: '0.16em',
+              fontSize: 'clamp(56px, 10.6cqw, 200px)',
+              lineHeight: 0.94,
+            }}
+          >
+            <span aria-hidden="true" />
+            <span>Heritage</span>
+            <span style={{ color: 'var(--blue)' }}>+</span>
+            <span>Ergonomics</span>
+            <span style={{ color: 'var(--red)' }}>−</span>
+            <span>Strain</span>
+          </div>
         </div>
         <div className="sa-g12 mt-14 md:mt-20 gap-y-8">
           <p className="sa-t-body col-span-12 md:col-span-5">The formula from my concept board. It isn’t a universal truth about guitars. It is the bet this project makes.</p>

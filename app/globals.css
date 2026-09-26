@@ -3478,6 +3478,67 @@ html[data-story='on'] {
   padding-top: var(--s3);
 }
 
+/* Every vw in the piece, rebased onto the column it is read in.
+   ──────────────────────────────────────────────────────────────────────
+   The piece was drawn to be the whole window, and it says so in 67 places: a
+   vw here, a clamp with a vw in the middle there — display type, the gaps
+   between columns, the width of a scroller. On this site it is read in three
+   quarters of a window, so every one of those numbers asks for a share of
+   something a third larger than the box it is in.
+
+   That is one fault, not a dozen, and it showed as a dozen: the survey
+   figures ran off the page, "Ergonomics" and "Rosewood" hung past the edge,
+   and the design thesis wrapped its own operators onto separate lines and
+   dropped a descender through the line below. Each was fixed where it was
+   found, which was the wrong altitude — this is the altitude.
+
+   A cqw is a share of the nearest container, so declaring .solic a container
+   makes cqw mean exactly what vw meant when this was the whole page: one
+   percent of the width the piece has been given. The rules below are the
+   piece's own, selector for selector, with vw swapped for cqw — generated
+   from solic.css rather than retyped, so nothing drifts. The piece's own
+   stylesheet is untouched; these sit after it and win on specificity.
+
+   Regenerate after any change to solic.css:
+     the rules are every `.solic …{…vw…}` in that file, re-prefixed with
+     .solic-stage and with vw replaced by cqw. */
+/* The container is the stage and not .solic, because an element cannot query
+   itself: a cqw written on .solic would look past it to whatever container is
+   above, and finding none, fall back to the viewport — which is the very thing
+   being corrected. .solic holds --sa-gutter, so this matters. */
+.solic-stage {
+  container-type: inline-size;
+}
+
+.solic-stage .solic .w-\[58vw\]{width:58cqw}
+.solic-stage .solic .w-\[78vw\]{width:78cqw}
+.solic-stage .solic .gap-x-\[clamp\(12px\2c 1\.6vw\2c 28px\)\]{-moz-column-gap:clamp(12px,1.6cqw,28px);column-gap:clamp(12px,1.6cqw,28px)}
+.solic-stage .solic .gap-x-\[clamp\(12px\2c 2\.4vw\2c 40px\)\]{-moz-column-gap:clamp(12px,2.4cqw,40px);column-gap:clamp(12px,2.4cqw,40px)}
+.solic-stage .solic .gap-x-\[clamp\(16px\2c 2\.4vw\2c 40px\)\]{-moz-column-gap:clamp(16px,2.4cqw,40px);column-gap:clamp(16px,2.4cqw,40px)}
+.solic-stage .solic .gap-x-\[clamp\(16px\2c 3vw\2c 48px\)\]{-moz-column-gap:clamp(16px,3cqw,48px);column-gap:clamp(16px,3cqw,48px)}
+.solic-stage .solic .gap-x-\[clamp\(24px\2c 5vw\2c 96px\)\]{-moz-column-gap:clamp(24px,5cqw,96px);column-gap:clamp(24px,5cqw,96px)}
+.solic-stage .solic .p-\[clamp\(12px\2c 2\.4vw\2c 36px\)\]{padding:clamp(12px,2.4cqw,36px)}
+.solic-stage .solic .text-\[clamp\(150px\2c 24vw\2c 380px\)\]{font-size:clamp(150px,24cqw,380px)}
+.solic-stage .solic .text-\[clamp\(200px\2c 34vw\2c 520px\)\]{font-size:clamp(200px,34cqw,520px)}
+.solic-stage .solic .text-\[clamp\(20px\2c 2vw\2c 32px\)\]{font-size:clamp(20px,2cqw,32px)}
+.solic-stage .solic .text-\[clamp\(24px\2c 2\.6vw\2c 44px\)\]{font-size:clamp(24px,2.6cqw,44px)}
+.solic-stage .solic .text-\[clamp\(30px\2c 3\.8vw\2c 64px\)\]{font-size:clamp(30px,3.8cqw,64px)}
+.solic-stage .solic .text-\[clamp\(34px\2c 4\.4vw\2c 76px\)\]{font-size:clamp(34px,4.4cqw,76px)}
+.solic-stage .solic .text-\[clamp\(38px\2c 4\.4vw\2c 80px\)\]{font-size:clamp(38px,4.4cqw,80px)}
+.solic-stage .solic .text-\[clamp\(40px\2c 5vw\2c 84px\)\]{font-size:clamp(40px,5cqw,84px)}
+.solic-stage .solic .text-\[clamp\(44px\2c 6\.4vw\2c 118px\)\]{font-size:clamp(44px,6.4cqw,118px)}
+.solic-stage .solic .text-\[clamp\(52px\2c 7\.4vw\2c 124px\)\]{font-size:clamp(52px,7.4cqw,124px)}
+.solic-stage .solic .text-\[clamp\(56px\2c 10\.6vw\2c 200px\)\]{font-size:clamp(56px,10.6cqw,200px)}
+.solic-stage .solic .text-\[clamp\(64px\2c 11\.6vw\2c 220px\)\]{font-size:clamp(64px,11.6cqw,220px)}
+.solic-stage .solic .text-\[clamp\(64px\2c 12\.5vw\2c 240px\)\]{font-size:clamp(64px,12.5cqw,240px)}
+.solic-stage .solic .text-\[clamp\(96px\2c 13vw\2c 220px\)\]{font-size:clamp(96px,13cqw,220px)}
+.solic-stage .solic .text-\[clamp\(96px\2c 17vw\2c 330px\)\]{font-size:clamp(96px,17cqw,330px)}
+.solic-stage .solic{--fg:#16140f;--mu:rgba(22,20,15,.58);--rule:rgba(22,20,15,.16);--blue:#2438e8;--red:#b02a20;--acc:#16140f;--sa-gutter:max(16px,5cqw);color:#16140f;font-family:SA Plex Sans,Helvetica Neue,Arial,sans-serif;font-size:18px;line-height:1.55;text-align:left;overflow-x:clip;-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+.solic-stage .solic .sm\:w-\[34vw\]{width:34cqw}
+.solic-stage .solic .sm\:w-\[46vw\]{width:46cqw}
+.solic-stage .solic .md\:pt-\[clamp\(0px\2c 14vw\2c 260px\)\]{padding-top:clamp(0px,14cqw,260px)}
+.solic-stage .solic .md\:pt-\[clamp\(0px\2c 9vw\2c 180px\)\]{padding-top:clamp(0px,9cqw,180px)}
+
 /* A phone has no quarter to give. The index is a pointer's tool — it is not
    drawn on the frame records either — so below the width where two columns
    stop being two columns, the piece takes the window back and is shown as it

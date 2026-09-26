@@ -38,9 +38,12 @@ export default function Act06() {
       <div className="mt-16 md:mt-24 py-12 md:py-16" style={{ background: '#E6E1D4', color: '#17221D' }}>
         <div className="sa-wrap">
           <div className="sa-t-label mb-8" style={{ color: 'rgba(23,34,29,.6)' }}>Model · outline, surfaces, solid body</div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8 items-center">
+          {/* Two by two. Four across put each model in a quarter of the column,
+              which at this scale is a guitar the width of a thumb — and the point
+              of the row is to watch one become the next. */}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 items-center">
             {['cad_2', 'cad_4', 'cad_6', 'cad_7'].map((n, i) => (
-              <Img key={n} name={n} alt={['Outline drawing of body and neck.', 'Surfaced model, body and neck, seen from above at an angle.', 'Solid body and neck with pickup cavities, in perspective.', 'Close perspective of the body edge and contours.'][i]} imgClass="object-contain mix-blend-multiply" className="aspect-[1.5]" />
+              <Img key={n} name={n} alt={['Outline drawing of body and neck.', 'Surfaced model, body and neck, seen from above at an angle.', 'Solid body and neck with pickup cavities, in perspective.', 'Close perspective of the body edge and contours.'][i]} imgClass="object-contain" className="aspect-[1.5]" />
             ))}
           </div>
         </div>
@@ -86,15 +89,9 @@ export default function Act06() {
         <Label className="mb-8">Materials · all quartersawn</Label>
         <dl className="grid grid-cols-1 sm:grid-cols-3 gap-x-[clamp(16px,3vw,48px)] gap-y-8">
           {[['Body', 'Swamp ash'], ['Neck', 'Maple'], ['Fretboard', 'Rosewood']].map(([k, v]) => (
-            /* Sized against the third of a row it occupies rather than
-               against the window — at 5vw "Rosewood", the longest of the
-               three, hung off the right of the page. */
-            <div key={k} className="sa-rule pt-4" style={{ containerType: 'inline-size' }}>
+            <div key={k} className="sa-rule pt-4">
               <dt className="sa-t-label text-mu">{k}</dt>
-              <dd
-                className="font-display font-semibold tracking-[-0.035em] leading-none mt-3"
-                style={{ fontSize: 'clamp(32px, 21cqi, 84px)' }}
-              >{v}</dd>
+              <dd className="font-display font-semibold tracking-[-0.035em] leading-none text-[clamp(40px,5vw,84px)] mt-3">{v}</dd>
             </div>
           ))}
         </dl>
@@ -112,8 +109,15 @@ export default function Act06() {
 
       {/* Workshop */}
       <div className="sa-wrap sa-g12 mt-28 md:mt-40">
-        <blockquote className="col-span-12 md:col-start-2 md:col-span-10">
-          <p className="font-serif italic text-[clamp(30px,3.8vw,64px)] leading-[1.06]">
+        <blockquote className="col-span-12 md:col-start-2 md:col-span-11">
+          {/* A joined hand rather than the serif italic, which sets this as a
+              row of separate letters and reads as type pretending to be
+              handwriting. Wider column and a smaller size so it lands in four
+              lines instead of six. See --font-hand in app/layout.tsx. */}
+          <p
+            className="text-[clamp(28px,3.2cqw,56px)] leading-[1.28]"
+            style={{ fontFamily: 'var(--font-hand), cursive' }}
+          >
             “I spent the next month in a workshop. Coils of wood shavings covered the floor. Tiny particles of ash hung in the sunlight shining through the little window.”
           </p>
           <footer className="sa-t-label text-mu mt-6">From my project notes</footer>

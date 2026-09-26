@@ -15,7 +15,7 @@ export default function Act01() {
       <header className="sa-wrap pt-[88px] md:pt-[120px]">
         <div className="sa-g12 items-end">
           <h1 className="sa-t-hero col-span-12 lg:col-span-10">
-            The object<br />I couldn’t find.
+            The guitar<br />I couldn’t find.
           </h1>
         </div>
         <div className="sa-g12 mt-10 md:mt-14 gap-y-8">
@@ -72,8 +72,8 @@ export default function Act01() {
               Red Special anyone would recognise it by. */}
           <img
             src={src('ref_redspecial')} alt="The Red Special, whole, from a reference photo."
-            width="1600" height="685" loading="lazy"
-            className="w-full h-auto mix-blend-multiply"
+            width="1200" height="431" loading="lazy"
+            className="w-full h-auto"
           />
           <Cap>The Red Special. Reference image from my research board.</Cap>
         </figure>
