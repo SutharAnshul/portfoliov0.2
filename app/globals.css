@@ -3627,78 +3627,53 @@ html[data-story='on'] {
    The node sits at 15px because the word is pinned to the 38px floor of its
    clamp everywhere this query applies: the floor gives out at 4.4cqw = 38px,
    a container of 863px, and the query stops at 767px. */
-.solic-stage .solic .solic-flow > span {
-  display: block;
+/* One line at every width, and never wider than the column.
+   ──────────────────────────────────────────────────────────────────────
+   The string is a fixed 9.26em at this weight and tracking, and the measure
+   is nine tenths of the container, so it fits on one line up to 9.72cqw and
+   wraps above that. The size is the act size until that ceiling and the
+   ceiling after it — one expression, no breakpoints, and it cannot wrap
+   however narrow the window gets. 9.2 rather than 9.72 leaves the margin a
+   font that renders a hair wide needs. */
+.solic-stage .solic .solic-flow {
+  font-size: min(9.2cqw, clamp(46px, 6.2cqw, 112px));
+  white-space: nowrap;
 }
 
 .solic-stage .solic .solic-flow i {
   font-style: normal;
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
-@media (min-width: 768px) {
-  .solic-stage .solic .solic-flow > span {
-    display: inline;
-  }
+/* The return, and the label inside it. */
+.solic-stage .solic .solic-cycle {
+  position: relative;
+  --cyc-h: clamp(52px, 5.5cqw, 88px);
 }
 
-@media (max-width: 767px) {
-  .solic-stage .solic .solic-loop > li {
-    padding-left: 38px;
-    padding-bottom: 40px;
-  }
+.solic-stage .solic .solic-cycle-return {
+  display: block;
+  width: 100%;
+  height: var(--cyc-h);
+  margin-top: clamp(10px, 1.4cqw, 22px);
+  overflow: visible;
+  color: var(--mu);
+}
 
-  /* One line the whole way down with the nodes sitting on it, rather than a
-     separate segment under each node — segments leave a break above every dot
-     and the rail stops reading as one continuous thing. It starts at the first
-     node and runs unbroken from there. */
-  .solic-stage .solic .solic-loop > li::before {
-    content: '';
-    position: absolute;
-    left: 5px;
-    top: 0;
-    bottom: 0;
-    border-left: 1px solid var(--rule);
-  }
-
-  .solic-stage .solic .solic-loop > li:first-child::before {
-    top: 17px;
-  }
-
-  /* 17.1px is where the cap of a 38px word centres, measured: line box 34.2,
-     baseline 30.6, cap top 3.6. The node is put on that rather than on the top
-     of the line box, which is 3.6px of nothing above the letter. */
-  .solic-stage .solic .solic-loop > li::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 12px;
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    background: var(--fg);
-  }
-
-  /* An open node, to say the loop returns rather than stops. */
-  .solic-stage .solic .solic-loop > li:last-child::after {
-    background: transparent;
-    border: 1px solid var(--fg);
-  }
-
-  .solic-stage .solic .solic-loop-close {
-    position: relative;
-    padding-left: 38px;
-    margin-top: 4px;
-  }
-
-  .solic-stage .solic .solic-loop-close::before {
-    content: '';
-    position: absolute;
-    left: 5px;
-    top: -44px;
-    height: 44px;
-    border-left: 1px solid var(--rule);
-  }
+/* In the space the loop encloses, not sitting in the line.
+   ──────────────────────────────────────────────────────────────────────
+   It was set across the bottom run with var(--bg) behind it to open a gap.
+   That only works where the act is painted its flat colour, and the field is
+   a scroll-interpolated blend between one act and the next, so anywhere but
+   the middle of the act the label carried a visible rectangle of the wrong
+   rust. Inside the loop it needs no colour behind it and no gap in the path,
+   and it reads as annotating the loop either way. */
+.solic-stage .solic .solic-cycle-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--cyc-h) * 0.46);
+  transform: translateX(-50%);
+  white-space: nowrap;
 }
 
 /* Outbound link as a button.
