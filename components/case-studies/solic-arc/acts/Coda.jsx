@@ -12,7 +12,11 @@ export default function Coda() {
       <div className="h-[26vh] md:h-[36vh]" />
       <div className="sa-wrap">
         <p className="font-display font-bold tracking-[-0.055em] leading-[0.84] text-[clamp(64px,11.6vw,220px)]">
-          People<br /><span className="text-mu">×</span> Products
+          {/* The site's one accent, not a second pink invented here — see
+              --brand in app/globals.css. It was --mu, which is the colour the
+              page uses for text it is playing down, and this × is the hinge of
+              the line rather than the quiet part of it. */}
+          People<br /><span style={{ color: 'var(--brand)' }}>×</span> Products
         </p>
         <div className="sa-g12 mt-12 md:mt-16 gap-y-6">
           <p className="sa-t-body col-span-12 md:col-span-6">Players shaped the question. The guitar is the answer I could build. Systems still ran underneath: a borrowed framework for shape, and a loop for testing it against the body.</p>

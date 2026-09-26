@@ -3646,16 +3646,41 @@ html[data-story='on'] {
 }
 
 /* The return, and the label inside it. */
+/* The loop is as wide as the words, not as wide as the column.
+   ──────────────────────────────────────────────────────────────────────
+   At 100% of the measure the return came down from a point well to the right
+   of "Feel" and rose at a point left of "Draw", so it enclosed a stretch of
+   empty column and stopped reading as the end of the line feeding the start
+   of it. max-content is the title's own width, the title being one nowrap
+   line, and the SVG is 100% of that. */
 .solic-stage .solic .solic-cycle {
   position: relative;
+  width: -moz-max-content;
+  width: max-content;
+  max-width: 100%;
   --cyc-h: clamp(52px, 5.5cqw, 88px);
+  --cyc-gap: clamp(10px, 1.4cqw, 22px);
+  padding-bottom: calc(var(--cyc-h) + var(--cyc-gap));
 }
 
+/* Out of flow, and the padding above holds its place.
+   ──────────────────────────────────────────────────────────────────────
+   In flow it defeated the max-content the container is sized by: an SVG with
+   a viewBox has an intrinsic width, its height times the viewBox ratio, and
+   at 52px tall against 1000x120 that is 433px — wider than the title on a
+   phone, so the container took 433, hit max-width and came out the full
+   measure again with the return hanging past the end of "Feel". Absolute, it
+   contributes nothing to the width and stretches to whatever the title set. */
 .solic-stage .solic .solic-cycle-return {
   display: block;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  /* width, not left:0 with right:0 — an SVG is a replaced element and resolves
+     an auto width from its own aspect ratio rather than stretching between the
+     two offsets, which left it 462px wide inside a 576px box. */
   width: 100%;
   height: var(--cyc-h);
-  margin-top: clamp(10px, 1.4cqw, 22px);
   overflow: visible;
   color: var(--mu);
 }

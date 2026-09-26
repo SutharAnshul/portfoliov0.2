@@ -34,11 +34,11 @@ function Cycle() {
         className="solic-cycle-return" aria-hidden="true"
       >
         <motion.path
-          d="M 952 4 C 952 112, 952 112, 780 112 L 220 112 C 48 112, 48 112, 48 16"
+          d="M 990 4 C 990 112, 990 112, 900 112 L 100 112 C 10 112, 10 112, 10 16"
           fill="none" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke"
           style={reduce ? undefined : { pathLength: draw }}
         />
-        <path d="M 38 32 L 48 10 L 58 32" fill="none" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+        <path d="M 2 30 L 10 10 L 18 30" fill="none" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
       </svg>
       {/* In the space the loop encloses. See .solic-cycle-label. */}
       <div className="solic-cycle-label sa-t-label text-mu">Until it feels right</div>
