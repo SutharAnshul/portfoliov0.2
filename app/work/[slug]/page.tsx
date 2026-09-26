@@ -1,4 +1,4 @@
-import { getCaseStudyBySlug, caseStudies } from '@/lib/case-studies'
+import { getCaseStudyBySlug, caseStudies, shownCaseStudies } from '@/lib/case-studies'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Settle } from '@/components/Settle'
@@ -88,9 +88,12 @@ export default async function CaseStudyPage({ params }: Props) {
   const caseStudy = getCaseStudyBySlug(slug)
   if (!caseStudy) notFound()
 
-  const index = caseStudies.findIndex((cs) => cs.slug === slug)
-  const prev = index > 0 ? caseStudies[index - 1] : null
-  const next = index < caseStudies.length - 1 ? caseStudies[index + 1] : null
+  /* Position in the sequence a reader can actually walk. A hidden record is
+     not in it — its URL still works, but it is nowhere in the running order,
+     so it is numbered 00 and the arrows have nowhere to go. */
+  const index = shownCaseStudies.findIndex((cs) => cs.slug === slug)
+  const prev = index > 0 ? shownCaseStudies[index - 1] : null
+  const next = index >= 0 && index < shownCaseStudies.length - 1 ? shownCaseStudies[index + 1] : null
 
   const screens = framesOf(caseStudy.sections, caseStudy.title)
   /** The second sequence, under its own heading. Most records have none. */
@@ -154,6 +157,11 @@ export default async function CaseStudyPage({ params }: Props) {
       <CaseIndex labels={labels} />
 
       <header className="case-head">
+        {/* A hidden record has no place in the running order, so it is given
+            no counter and no arrows rather than a 00 of something and two
+            controls that go nowhere. Reached by its own URL, it is simply
+            itself. */}
+        {index >= 0 && (
         <nav className="case-nav t-meta" aria-label="Record">
           <Link
             href={prev ? `/work/${prev.slug}` : '#'}
@@ -165,7 +173,7 @@ export default async function CaseStudyPage({ params }: Props) {
             <PixelIcon name="prev" size={26} />
           </Link>
           <span className="case-nav-no">
-            {pad(index + 1)} / {pad(caseStudies.length)}
+            {pad(index + 1)} / {pad(shownCaseStudies.length)}
           </span>
           <Link
             href={next ? `/work/${next.slug}` : '#'}
@@ -177,6 +185,7 @@ export default async function CaseStudyPage({ params }: Props) {
             <PixelIcon name="next" size={26} />
           </Link>
         </nav>
+        )}
 
         <Settle boot mass="medium">
           <h1 className="case-title">{caseStudy.title}</h1>

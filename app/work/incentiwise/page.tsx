@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import Link from 'next/link'
-import { caseStudies } from '@/lib/case-studies'
+import { shownCaseStudies } from '@/lib/case-studies'
 import { CaseIndex } from '@/components/CaseIndex'
 import { StoryBackground, type Theme } from '@/components/StoryBackground'
 import { StoryFit } from '@/components/StoryFit'
@@ -85,8 +85,8 @@ function story() {
 export default function IncentiwiseStory() {
   const { html, acts } = story()
 
-  const index = caseStudies.findIndex((cs) => cs.slug === SLUG)
-  const next = caseStudies[index + 1] ?? null
+  const index = shownCaseStudies.findIndex((cs) => cs.slug === SLUG)
+  const next = index >= 0 ? shownCaseStudies[index + 1] ?? null : null
 
   return (
     <article className="case-story">

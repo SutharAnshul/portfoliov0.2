@@ -1,4 +1,4 @@
-import { caseStudies } from '@/lib/case-studies'
+import { shownCaseStudies } from '@/lib/case-studies'
 import { Settle } from '@/components/Settle'
 import { WorkTile } from '@/components/WorkTile'
 
@@ -15,7 +15,7 @@ export function WorkGrid() {
       <Settle mass="light">
         <div className="work-head">
           <p className="work-slug">//selected work//</p>
-          <span className="t-label">{String(caseStudies.length).padStart(2, '0')} items</span>
+          <span className="t-label">{String(shownCaseStudies.length).padStart(2, '0')} items</span>
         </div>
       </Settle>
 
@@ -23,7 +23,7 @@ export function WorkGrid() {
           picture must not crowd the picture below it, where two side by side
           only need telling apart. */}
       <div className="work-tiles">
-        {caseStudies.map((study, index) => (
+        {shownCaseStudies.map((study, index) => (
           <Settle key={study.slug} mass="medium" delay={index * 80}>
             <WorkTile study={study} />
           </Settle>

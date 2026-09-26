@@ -84,6 +84,7 @@ export const caseStudies: CaseStudy[] = [
       'The sheets that follow are the system as documented. Each component is drawn across its full matrix rather than in a single resting state, because the states are where a system either holds or falls apart: 49 component sets, 2,799 variants, and 2,370 instances placed from them across the product.',
     ],
     featured: true,
+    hidden: true,
     thumbnail: '/images/superhealth/thumbnail.png',
     year: 2026,
     details: {
@@ -126,6 +127,7 @@ export const caseStudies: CaseStudy[] = [
       'The deliverable is not a picture of a flow. It is the flow — running below, on this page. Open it and quote something. Under it sits the system it was built from: 70% neutral concrete and paper tones, charcoal for commitment, and yellow held back as a signal rather than spent as a background.',
     ],
     featured: true,
+    hidden: true,
     thumbnail: '/images/aris/thumbnail.jpg',
     year: 2026,
     details: {
@@ -199,10 +201,20 @@ export const caseStudies: CaseStudy[] = [
   },
 ]
 
+/**
+ * The records on show.
+ *
+ * caseStudies stays the whole shelf — getCaseStudyBySlug reads from it, and so
+ * does the route generation, which is what keeps a hidden record's own URL
+ * working. This is what the site counts, lists and walks between: everything
+ * not currently marked hidden, in the same order.
+ */
+export const shownCaseStudies: CaseStudy[] = caseStudies.filter((cs) => !cs.hidden)
+
 export function getCaseStudyBySlug(slug: string): CaseStudy | undefined {
   return caseStudies.find((cs) => cs.slug === slug)
 }
 
 export function getFeaturedCaseStudies(): CaseStudy[] {
-  return caseStudies.filter((cs) => cs.featured)
+  return shownCaseStudies.filter((cs) => cs.featured)
 }

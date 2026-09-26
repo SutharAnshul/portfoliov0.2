@@ -16,6 +16,15 @@ export interface CaseStudy {
   /** Body paragraphs. */
   opening?: string[]
   featured: boolean
+  /**
+   * Kept, but not shown.
+   *
+   * A record marked this way is out of the index, out of the count, and out of
+   * the sequence the arrows walk — but its route is still built and its URL
+   * still works, so a link already sent to somebody does not rot while the
+   * work is off the shelf. Set it back to false to put the record back.
+   */
+  hidden?: boolean
   thumbnail?: string
   year: number
   details: {
