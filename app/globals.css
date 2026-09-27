@@ -3225,6 +3225,233 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   margin-inline: auto;
 }
 
+/* ── The product, passing through ──────────────────────────────────────
+   A row of the record's own screens, on tubes, running the full width of the
+   window — where the Slack card used to be, which is the graphic it replaces.
+
+   Two elements, in different places on purpose. The mount sits inside the
+   record and holds the vertical space, so the headline above and the lede
+   below land where they should. The band is rendered into .case-story,
+   because the record's sections are 1440px wide with overflow: hidden and
+   nothing wider than the column survives that clip. See
+   components/IncentiwiseStrip.tsx, which pins one to the other. */
+#iw-strip {
+  --tile-h: 560px;
+  margin: 40px 0 120px;
+  height: var(--tile-h);
+}
+
+/* Placed by hand: top, left, width and height are all written from JS in
+   screen pixels, because the band lives outside the record's zoom. */
+.iw-strip-band {
+  position: absolute;
+  z-index: 0;
+  overflow: hidden;
+  /* The strip stops being a rectangle where it is being blurred.
+     ──────────────────────────────────────────────────────────────────
+     overflow: hidden is a clip, and a clip is infinitely sharp. Glass laid
+     over it blurs the backdrop, but a blur only softens an edge across about
+     twice its radius, while the detail inside — 8px labels, hairline table
+     rules — is gone at three. So the contents dissolved and the boundary
+     stayed a drawn line, which is the thing that read as unnatural: nothing
+     in the world blurs its middle and keeps its edges.
+
+     Two mask layers, unioned. The first feathers the top and bottom. The
+     second is solid from just past the glass rightwards, and a union with
+     solid is solid — so the feather exists only where there is blur to
+     justify it, and the frames stay crisp everywhere else. */
+  --feather: calc(70px * var(--k, 1));
+  mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 var(--feather),
+      #000 calc(100% - var(--feather)),
+      transparent 100%
+    ),
+    linear-gradient(
+      to right,
+      transparent 0 calc(var(--fade, 0px) + 120px),
+      #000 calc(var(--fade, 0px) + 320px)
+    );
+  mask-composite: add;
+  /* Draggable with a mouse and swipeable with a thumb — pan-y rather than
+     none, so the page still scrolls vertically through it. none would trap
+     the finger and make the strip a hole in the page. */
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+}
+
+.iw-strip-band[data-dragging] {
+  cursor: grabbing;
+}
+
+/* The pictures are the grab handle, not a thing to drag out of the page. */
+.iw-strip-band img,
+.iw-strip-band canvas {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* Sized off --k, the record's own scale, so the strip reads at the same size
+   as everything around it despite not being inside the thing that scales it. */
+.iw-strip-tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(840px * var(--k, 1));
+  height: calc(560px * var(--k, 1));
+  will-change: transform;
+}
+
+/* Flat, and no radius.
+   ──────────────────────────────────────────────────────────────────────
+   The tube shape comes off for these frames. .crt-screen carries an SVG
+   displacement filter and a bulge clip-path, and the shader adds a barrel warp
+   of its own; all three magnify about the centre and cut every edge. On a
+   portrait or a thumbnail that is the whole point, but here it eats the first
+   row of every app — the nav, the tabs, the thing that tells you what screen
+   you are looking at. These may only ever lose their bottom.
+
+   What still reads as a tube: the scanlines, the grille, the bloom and the
+   flicker. None of those move a pixel sideways. */
+.iw-strip-tile .crt-screen {
+  border-radius: 0;
+  filter: none;
+  clip-path: none;
+}
+
+/* Full width of the frame, top on the frame's top, and whatever runs past the
+   bottom is cut there. Every source is no wider than 3:2 for that reason. */
+.iw-strip-tile .crt-src,
+.iw-strip-tile .crt-canvas {
+  object-position: top center;
+}
+
+/* The tube, at half.
+   ──────────────────────────────────────────────────────────────────────
+   Everywhere else on the site the shader replaces the picture outright. Here
+   the picture stays underneath at full strength and the tube is composited
+   over it, so what you read is half a clean screenshot and half a CRT. The
+   knobs — grille, scanline pitch, bloom — only ever trade legibility against
+   character; blending trades nothing, because the sharp original is still
+   there carrying the detail. These are screenshots of dense product UI and
+   they have to survive being read at a third of their size. */
+.iw-strip-tile .crt-screen[data-gl='on'] .crt-src {
+  opacity: 1;
+}
+
+.iw-strip-tile .crt-screen[data-gl='on'] .crt-canvas {
+  opacity: 0.5;
+}
+
+/* ── What the index stands on ──────────────────────────────────────────/* ── What the index stands on ──────────────────────────────────────────
+   The strip runs the full width of the window and the index sits over its left
+   end, so that end is thinned out until the index has something to be read
+   against.
+
+   This is the veil from under the mark, turned on its side: the same four
+   radii — 3, 6, 11, 16 — over the same three-stop masks, each pane doing less
+   area and more work than the last. The middle stop is the part that matters.
+   A mask running #000 to transparent is a linear ramp and reads as one; #000
+   to 45% to transparent stays nearly solid for most of its length and then
+   lets go, which is what makes a veil thin out rather than stop. One pane at
+   one radius is a band; four are a gradient of blur.
+
+   --fade is the index's right edge, measured and published by the component,
+   so every stop below is an offset from where the index actually ends at this
+   window size rather than a guess at it. */
+.iw-strip-fade {
+  /* Top, left, width and height are written from JS, like the band: it is a
+     sibling of the band now, not a child, so that it can stand taller than it.
+     Only the horizontal reach is CSS, because only that is known here. */
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  clip-path: inset(0 calc(100% - var(--fade, 0px) - 280px) 0 0);
+}
+
+.iw-strip-fade > span {
+  position: absolute;
+  inset: 0;
+  display: block;
+  backdrop-filter: blur(var(--b));
+  mask-image: var(--profile);
+}
+
+.iw-strip-fade > span:nth-child(1) {
+  --b: 3px;
+  --profile: linear-gradient(
+    to right,
+    #000 0 calc(var(--fade, 0px) + 40px),
+    rgba(0, 0, 0, 0.45) calc(var(--fade, 0px) + 150px),
+    transparent calc(var(--fade, 0px) + 260px)
+  );
+}
+
+.iw-strip-fade > span:nth-child(2) {
+  --b: 6px;
+  --profile: linear-gradient(
+    to right,
+    #000 0 calc(var(--fade, 0px) - 20px),
+    rgba(0, 0, 0, 0.45) calc(var(--fade, 0px) + 90px),
+    transparent calc(var(--fade, 0px) + 190px)
+  );
+}
+
+.iw-strip-fade > span:nth-child(3) {
+  --b: 11px;
+  --profile: linear-gradient(
+    to right,
+    #000 0 calc(var(--fade, 0px) - 90px),
+    rgba(0, 0, 0, 0.45) calc(var(--fade, 0px) + 30px),
+    transparent calc(var(--fade, 0px) + 120px)
+  );
+}
+
+.iw-strip-fade > span:nth-child(4) {
+  --b: 16px;
+  --profile: linear-gradient(
+    to right,
+    #000 0 calc(var(--fade, 0px) - 160px),
+    rgba(0, 0, 0, 0.45) calc(var(--fade, 0px) - 40px),
+    transparent calc(var(--fade, 0px) + 60px)
+  );
+}
+
+/* The colour over the glass. More of it than the veil carries, because the
+   veil is holding six letters of bold display type off a picture and this is
+   holding ten lines of 11px grey off a moving dashboard. Solid to just past
+   the index's last character, then the same three-stop letting go the masks
+   use, so the wash and the blur stop together instead of one outliving the
+   other. var(--background), so it crosses acts with everything else. */
+.iw-strip-fade::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Solid across the strip and gone above and below it.
+     ──────────────────────────────────────────────────────────────────
+     The box this sits in stands proud of the strip, so the glass has somewhere
+     to put its own hard edges — out in the gaps, over nothing but page, where
+     a blurred background is the same background and there is nothing to draw.
+     The colour must not follow it out there. Painted over the full height it
+     lays flat background across those gaps, which is a rectangle again. */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 calc(80px * var(--k, 1)),
+    #000 calc(100% - 80px * var(--k, 1)),
+    transparent 100%
+  );
+  background: linear-gradient(
+    to right,
+    var(--background) 0,
+    var(--background) calc(var(--fade, 0px) - 16px),
+    color-mix(in srgb, var(--background) 45%, transparent) calc(var(--fade, 0px) + 110px),
+    transparent calc(var(--fade, 0px) + 250px)
+  );
+}
+
 /* ── Full screen ───────────────────────────────────────────────────────
    A picture in a record, at its own size. See components/Lightbox.tsx. The
    ground is the page's own colour rather than a black scrim, so on the long
@@ -3338,6 +3565,9 @@ html[data-story='on'] {
    design at a different size and not a different design — and it is only ever
    scaled down, so nothing is ever shown larger than it was drawn. */
 .case-story {
+  /* The strip is positioned against this, having been lifted out of the
+     record to escape its 1440px clip. */
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
   column-gap: 0;
@@ -3346,6 +3576,9 @@ html[data-story='on'] {
 
 .case-story .case-index {
   grid-column: 1;
+  /* Above the strip and every layer of glass over it — all of which run the
+     full width of the window and pass underneath. */
+  z-index: 4;
   padding-right: var(--s7);
   position: sticky;
   top: calc(var(--mark-top) + 110px);

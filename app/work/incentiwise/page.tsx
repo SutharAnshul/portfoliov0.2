@@ -6,6 +6,7 @@ import { CaseIndex } from '@/components/CaseIndex'
 import { StoryBackground, type Theme } from '@/components/StoryBackground'
 import { StoryFit } from '@/components/StoryFit'
 import { Lightbox } from '@/components/Lightbox'
+import { IncentiwiseStrip } from '@/components/IncentiwiseStrip'
 import './story.css'
 
 /**
@@ -94,6 +95,7 @@ export default function IncentiwiseStory() {
       <StoryFit />
       <CaseIndex labels={acts} />
       <Lightbox within=".story" />
+      <IncentiwiseStrip />
 
       {/* The column is what the record is measured against and scaled into —
           see StoryFit. It has to be a box of its own: the record carries a
