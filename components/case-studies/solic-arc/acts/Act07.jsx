@@ -57,7 +57,8 @@ export default function Act07() {
 
       {/* Reveal */}
       <div className="h-[36vh] md:h-[50vh]" />
-      {/* Three words, at the size the wordmark used to be given.
+      {/* Two words, at the size this record gives a thing it has been building
+          towards for six acts.
           ──────────────────────────────────────────────────────────────
           What stood here was the logo drawn for the instrument, set as large
           as the column allowed, with "An extension of the player's body."
@@ -65,11 +66,38 @@ export default function Act07() {
           does it there; repeating it here made the reveal a title card for a
           product rather than the moment the act hands you the object.
 
-          So the label that used to introduce the mark is the heading now, and
-          it carries the h2 the mark was carrying — the outline is unchanged,
-          and what is read aloud is a phrase rather than an alt text. */}
+          The first replacement was worse. It kept the words and set them at
+          the section size — which is the size of a subheading, below the act
+          titles, and after half a screen of nothing it read as a label on a
+          gallery rather than as an arrival. A reveal is not a smaller version
+          of a reveal.
+
+          So: the display register the record already keeps for its biggest
+          moments. The Coda's "People × Products" is this face at this leading
+          and this tracking, and Act 03 sets a single number at 380px. Sized so
+          it holds one line across the column here and folds to two on a phone,
+          which is the only place a lone "The" is worth the break.
+
+          The gold is --acc, which every act declares and nothing has ever
+          used. Acts 06 and 07 — making it, and having made it — are the two
+          that set it to a gold rather than to their own text colour, so the
+          token was always meant for about here. It is also the wordmark's own
+          second colour, which is the one thing worth keeping from the mark
+          that used to stand in this spot.
+
+          Still the h2 the mark was carrying: the outline is unchanged, and
+          what is read aloud is a phrase rather than an alt text.
+
+          The size is the Coda's, to the character — this record ships a
+          compiled stylesheet, so an arbitrary Tailwind value that is not
+          already in it generates nothing and the element quietly falls back to
+          18px. Which is worth more than a workaround: the two moments this
+          record raises its voice for are now the same size by construction
+          rather than by two numbers that happen to be near each other. */}
       <div className="sa-wrap">
-        <h2 className="sa-t-sec">The instrument</h2>
+        <h2 className="font-display font-bold tracking-[-0.055em] leading-[0.84] text-[clamp(64px,11.6vw,220px)]">
+          The <span style={{ color: 'var(--acc)' }}>instrument</span>
+        </h2>
       </div>
 
       {/* The built guitar, where a render of it used to be.
@@ -90,8 +118,8 @@ export default function Act07() {
           painted wider than about 420 CSS px is being enlarged on any screen
           with two device pixels to the one. Upscaling a photograph to make a
           hero of it is the other way of failing to show the thing. */}
-      <div className="sa-wrap sa-g12 mt-20 md:mt-28 gap-y-4 items-end">
-        <figure className="col-span-6 md:col-start-1 md:col-span-5">
+      <div className="sa-wrap sa-g12 mt-10 md:mt-16 gap-y-4 items-end">
+        <figure className="col-span-6 md:col-span-5">
           <Reveal name="wall" alt="Solic Arc hanging on a white wall beside an acoustic guitar." className="aspect-[843/1128]" />
         </figure>
         <figure className="col-span-6 md:col-start-7 md:col-span-6">
@@ -135,10 +163,16 @@ export default function Act07() {
           mosaics at the head of this act are. */}
       <div className="sa-wrap sa-g12 mt-24 md:mt-36 gap-y-4 items-start">
         <figure className="col-span-6 md:col-start-3 md:col-span-4 md:mt-[10vh]">
-          <Reveal name="room_play" alt="Solic Arc being played seated at night in the same room, lit by a single lamp." className="aspect-[843/1265]" />
+          {/* Proportion inline, not as aspect-[843/1265]: the compiled
+              stylesheet only carries the arbitrary values the export was built
+              with, and 843/1128 is the only one of these it has. The class
+              would resolve to nothing and leave the box to the image's own
+              width and height attributes — right by luck, since they are the
+              numbers the ratio came from, and wrong the moment either moves. */}
+          <Reveal name="room_play" alt="Solic Arc being played seated at night in the same room, lit by a single lamp." wrapStyle={{ aspectRatio: '843 / 1265' }} />
         </figure>
         <figure className="col-span-6 md:col-span-5">
-          <Reveal name="sofa_three" alt="Solic Arc standing on a sofa beside a red bass and a black Jackson." className="aspect-[843/1124]" from="right" />
+          <Reveal name="sofa_three" alt="Solic Arc standing on a sofa beside a red bass and a black Jackson." wrapStyle={{ aspectRatio: '843 / 1124' }} from="right" />
         </figure>
         <Cap className="col-span-12 md:col-start-3 md:col-span-9">The real one, at home.</Cap>
       </div>
