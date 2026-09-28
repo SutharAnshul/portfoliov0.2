@@ -2073,7 +2073,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   font-family: var(--family-ui);
   font-size: 10.5px;
   letter-spacing: 0.03em;
-  /* Tabular, so five different date ranges still make a straight left column
+  /* Tabular, so six different date ranges still make a straight left column
      and the eye can run down it. */
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -2095,7 +2095,7 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
 /* The role is the least of the three and set in the reading face, which at
    this size reads quieter beside the mono than a smaller mono would. Ranged
-   right, so the five of them make a column. */
+   right, so the six of them make a column. */
 .record-role {
   font-family: var(--family-read);
   font-size: 11.5px;
@@ -2845,17 +2845,85 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 /* ── On a phone ────────────────────────────────────────────────────────
-   One column, in reading order: the page names itself, the record, the offer,
-   the sentence, and the four ways to reach him under it. The wide left margin
-   is a thing a wide screen can afford and a phone cannot. */
+   An information grid on three anchors, not the desktop stacked.
+   ──────────────────────────────────────────────────────────────────────
+   What was here before this read as a résumé, and the reason was structural
+   rather than typographic. Every entry was its own two-line block with a wide
+   gap under it, so the eye counted six things instead of reading one table.
+   No amount of spacing fixes that; spacing is what caused it.
+
+   ── Why the record cannot simply keep the desktop's row ─────────────────
+   Wide, an entry is one line: date, organisation, role, in three columns.
+   That does not fit a phone, and not by a little. At the smallest sizes this
+   page will accept, the longest entry — Apr 2024 – Jul 2025 / Impact
+   Acquisition / Growth — is 352px of type before any gap between the three,
+   against the 343px a 375px screen has between its margins. Shared column
+   tracks are worse still: the widest date, the widest organisation and the
+   widest role come to 403px.
+
+   So the row has to fold. The question is only where, and the answer is the
+   role: it is the least of the three on the desktop too, and it is the only
+   one that can move without breaking a left edge. The date stays in a narrow
+   column of its own and wraps inside it — which is what makes it read as
+   metadata rather than as a heading — the organisation takes the first line
+   at full strength, and the role goes to the right of the second.
+
+       SEPT 2024 –   CNVRT Labs
+       FEB 2026                        Product Design
+
+   Three vertical alignments survive that, all of them running the whole
+   length of the list: dates down the left of their column, organisations down
+   the left of theirs, roles down the right edge of the page. The date column
+   is a fixed track and the other is 1fr, so every row resolves to the same two
+   widths without subgrid — six rows of one table, which is the thing the
+   stacked version threw away.
+
+   ── Three anchors ──────────────────────────────────────────────────────
+   The desktop's composition is not its type, it is the empty left half and
+   the fact that different things start in different places. A phone cannot
+   spend half its width on margin, but it can spend a tenth, and it can put
+   things at more than one x.
+
+       0    //about me//        the section naming itself
+        x1     the record       the grid, stepped in
+       0    CASE FILE           the record signing off
+       0    Open to work  CV →  the offer, spanning the measure
+         x2    the sentence     stepped in further, and its sign-off
+                     [icons]    at the right edge, under it
+
+   Three anchors and a right edge, against the one column everything used to
+   share. The changing x is the composition.
+
+   ── The scale ──────────────────────────────────────────────────────────
+   This reverses the sizes set here earlier, which pushed everything up on the
+   grounds that a phone should not ask to be squinted at. That was right about
+   legibility and wrong about hierarchy: at 12.5 / 16 / 13.5 the metadata was
+   nearly as loud as the names, so nothing led. Back down to a restrained
+   ramp — labels and dates at 10.5, organisations at 15.5, roles at 11.5 —
+   where the organisation is plainly the thing to read and the rest is the
+   apparatus around it. */
 @media (max-width: 767px) {
   .about {
+    /* The two inward anchors. The first grows with the screen; the second is
+       the first again and most of it over, so the page steps twice and the
+       second step is provably the larger rather than two clamps that happen
+       to keep in step. */
+    --x1: clamp(18px, 5.5vw, 34px);
+    --x2: calc(var(--x1) * 1.8);
+
+    /* Wide enough for the longest first line a date can break to —
+       "Sept 2024 –" is 78.5px at this size — and no wider, because the
+       column's job is to be narrow. */
+    --date-col: 82px;
+    --date-gap: 14px;
+
     grid-template-columns: minmax(0, 1fr);
-    row-gap: var(--s6);
+    /* The label, then air, then the grid. */
+    row-gap: 40px;
   }
 
   .about-slug,
-.about-col {
+  .about-col {
     grid-column: 1;
   }
 
@@ -2863,100 +2931,193 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     padding-right: 0;
   }
 
-  /* "Open to work" and "Curriculum vitae" meet in the middle at this width,
-     so they stop sharing a line. */
-  .about-open {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--s4);
+  /* ── A scale for the hand ──────────────────────────────────────────
+     Scoped to this page's three sections, so the records keep their own. */
+  .about,
+  .work,
+  .foot {
+    --fs-meta: 12.5px;
+    --fs-title: 14px;
   }
 
-  /* And the contacts lie down again: a column beside a sentence needs a margin
-     to stand in, and a phone has none. */
+  /* The apparatus: the case-file line, the sign-off, the document, the item
+     count. Quieter than the work's captions, which sit on pictures and have
+     to hold their own against them. */
+  .about {
+    --fs-label: 10.5px;
+  }
+
+  .work,
+  .foot {
+    --fs-label: 12px;
+  }
+
+  /* Both section labels at one size, because they are the same thing said
+     twice and a pixel between them would only read as a mistake. */
+  .about-slug,
+  .work-slug {
+    font-size: 13px;
+  }
+
+  /* ── The record ────────────────────────────────────────────────────
+     Two lines an entry and the dense end of the range between them: the
+     entries have to sit closer together than the lines inside one are far
+     apart, or the list becomes six blocks again. */
+  .record {
+    margin-left: var(--x1);
+    gap: 20px;
+  }
+
+  .record-row {
+    grid-template-columns: var(--date-col) minmax(0, 1fr);
+    column-gap: var(--date-gap);
+    row-gap: 0;
+    align-items: start;
+  }
+
+  /* Spanning both lines, and wrapping inside its track — the one place on
+     this page where a line is allowed to break, because breaking is what
+     turns a date into a column of metadata instead of a headline. The nudge
+     is optical: a grid item spanning two rows cannot take part in baseline
+     alignment, so it sits by its top, and 10.5px type set against 15.5px
+     needs its first baseline pushed down to meet it. */
+  .record-span {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    white-space: normal;
+    font-size: 10.5px;
+    line-height: 1.5;
+    padding-top: 4px;
+  }
+
+  /* The thing you are meant to read. */
+  .record-org {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 15.5px;
+    line-height: 1.3;
+  }
+
+  /* At the right edge of the page, under the name it belongs to. The desktop
+     ranges these right for the same reason: a column to run down. */
+  .record-role {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: right;
+    font-size: 11.5px;
+    line-height: 1.4;
+  }
+
+  /* ── What separates the sections ───────────────────────────────────
+     Off the column and onto the blocks, because the whitespace belongs
+     between the sections and not inside them. */
+  .about-col {
+    gap: 0;
+  }
+
+  /* The record signing off, back at the page's edge. */
+  .about-record .piece-foot {
+    margin-top: 32px;
+  }
+
+  /* The longest pause on the page, which is what makes the case-file line a
+     hinge between the history and the offer rather than a footnote under the
+     history. */
+  .about-open {
+    margin-top: 56px;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s4);
+    font-size: 13px;
+  }
+
+  .about-cv {
+    font-size: 11px;
+  }
+
+  /* ── The sentence, and the end of the page ─────────────────────────
+     The whole block steps in to the second anchor: the sentence, the sign-off
+     under it and the four icons at the right edge under that. Three lines at
+     three alignments, which is the tension the desktop gets from standing the
+     icons in a column beside the sentence — laid on its side, because a phone
+     has no margin to stand them in.
+
+     They cannot share a line here. The sign-off is 253px of tracked capitals
+     and the icons 152px, which is wider than the measure on every phone in
+     this range.
+
+     display: contents on the body, so the sentence and its sign-off become
+     items of this grid directly. The alternative is a text column as narrow as
+     the icons leave it. Safe here: the body is a plain div with no role to
+     lose. */
   .about-statement {
-    display: block;
+    margin-top: 48px;
+    margin-left: var(--x2);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .statement-body {
+    display: contents;
+  }
+
+  /* The conclusion of the page rather than another section of it: an editorial
+     measure, not the width of whatever is left. */
+  .about .statement {
+    grid-row: 1;
+    max-width: 350px;
+    font-size: 19.5px;
+    line-height: 1.45;
+  }
+
+  .statement-body .piece-foot {
+    grid-row: 2;
+    margin-top: 40px;
+  }
+
+  /* And the rail lies down. It is hidden at this width no longer: stacked, it
+     used to drop into the flow immediately under the sign-off — hard against
+     it, and then the same four icons again a screenful later — so the page
+     carried the set twice in one view. As the last line of the sentence's
+     block it is part of that block, the way the column is on the desktop, and
+     the foot's copy is a whole scroll of work away. */
+  .about-statement .contact-rail {
+    grid-row: 3;
+    justify-self: end;
+    margin-top: 20px;
   }
 
   .contact-row[data-dir='down'] {
     flex-direction: row;
   }
 
-  /* One set of contacts, at the end.
-     ────────────────────────────────────────────────────────────────────
-     Wide, this rail stands in the margin beside the sentence and the foot
-     carries its own copy at the bottom of the page: two rows, but never both
-     in view, and each reading as part of the thing it sits in. Stacked, the
-     margin is gone, so the rail drops into the flow immediately under the
-     sign-off — hard against it, and then the same four icons again a
-     screenful later. The page is short enough that you see both.
-     The one at the foot is the one that stays: it is where you look for a way
-     to reach someone once you have read the work, and it is what gives the
-     page an ending rather than a last tile. */
-  .about-statement .contact-rail {
-    display: none;
+  /* ── The mark ──────────────────────────────────────────────────────
+     Smaller than the desktop's, and centred as it already was. The impact is
+     meant to come from what is around it, and at 88px it was taking a width
+     that the composition underneath never answers.
+
+     The page's opening is written from the mark rather than from the spacing
+     scale, because what is being set is the air under a known object: the
+     line it sits on, how far the front page starts below that, the mark's own
+     height at this size, and then the gap. It was 86px of gap; it is 48. */
+  .site-mark .sig {
+    font-size: 20.5px;
   }
 
-  /* One column, and further apart than two columns needed. Side by side, each
+  .shell[data-home='true'] .site-page {
+    padding-top: calc(var(--mark-top) + var(--drop) + 36px + var(--s7));
+  }
+
+  /* ── The work ──────────────────────────────────────────────────────
+     One column, and further apart than two columns needed. Side by side, each
      tile is bounded by its neighbour; stacked, the only thing between one
      tile's caption and the next tile's picture is this gap, and at 32px the
      caption read as a label on the picture below it as much as on its own. */
   .work-tiles {
     grid-template-columns: minmax(0, 1fr);
     row-gap: var(--s7);
-  }
-
-  /* ── A scale for the hand ──────────────────────────────────────────
-     Every size on this page was the desktop's. Nothing scaled, so type drawn
-     for a 1440px canvas with a wide margin either side was being read at
-     390px: dates, roles, the case-file line, the item count and the CV link
-     all at 10.5px, organisations at 13px. Below about 12px a phone is asking
-     to be squinted at, and five of those lines were under it.
-
-     The slug comes DOWN, which looks like the odd one out and is the point:
-     at 16px "//about me//" was larger than the organisations it introduces,
-     so the label outranked the content. A label should be the quietest thing
-     in its own section.
-
-     Tokens where a token exists, so one number moves a family, and scoped to
-     the three sections of this page rather than :root — the records have
-     their own scale and their own margins and are not this problem. */
-  .about,
-  .work,
-  .foot {
-    --fs-label: 12px;
-    --fs-meta: 12.5px;
-    --fs-title: 14px;
-  }
-
-  .about-slug,
-  .work-slug {
-    font-size: 14px;
-  }
-
-  .record-span {
-    font-size: 12.5px;
-  }
-
-  .record-org {
-    font-size: 16px;
-  }
-
-  .record-role {
-    font-size: 13.5px;
-  }
-
-  .about-open {
-    font-size: 15px;
-  }
-
-  /* Back down from the offer it stands under: it is the quieter half of that
-     pair, and at the label size it had become a footnote. */
-  .about-cv {
-    font-size: 13.5px;
-  }
-
-  .statement {
-    font-size: 20px;
   }
 
   /* The foot came to 128px of nothing between the last caption and the icons —
@@ -2973,21 +3134,22 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     padding-top: var(--s7);
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s7));
   }
+}
 
-  /* The date moves above its row rather than being squeezed beside it, and
-     the entries stand further apart to say which date belongs to which name
-     now that the row no longer does it. */
-  .record {
-    gap: var(--s5);
+/* ── Narrower than a phone made this decade ────────────────────────────
+   At 320px the grid's first line — the step, the date column, its gap and
+   "Impact Acquisition" — comes to 298px against 288 of measure. The step
+   gives up some of itself and the organisations come down a point, which is
+   the least destructive pair of changes available: both edges of the grid
+   survive, and so does every anchor. The sentence steps in less far for the
+   same reason, so that its sign-off still holds one line. */
+@media (max-width: 349px) {
+  .about {
+    --x1: 12px;
   }
 
-  .record-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: 3px;
-  }
-
-  .record-span {
-    grid-column: 1 / -1;
+  .record-org {
+    font-size: 14.5px;
   }
 }
 
