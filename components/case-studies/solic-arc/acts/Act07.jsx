@@ -1,4 +1,4 @@
-import { Act, Opener, Kind, Cap, Reveal, NC, SHOW_NC, useSrc } from '../components/ui'
+import { Act, Opener, Kind, Cap, Reveal, NC, SHOW_NC } from '../components/ui'
 
 const P = (name, cls, alt, aspect) => ({ name, cls, alt, aspect })
 const MOSAIC = [
@@ -34,7 +34,6 @@ const SPEC = [
 ]
 
 export default function Act07() {
-  const src = useSrc()
   return (
     <Act i={6} id="players">
       <Opener i={6} lede="Octaves is IIT Guwahati’s music club. Its guitarists sat down with Solic Arc, stood up with it, and played." />
@@ -58,46 +57,47 @@ export default function Act07() {
 
       {/* Reveal */}
       <div className="h-[36vh] md:h-[50vh]" />
+      {/* Three words, at the size the wordmark used to be given.
+          ──────────────────────────────────────────────────────────────
+          What stood here was the logo drawn for the instrument, set as large
+          as the column allowed, with "An extension of the player's body."
+          under it. Both have gone. The brand line is the cover's job and it
+          does it there; repeating it here made the reveal a title card for a
+          product rather than the moment the act hands you the object.
+
+          So the label that used to introduce the mark is the heading now, and
+          it carries the h2 the mark was carrying — the outline is unchanged,
+          and what is read aloud is a phrase rather than an alt text. */}
       <div className="sa-wrap">
-        <p className="sa-t-label text-mu mb-6">The instrument</p>
-        {/* The wordmark, not a setting of the name in the page's serif. This
-            is the mark drawn for the instrument, so the one place the name is
-            given at size is the one place it should be the real thing.
-
-            The cream and gold cut, for the navy this act is painted in;
-            logo_onlight.webp is the grey cut for a pale field, unused so far.
-            Still an h2 with the name as alt text, so the heading is in the
-            outline and read aloud as before.
-
-            Width in cqw against the column, not the window, and the height
-            follows from the file's own proportion — 713x213 — so nothing has
-            to be restated if the mark is ever redrawn. */}
-        <h2>
-          <img
-            src={src('logo_ondark')} alt="Solic Arc"
-            width="713" height="213" loading="lazy"
-            style={{ width: 'clamp(260px, 60cqw, 820px)', height: 'auto' }}
-          />
-        </h2>
-        <p className="font-serif italic text-[clamp(24px,2.6vw,44px)] leading-tight mt-6 md:mt-8 text-mu">An extension of the player’s body.</p>
+        <h2 className="sa-t-sec">The instrument</h2>
       </div>
 
-      <figure className="mt-16 md:mt-24">
-        <Reveal
-          name="body_studio" parallax={2}
-          alt="Render of the Solic Arc body: natural ash, carbon-fibre pickguard, two cream humbuckers, a vintage-style tremolo bridge and a rosewood fretboard."
-          /* 1743x1309, its own proportion. It was in a box a screenful tall
-             with object-cover trimming whatever did not fit, which at that
-             height meant the top and bottom of the body — so the one picture
-             of the finished instrument was showing the middle of it. */
-          className="w-full" wrapStyle={{ aspectRatio: '1743 / 1309' }}
-          imgClass="object-cover"
-        />
-        <div className="sa-wrap sa-g12 mt-6 gap-y-3">
-          <Kind className="col-span-12 md:col-span-3">Render</Kind>
-          <p className="col-span-12 md:col-span-8 sa-t-cap mt-0">A render of the final design. The built guitar has the same carbon-fibre pickguard.</p>
-        </div>
-      </figure>
+      {/* The built guitar, where a render of it used to be.
+          ──────────────────────────────────────────────────────────────
+          The render was the only picture of the finished instrument that was
+          not the finished instrument — a model of it on a white sweep, with a
+          caption underneath explaining which parts of it were true of the real
+          one. The guitar exists and has been photographed. The act can show it.
+
+          These two were the act's closing pair. Moving them up costs that
+          ending nothing: the two photographs that replace them there are the
+          instrument being played and the instrument standing beside the ones
+          it was measured against, which is the better close anyway.
+
+          Wider than the pair was at the foot of the act, because this is the
+          slot a full-bleed render used to hold and a reveal wants the room.
+          Not full-bleed though: these files are 843px across, and a picture
+          painted wider than about 420 CSS px is being enlarged on any screen
+          with two device pixels to the one. Upscaling a photograph to make a
+          hero of it is the other way of failing to show the thing. */}
+      <div className="sa-wrap sa-g12 mt-20 md:mt-28 gap-y-4 items-end">
+        <figure className="col-span-6 md:col-start-1 md:col-span-5">
+          <Reveal name="wall" alt="Solic Arc hanging on a white wall beside an acoustic guitar." className="aspect-[843/1128]" />
+        </figure>
+        <figure className="col-span-6 md:col-start-7 md:col-span-6">
+          <Reveal name="room_night" alt="Solic Arc resting on a stool at night in a room with a keyboard and desk." className="aspect-[843/1128]" from="right" />
+        </figure>
+      </div>
 
       <div className="sa-wrap sa-g12 mt-24 md:mt-36 gap-y-14">
         <div className="col-span-12 md:col-span-5">
@@ -124,14 +124,23 @@ export default function Act07() {
         </dl>
       </div>
 
-      <div className="sa-wrap sa-g12 mt-24 md:mt-36 gap-y-4 items-end">
-        <figure className="col-span-6 md:col-start-2 md:col-span-4">
-          <Reveal name="wall" alt="Solic Arc hanging on a white wall beside an acoustic guitar." className="aspect-[843/1128]" />
+      {/* The same two facts the act has been making, made once more without
+          argument: it gets played, and it stands next to instruments somebody
+          bought. Act 07 until here is other people's hands, in a club, on an
+          afternoon — the guitarists of Octaves, who were handed it and asked.
+          These are the room it was built in, at night, with nobody watching,
+          which is the only test that carries on after the sessions end.
+
+          Offset and staggered rather than squared up, the way the player
+          mosaics at the head of this act are. */}
+      <div className="sa-wrap sa-g12 mt-24 md:mt-36 gap-y-4 items-start">
+        <figure className="col-span-6 md:col-start-3 md:col-span-4 md:mt-[10vh]">
+          <Reveal name="room_play" alt="Solic Arc being played seated at night in the same room, lit by a single lamp." className="aspect-[843/1265]" />
         </figure>
         <figure className="col-span-6 md:col-span-5">
-          <Reveal name="room_night" alt="Solic Arc resting on a stool at night in a room with a keyboard and desk." className="aspect-[843/1128]" from="right" />
+          <Reveal name="sofa_three" alt="Solic Arc standing on a sofa beside a red bass and a black Jackson." className="aspect-[843/1124]" from="right" />
         </figure>
-        <Cap className="col-span-12 md:col-start-2 md:col-span-9">The real one, at home.</Cap>
+        <Cap className="col-span-12 md:col-start-3 md:col-span-9">The real one, at home.</Cap>
       </div>
       <div className="sa-pause" />
     </Act>
