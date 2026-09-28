@@ -2413,11 +2413,17 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 :root {
   --page-x: var(--s4);
   --mark-top: var(--s5);
-  /* A phone has less room to spend on the pause before the first line, and it
-     was spending the most: 216px of nothing above "//about me//", a quarter of
-     the screen, before the page said anything. Enough is kept that the name
-     still travels on the way up. */
-  --drop: var(--s5);
+  /* How far the front page — the name included — starts below where it ends
+     up. Shell reads this number and hands the mark back (drop - scrollY), so
+     it is also the distance the name travels on the way up to the bar, and
+     the page and the mark move together the whole way.
+
+     It was 216px once, which was a quarter of a phone screen of nothing above
+     "//about me//" before the page said anything, and then 24px, which was so
+     little that the name barely travelled at all. This sits between them: the
+     name opens clear of the top of the window, and there is still a journey
+     for the first scroll to complete. */
+  --drop: var(--s7);
 }
 
 @media (min-width: 768px) {
@@ -2871,12 +2877,14 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
        SEPT 2024 –   CNVRT Labs
        FEB 2026                        Product Design
 
-   Three vertical alignments survive that, all of them running the whole
-   length of the list: dates down the left of their column, organisations down
-   the left of theirs, roles down the right edge of the page. The date column
-   is a fixed track and the other is 1fr, so every row resolves to the same two
-   widths without subgrid — six rows of one table, which is the thing the
-   stacked version threw away.
+   Two vertical alignments survive that, both running the whole length of the
+   list: dates down the left of their column, organisations and their roles
+   down the left of theirs. The date column is a fixed track and the other is
+   1fr, so every row resolves to the same two widths without subgrid — six
+   rows of one table, which is the thing the stacked version threw away.
+
+   The role was ranged right for a while, to keep the third edge as well. See
+   .record-role below for why an edge is the wrong thing to spend that line on.
 
    ── Three anchors ──────────────────────────────────────────────────────
    The desktop's composition is not its type, it is the empty left half and
@@ -2998,12 +3006,28 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     line-height: 1.3;
   }
 
-  /* At the right edge of the page, under the name it belongs to. The desktop
-     ranges these right for the same reason: a column to run down. */
+  /* Under the name it belongs to, and at the same edge as it.
+     ──────────────────────────────────────────────────────────────────
+     This was ranged right, to keep the hard right edge the desktop's rows
+     have. Measured, the list was exact — every role ended on 413.00 and every
+     row was 36.23 tall — and it still read as staggered, because the thing
+     that was wrong was not alignment.
+
+     A role ranged right on the line below its organisation sits nearer the
+     next entry's date than the name it describes. Proximity is what says
+     which fact belongs to which, and it was saying nothing: "Product Design"
+     floated between SuperHealth above and Bigfoot Guitars below, owned by
+     neither, and the eye zigzagged left-right-left down the whole list.
+
+     On the desktop the right edge costs nothing, because the row is one line
+     and the role is already beside its name. Folded onto two, it costs the
+     pairing, which is the only thing the row is for. So the role gives the
+     edge up and stands under its organisation: two columns, two left edges,
+     and every entry a block you read down. */
   .record-role {
     grid-column: 2;
     grid-row: 2;
-    text-align: right;
+    text-align: left;
     font-size: 11.5px;
     line-height: 1.4;
   }
@@ -3037,60 +3061,35 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   }
 
   /* ── The sentence, and the end of the page ─────────────────────────
-     The whole block steps in to the second anchor: the sentence, the sign-off
-     under it and the four icons at the right edge under that. Three lines at
-     three alignments, which is the tension the desktop gets from standing the
-     icons in a column beside the sentence — laid on its side, because a phone
-     has no margin to stand them in.
+     The desktop arrangement, kept: the sentence and its sign-off on the left,
+     the four ways to reach him standing in a column at the right of the box
+     they are in.
 
-     They cannot share a line here. The sign-off is 253px of tracked capitals
-     and the icons 152px, which is wider than the measure on every phone in
-     this range.
+     This was a staircase for a while — sentence, then sign-off, then the icons
+     lying down on a line of their own — on the reasoning that the sign-off and
+     a row of icons are 441px between them and will not share a line on any
+     phone. True, and beside the point: the icons do not need to share the
+     sign-off's line, they need to stand beside the whole block. Stood up they
+     are 26px wide, which any phone can spare.
 
-     display: contents on the body, so the sentence and its sign-off become
-     items of this grid directly. The alternative is a text column as narrow as
-     the icons leave it. Safe here: the body is a plain div with no role to
-     lose. */
+     Only the gap changes from the desktop's. 32px of it out of a 306px measure
+     is a tenth of the sentence. */
   .about-statement {
     margin-top: 48px;
     margin-left: var(--x2);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-  }
-
-  .statement-body {
-    display: contents;
+    gap: var(--s4);
   }
 
   /* The conclusion of the page rather than another section of it: an editorial
      measure, not the width of whatever is left. */
   .about .statement {
-    grid-row: 1;
     max-width: 350px;
     font-size: 19.5px;
     line-height: 1.45;
   }
 
   .statement-body .piece-foot {
-    grid-row: 2;
     margin-top: 40px;
-  }
-
-  /* And the rail lies down. It is hidden at this width no longer: stacked, it
-     used to drop into the flow immediately under the sign-off — hard against
-     it, and then the same four icons again a screenful later — so the page
-     carried the set twice in one view. As the last line of the sentence's
-     block it is part of that block, the way the column is on the desktop, and
-     the foot's copy is a whole scroll of work away. */
-  .about-statement .contact-rail {
-    grid-row: 3;
-    justify-self: end;
-    margin-top: 20px;
-  }
-
-  .contact-row[data-dir='down'] {
-    flex-direction: row;
   }
 
   /* ── The mark ──────────────────────────────────────────────────────
