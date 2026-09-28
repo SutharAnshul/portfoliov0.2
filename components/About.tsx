@@ -16,11 +16,12 @@ import { ContactRow } from '@/components/ContactRow'
  * looked at.
  */
 
-/* The five entries, newest first by start date. The degree sits last because
+/* The six entries, newest first by start date. The degree sits last because
    it began first, not because education conventionally goes at the bottom —
-   and keeping all five is what shows the overlap a shorter list would hide. */
+   and keeping all six is what shows the overlap a shorter list would hide. */
 const RECORD = [
   { span: 'May – Jul 2026', org: 'SuperHealth', role: 'Product Design' },
+  { span: 'Feb – Apr 2026', org: 'Bigfoot Guitars', role: 'Luthier' },
   { span: 'Sept 2024 – Feb 2026', org: 'CNVRT Labs', role: 'Product Design' },
   { span: 'Apr 2024 – Jul 2025', org: 'Impact Acquisition', role: 'Growth' },
   { span: 'Jul 2023 —', org: 'Herbal Mitra', role: 'Co-founder' },
