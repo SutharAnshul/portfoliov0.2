@@ -2740,9 +2740,12 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   padding-bottom: var(--s8);
 }
 
-/* A section naming itself, in the same hand both times. */
+/* A section naming itself, in the same hand both times — and the work's own
+   item count, which stands at the other end of the work's slug line and was
+   the only thing up here set as a tracked uppercase label. */
 .about-slug,
-.work-slug {
+.work-slug,
+.work-count {
   margin: 0;
   font-family: var(--family-ui);
   font-size: 16px;
@@ -2961,9 +2964,11 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   }
 
   /* Both section labels at one size, because they are the same thing said
-     twice and a pixel between them would only read as a mistake. */
+     twice and a pixel between them would only read as a mistake. The count
+     rides with them. */
   .about-slug,
-  .work-slug {
+  .work-slug,
+  .work-count {
     font-size: 13px;
   }
 
@@ -3056,8 +3061,13 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     font-size: 13px;
   }
 
+  /* The same size as the offer it stands opposite. It was a point and a half
+     under, on the reasoning that it is the quieter half of the pair — which is
+     true of its colour and its weight, and did not need to be true of its size
+     as well. Three quiet signals for one idea is a whisper. The pink and the
+     rule carry it; the size can stop apologising. */
   .about-cv {
-    font-size: 11px;
+    font-size: 13px;
   }
 
   /* ── The sentence, and the end of the page ─────────────────────────

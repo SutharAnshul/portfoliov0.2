@@ -18,14 +18,25 @@ import { ContactRow } from '@/components/ContactRow'
 
 /* The six entries, newest first by start date. The degree sits last because
    it began first, not because education conventionally goes at the bottom —
-   and keeping all six is what shows the overlap a shorter list would hide. */
+   and keeping all six is what shows the overlap a shorter list would hide.
+
+   One shape for every span: three-letter month, four-digit year, both ends.
+   Not the shortest way to write them — "May – Jul 2026" says the same thing
+   in five fewer characters — but a column of dates is read by running down
+   it, and a column where some rows carry a year on both sides and some carry
+   it once has to be read a row at a time instead. The repetition is what
+   makes it scannable. It also costs nothing here: every span now breaks after
+   the dash into exactly two lines on a phone, where four of them did before
+   and two did not.
+
+   Sept is the odd one out of the twelve at four letters, so it is Sep. */
 const RECORD = [
-  { span: 'May – Jul 2026', org: 'SuperHealth', role: 'Product Design' },
-  { span: 'Feb – Apr 2026', org: 'Bigfoot Guitars', role: 'Luthier' },
-  { span: 'Sept 2024 – Feb 2026', org: 'CNVRT Labs', role: 'Product Design' },
+  { span: 'May 2026 – Jul 2026', org: 'SuperHealth', role: 'Product Design' },
+  { span: 'Feb 2026 – Apr 2026', org: 'Bigfoot Guitars', role: 'Luthier' },
+  { span: 'Sep 2024 – Feb 2026', org: 'CNVRT Labs', role: 'Product Design' },
   { span: 'Apr 2024 – Jul 2025', org: 'Impact Acquisition', role: 'Growth' },
-  { span: 'Jul 2023 —', org: 'Herbal Mitra', role: 'Co-founder' },
-  { span: '2021 – 2025', org: 'IIT Guwahati', role: 'B.Des.' },
+  { span: 'Jul 2023', org: 'Herbal Mitra', role: 'Co-founder' },
+  { span: 'Jul 2021 – Jul 2025', org: 'IIT Guwahati', role: 'B.Des.' },
 ]
 
 export function About() {

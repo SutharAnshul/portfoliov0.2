@@ -15,7 +15,11 @@ export function WorkGrid() {
       <Settle mass="light">
         <div className="work-head">
           <p className="work-slug">//selected work//</p>
-          <span className="t-label">{String(shownCaseStudies.length).padStart(2, '0')} items</span>
+          {/* The count is the other end of the slug's line, so it is set in the
+              slug's hand rather than as a label: same face, size, tracking and
+              20% ink, and no uppercasing. Two things on one rule, saying the
+              same kind of thing. */}
+          <span className="work-count">{String(shownCaseStudies.length).padStart(2, '0')} items</span>
         </div>
       </Settle>
 
