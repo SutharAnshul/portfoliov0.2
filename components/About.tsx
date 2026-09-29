@@ -71,7 +71,14 @@ export function About() {
             wants it, and it used to wait at the foot of the page past
             everything else. */}
         <p className="about-open">
-          <span>Open to work</span>
+          {/* Two elements for one key: the outer holds the dark outline, the
+              inner the face and both bevels. It takes two because each needs
+              its own silhouette — a single element could draw the bevel with
+              inset shadows, but clip-path would then cut them away at exactly
+              the corners the shape exists for. */}
+          <span className="offer-pill">
+            <span className="offer-pill-face">Open to work</span>
+          </span>
           <a
             href="/Anshul_Suthar_CV.pdf"
             target="_blank"

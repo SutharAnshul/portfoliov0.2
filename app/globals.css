@@ -2049,23 +2049,37 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
    line spanning between them rather than as two words that need to be near
    each other. Capping it left a ragged margin of dead panel to the right of
    the roles, which is the thing the alignment exists to avoid. */
+/* Three columns for the whole list, not three columns per entry.
+   ──────────────────────────────────────────────────────────────────────
+   Every row used to be a grid of its own, so "auto" sized the date column to
+   that row's date and nothing else. The organisations landed wherever their
+   own date happened to end: six rows, six different left edges. It read as a
+   column only because five of the six dates happened to be the same length,
+   and the moment one was not — Herbal Mitra, which has a start and no end —
+   that row stuck out and looked like a mistake, because next to five aligned
+   things it was one.
+
+   The tracks belong to the list. `subgrid` on the row hands the sizing up to
+   .record, which measures every date and every role before it decides, so the
+   date column is as wide as the longest date and the organisations all start
+   on one line no matter what any single row contains. */
 .record {
   margin: 0;
   padding: 0;
   list-style: none;
   display: grid;
-  gap: var(--s3);
-}
-
-/* Date, name, role. The middle column takes the slack so the role is pushed
-   to the end of the list and every role starts from the same right edge — a
-   column to run down, which is the point of setting the whole thing in the
-   monospace. What keeps that from stranding the role is the cap above, not the
-   alignment. */
-.record-row {
-  display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--s3) var(--s4);
+}
+
+/* Date, name, role. The middle column takes the slack, so the role is pushed
+   to the end of the list and every role ends on the same right edge — a
+   column to run down, which is the point of setting the whole thing in the
+   monospace. */
+.record-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   align-items: baseline;
 }
 
@@ -2770,10 +2784,14 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 }
 
 /* The offer at one end of the line, the document at the other, and the width
-   of the column between them. */
+   of the column between them.
+
+   Centred, not baselined: the offer is a drawn object now and the document is
+   a line of type, and there is no shared baseline between a 36px block and a
+   13px word that does not look like one of them has slipped. */
 .about-open {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--s5);
   margin: 0;
@@ -2782,6 +2800,98 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   letter-spacing: 0.03em;
   line-height: 1;
   color: var(--brand);
+}
+
+/* ── The offer, as a pixel ────────────────────────────────────────────
+   A bevelled key of the kind a 90s interface drew: a dark outline, a lit edge
+   along the top and left, a shadowed one along the bottom and right, and a
+   face between them that is lighter at the top than the bottom. Everything
+   about it is hard-edged. There is not a gradient ramp or a soft shadow
+   anywhere in it — every colour meets its neighbour on a whole pixel, which
+   is what separates the look from a rounded button with a bevel filter on it.
+
+   The silhouette is a stadium climbed in two steps of 6px at each end, cut
+   with clip-path rather than border-radius. A radius anti-aliases, and an
+   anti-aliased edge on a shape whose whole argument is that it is made of
+   pixels is the one mistake that gives it away.
+
+   Four tints of the site's one accent and nothing else. They are mixed from
+   --brand rather than written as hex, so the key follows the accent if the
+   accent ever moves. */
+.offer-pill {
+  --p: 6px;
+  --p2: 12px;
+  --pill-lit: color-mix(in oklab, var(--brand), white 30%);
+  --pill-top: color-mix(in oklab, var(--brand), white 11%);
+  --pill-dim: color-mix(in oklab, var(--brand), black 22%);
+  --pill-edge: color-mix(in oklab, var(--brand), black 62%);
+  display: inline-block;
+  padding: 2px;
+  background: var(--pill-edge);
+  clip-path: polygon(
+    var(--p2) 0, calc(100% - var(--p2)) 0,
+    calc(100% - var(--p2)) var(--p), calc(100% - var(--p)) var(--p),
+    calc(100% - var(--p)) var(--p2), 100% var(--p2),
+    100% calc(100% - var(--p2)), calc(100% - var(--p)) calc(100% - var(--p2)),
+    calc(100% - var(--p)) calc(100% - var(--p)), calc(100% - var(--p2)) calc(100% - var(--p)),
+    calc(100% - var(--p2)) 100%, var(--p2) 100%,
+    var(--p2) calc(100% - var(--p)), var(--p) calc(100% - var(--p)),
+    var(--p) calc(100% - var(--p2)), 0 calc(100% - var(--p2)),
+    0 var(--p2), var(--p) var(--p2),
+    var(--p) var(--p), var(--p2) var(--p)
+  );
+}
+
+/* The face, and both bevels. Three stacked gradients, every stop hard.
+   ──────────────────────────────────────────────────────────────────────
+   The side bevel is on top and transparent through the middle, so the bands
+   under it show through; then the top and bottom bevel; then the face itself,
+   which is not one flat colour but two, stepping down a little under halfway.
+   That last one is what the reference has and what a single flat fill misses:
+   a key is a physical thing catching light from above, so it is lighter
+   where it faces up. Two tones and a hard join, not a ramp. */
+.offer-pill-face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 20px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--pill-lit) 0 2px,
+      transparent 2px calc(100% - 2px),
+      var(--pill-dim) calc(100% - 2px)
+    ),
+    linear-gradient(
+      var(--pill-lit) 0 2px,
+      transparent 2px calc(100% - 2px),
+      var(--pill-dim) calc(100% - 2px)
+    ),
+    linear-gradient(
+      var(--pill-top) 0 45%,
+      var(--brand) 45%
+    );
+  clip-path: polygon(
+    var(--p2) 0, calc(100% - var(--p2)) 0,
+    calc(100% - var(--p2)) var(--p), calc(100% - var(--p)) var(--p),
+    calc(100% - var(--p)) var(--p2), 100% var(--p2),
+    100% calc(100% - var(--p2)), calc(100% - var(--p)) calc(100% - var(--p2)),
+    calc(100% - var(--p)) calc(100% - var(--p)), calc(100% - var(--p2)) calc(100% - var(--p)),
+    calc(100% - var(--p2)) 100%, var(--p2) 100%,
+    var(--p2) calc(100% - var(--p)), var(--p) calc(100% - var(--p)),
+    var(--p) calc(100% - var(--p2)), 0 calc(100% - var(--p2)),
+    0 var(--p2), var(--p) var(--p2),
+    var(--p) var(--p), var(--p2) var(--p)
+  );
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-indent: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  /* Lifted off the face by one hard pixel, the way the label on a key is. */
+  color: color-mix(in srgb, white 94%, var(--brand));
+  text-shadow: 0 1px 0 var(--pill-dim);
 }
 
 .about-cv {
@@ -2976,7 +3086,11 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
      Two lines an entry and the dense end of the range between them: the
      entries have to sit closer together than the lines inside one are far
      apart, or the list becomes six blocks again. */
+  /* One column again, and the rows go back to being grids of their own: the
+     date track is a fixed width here rather than a measured one, so there is
+     nothing for a subgrid to inherit and every row aligns by construction. */
   .record {
+    grid-template-columns: minmax(0, 1fr);
     margin-left: var(--x1);
     gap: 20px;
   }
@@ -3159,6 +3273,17 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
   .record-org {
     font-size: 14.5px;
+  }
+
+  /* The offer is a drawn object of fixed width now — 156px, which it is at
+     every screen size because the words inside it do not reflow — and with the
+     document beside it that is 331px of a 288px measure. Nothing to trade, so
+     they stop sharing a line. The key keeps its size; it is the one thing on
+     this page that should not be made smaller to fit. */
+  .about-open {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s3);
   }
 }
 
