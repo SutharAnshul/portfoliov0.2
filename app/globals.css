@@ -273,11 +273,20 @@
      tall as the line box reads as a bar and the row stops looking like type. */
   --sig-block-h: 0.76em;
   /* Cut out of every side of every block, so the space between two blocks is
-     always two bleeds — 3px, across and down alike. There is no grid gap on
-     either axis: across, a gap would push the cells off the character pitch;
-     down, a gap plus the block's own inset came to 8.76px against the 3px
-     across, which is the whole reason this is one number now. */
-  --sig-bleed: 1.5px;
+     always two bleeds, across and down alike. There is no grid gap on either
+     axis: across, a gap would push the cells off the character pitch; down, a
+     gap plus the block's own inset came to 8.76px against the 3px across,
+     which is the whole reason this is one number.
+
+     In em, not px. It was 1.5px, which is 0.0625 of the mark's 24px and is
+     exactly what this still resolves to there — the mark has not moved. But a
+     fixed bleed is a fixed bleed at every size, and the second field to use
+     these cells is a third of the mark's: at 10.5px the same 3px ate 47% of
+     the cell, so the blocks came out narrower than the gaps between them and
+     the row stopped reading as covered characters. Relative, the proportion
+     holds wherever the cells are used — 79.5% of the cell is a block at any
+     size. */
+  --sig-bleed: 0.0625em;
   /* -4%, applied by narrowing the cell. */
   --sig-track: -0.04em;
   /* The site's one accent. Anything pink anywhere reads from this: the
@@ -2802,100 +2811,99 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
   color: var(--brand);
 }
 
-/* ── The offer, as a pixel ────────────────────────────────────────────
-   A bevelled key of the kind a 90s interface drew: a dark outline, a lit edge
-   along the top and left, a shadowed one along the bottom and right, and a
-   face between them that is lighter at the top than the bottom. Everything
-   about it is hard-edged. There is not a gradient ramp or a soft shadow
-   anywhere in it — every colour meets its neighbour on a whole pixel, which
-   is what separates the look from a rounded button with a bevel filter on it.
+/* ── The offer, as a key ──────────────────────────────────────────────
+   A bevelled key of the kind a 90s interface drew: a lit edge along the top,
+   a shadowed one along the bottom, three white pixels catching the light at
+   the top left, and the accent itself for the face. Everything about it is
+   hard-edged — not a gradient ramp or a blurred shadow anywhere, every colour
+   meeting its neighbour on a whole pixel.
 
-   The silhouette is a stadium climbed in two steps of 6px at each end, cut
-   with clip-path rather than border-radius. A radius anti-aliases, and an
-   anti-aliased edge on a shape whose whole argument is that it is made of
-   pixels is the one mistake that gives it away.
+   ── Why 26px, and why the corner is 2px ─────────────────────────────────
+   It stands the same height as a contact chip, which is 26px. That is not a
+   number picked to look right: the chips are drawn on a 13×13 grid at 26px,
+   so one cell of that grid is exactly 2px — and the corner of every icon on
+   this site is one cell taken off. Giving the key a 2px notch makes its
+   corner the same corner, at the same scale, by construction rather than by
+   eye.
 
-   Four tints of the site's one accent and nothing else. They are mixed from
-   --brand rather than written as hex, so the key follows the accent if the
-   accent ever moves. */
+   Cut with clip-path and not border-radius. A radius anti-aliases, and a soft
+   edge on a shape whose whole argument is that it is made of pixels is the
+   one mistake that gives it away.
+
+   Sentence case. Tracked capitals are what a button does; this is a sentence
+   about the person, and it is only sitting on a key. */
 .offer-pill {
-  --p: 6px;
-  --p2: 12px;
-  --pill-lit: color-mix(in oklab, var(--brand), white 30%);
-  --pill-top: color-mix(in oklab, var(--brand), white 11%);
-  --pill-dim: color-mix(in oklab, var(--brand), black 22%);
-  --pill-edge: color-mix(in oklab, var(--brand), black 62%);
-  display: inline-block;
-  padding: 2px;
-  background: var(--pill-edge);
-  clip-path: polygon(
-    var(--p2) 0, calc(100% - var(--p2)) 0,
-    calc(100% - var(--p2)) var(--p), calc(100% - var(--p)) var(--p),
-    calc(100% - var(--p)) var(--p2), 100% var(--p2),
-    100% calc(100% - var(--p2)), calc(100% - var(--p)) calc(100% - var(--p2)),
-    calc(100% - var(--p)) calc(100% - var(--p)), calc(100% - var(--p2)) calc(100% - var(--p)),
-    calc(100% - var(--p2)) 100%, var(--p2) 100%,
-    var(--p2) calc(100% - var(--p)), var(--p) calc(100% - var(--p)),
-    var(--p) calc(100% - var(--p2)), 0 calc(100% - var(--p2)),
-    0 var(--p2), var(--p) var(--p2),
-    var(--p) var(--p), var(--p2) var(--p)
-  );
-}
-
-/* The face, and both bevels. Three stacked gradients, every stop hard.
-   ──────────────────────────────────────────────────────────────────────
-   The side bevel is on top and transparent through the middle, so the bands
-   under it show through; then the top and bottom bevel; then the face itself,
-   which is not one flat colour but two, stepping down a little under halfway.
-   That last one is what the reference has and what a single flat fill misses:
-   a key is a physical thing catching light from above, so it is lighter
-   where it faces up. Two tones and a hard join, not a ramp. */
-.offer-pill-face {
-  display: flex;
+  /* One cell of the icon grid. */
+  --u: 2px;
+  --pill-lit: color-mix(in oklab, var(--brand), white 26%);
+  --pill-dim: color-mix(in oklab, var(--brand), black 30%);
+  position: relative;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
-  padding: 0 20px;
+  height: 26px;
+  padding: 0 14px;
+  clip-path: polygon(
+    var(--u) 0, calc(100% - var(--u)) 0,
+    calc(100% - var(--u)) var(--u), 100% var(--u),
+    100% calc(100% - var(--u)), calc(100% - var(--u)) calc(100% - var(--u)),
+    calc(100% - var(--u)) 100%, var(--u) 100%,
+    var(--u) calc(100% - var(--u)), 0 calc(100% - var(--u)),
+    0 var(--u), var(--u) var(--u)
+  );
   background:
     linear-gradient(
-      90deg,
-      var(--pill-lit) 0 2px,
-      transparent 2px calc(100% - 2px),
-      var(--pill-dim) calc(100% - 2px)
+      var(--pill-lit) 0 var(--u),
+      transparent var(--u) calc(100% - var(--u)),
+      var(--pill-dim) calc(100% - var(--u))
     ),
-    linear-gradient(
-      var(--pill-lit) 0 2px,
-      transparent 2px calc(100% - 2px),
-      var(--pill-dim) calc(100% - 2px)
-    ),
-    linear-gradient(
-      var(--pill-top) 0 45%,
-      var(--brand) 45%
-    );
-  clip-path: polygon(
-    var(--p2) 0, calc(100% - var(--p2)) 0,
-    calc(100% - var(--p2)) var(--p), calc(100% - var(--p)) var(--p),
-    calc(100% - var(--p)) var(--p2), 100% var(--p2),
-    100% calc(100% - var(--p2)), calc(100% - var(--p)) calc(100% - var(--p2)),
-    calc(100% - var(--p)) calc(100% - var(--p)), calc(100% - var(--p2)) calc(100% - var(--p)),
-    calc(100% - var(--p2)) 100%, var(--p2) 100%,
-    var(--p2) calc(100% - var(--p)), var(--p) calc(100% - var(--p)),
-    var(--p) calc(100% - var(--p2)), 0 calc(100% - var(--p2)),
-    0 var(--p2), var(--p) var(--p2),
-    var(--p) var(--p), var(--p2) var(--p)
-  );
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-indent: 0.12em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  /* Lifted off the face by one hard pixel, the way the label on a key is. */
-  color: color-mix(in srgb, white 94%, var(--brand));
-  text-shadow: 0 1px 0 var(--pill-dim);
+    var(--brand);
 }
 
+/* The three pixels that say the light is coming from up there. Pure white,
+   not a tint of the accent — a specular highlight is the colour of the light,
+   not of the thing it lands on. */
+.offer-pill::before {
+  content: '';
+  position: absolute;
+  left: var(--u);
+  top: var(--u);
+  width: calc(var(--u) * 3);
+  height: var(--u);
+  background: #fff;
+}
+
+.offer-pill-face {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: #fff;
+}
+
+/* ── The document, as a field of cells ────────────────────────────────
+   The same construction as the name mark, reusing its cell rules outright, so
+   the two are the same object at two sizes — see components/blockField.ts for
+   the clock they share and why a row of eighteen finishes when a row of six
+   does.
+
+   No underline. It had one to say it was a link, which is a job the sweep and
+   the ripple now do between them; leaving it would draw a straight rule under
+   a row of cells that are busy not being straight. */
+.block-link {
+  display: inline-block;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+/* One size at every width, unlike every other label on this page.
+   ────────────────────────────────────────────────────────────────────
+   It was --fs-label, which is 10.5px here and 13px on a phone. That is the
+   right instinct for a label and the wrong one for this: the cells are sized
+   from the font, so the token was not setting the type of a link, it was
+   setting how big the blocks are — and the desktop was getting the smaller
+   pair of the two while sitting opposite a 26px key. */
 .about-cv {
-  font-size: var(--fs-label);
+  font-size: 13px;
   white-space: nowrap;
 }
 
@@ -3175,15 +3183,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
     font-size: 13px;
   }
 
-  /* The same size as the offer it stands opposite. It was a point and a half
-     under, on the reasoning that it is the quieter half of the pair — which is
-     true of its colour and its weight, and did not need to be true of its size
-     as well. Three quiet signals for one idea is a whisper. The pink and the
-     rule carry it; the size can stop apologising. */
-  .about-cv {
-    font-size: 13px;
-  }
-
   /* ── The sentence, and the end of the page ─────────────────────────
      The desktop arrangement, kept: the sentence and its sign-off on the left,
      the four ways to reach him standing in a column at the right of the box
@@ -3273,17 +3272,6 @@ html.has-custom-cursor .cursor-zoom-out { cursor: zoom-out; }
 
   .record-org {
     font-size: 14.5px;
-  }
-
-  /* The offer is a drawn object of fixed width now — 156px, which it is at
-     every screen size because the words inside it do not reflow — and with the
-     document beside it that is 331px of a 288px measure. Nothing to trade, so
-     they stop sharing a line. The key keeps its size; it is the one thing on
-     this page that should not be made smaller to fit. */
-  .about-open {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--s3);
   }
 }
 

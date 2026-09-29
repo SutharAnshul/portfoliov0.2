@@ -1,4 +1,10 @@
+import { BlockLink } from '@/components/BlockLink'
 import { ContactRow } from '@/components/ContactRow'
+
+/* A module constant, so the field's effect has a stable identity to depend on.
+   The arrow rides in the cells with the words — it is part of the shape the
+   sweep travels across, and leaving it outside would strand it mid-animation. */
+const CV = ['Curriculum vitae →'] as const
 
 /**
  * Who he is: a record of where he has been, an offer, and a sentence.
@@ -35,7 +41,11 @@ const RECORD = [
   { span: 'Feb 2026 – Apr 2026', org: 'Bigfoot Guitars', role: 'Luthier' },
   { span: 'Sep 2024 – Feb 2026', org: 'CNVRT Labs', role: 'Product Design' },
   { span: 'Apr 2024 – Jul 2025', org: 'Impact Acquisition', role: 'Growth' },
-  { span: 'Jul 2023', org: 'Herbal Mitra', role: 'Co-founder' },
+  /* The only entry still running, and the only one whose second half is not a
+     date. Eight marks rather than a word, because it is the same width as the
+     "Jul 2025" it stands in for — so the column keeps its shape and the row
+     that has no end still reads as a range. */
+  { span: 'Jul 2023 – ????????', org: 'Herbal Mitra', role: 'Co-founder' },
   { span: 'Jul 2021 – Jul 2025', org: 'IIT Guwahati', role: 'B.Des.' },
 ]
 
@@ -79,14 +89,18 @@ export function About() {
           <span className="offer-pill">
             <span className="offer-pill-face">Open to work</span>
           </span>
-          <a
+          {/* The same field of cells the name mark is, on the same clock: it
+              leaves the reading state on the frame the mark does and comes
+              back on the frame the mark does, and a pointer laid on any
+              character sends the wave out from there in both directions. */}
+          <BlockLink
+            label="Curriculum vitae"
+            rows={CV}
             href="/Anshul_Suthar_CV.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="link-quiet about-cv"
-          >
-            Curriculum vitae →
-          </a>
+            className="about-cv"
+          />
         </p>
 
         <section className="about-statement">

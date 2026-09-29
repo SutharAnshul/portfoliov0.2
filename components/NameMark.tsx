@@ -1,6 +1,7 @@
 'use client'
 
-import { createElement, useEffect, useRef, useState } from 'react'
+import { createElement } from 'react'
+import { SETTLE, useBlockField } from '@/components/blockField'
 
 /**
  * The name, as a field of cells that periodically resolve out of solid blocks.
@@ -41,107 +42,21 @@ import { createElement, useEffect, useRef, useState } from 'react'
  * where it stands and turns that box, and only that box, into its letter — so
  * the name can be read by moving across it rather than by waiting for it.
  *
- * Arriving while the name is showing does not snap the field shut. The cover
- * radiates out from the box under the pointer, one ring of cells every 30ms,
- * so the pointer reads as the thing that closed them rather than as a switch
- * thrown somewhere off screen. Leaving unwinds the same ripple from the
- * outside in, back to whatever the cycle was holding.
+ * The cover radiates out from the box under the pointer, one ring of cells
+ * every 30ms, and leaving unwinds the same ripple from the outside in. The
+ * wavefront is pink and only the wavefront.
  *
- * The wavefront is pink, and only the wavefront: a box holds the accent for
- * 90ms as the ring passes through it and then settles to white. Colouring
- * every covered box instead would say the field is pink; colouring three
- * rings of it says something is moving outward through the field, which is
- * the thing worth seeing. It is the same accent the periodic sweep leads
- * with, so both motions are read by the same mark.
+ * ── Not the only field on the page ──────────────────────────────────────
  *
- * The clock is paused for all of it, and the borrowed time is handed back only
- * once the unwind finishes — so the sweep resumes on the beat it was
- * interrupted on, and never against a field still in motion underneath it.
+ * The timing, the sweeps and the ripple all live in blockField, because the
+ * link to the CV is the same thing in one row of eighteen cells and has to
+ * stay in step with this. See there for how two fields of different lengths
+ * start and finish together.
  */
 
+/* A module constant, so the field's effect has a stable identity to depend on
+   rather than a new array on every render. */
 const ROWS = ['ANSHUL', 'SUTHAR'] as const
-const N = ROWS[0].length
-
-/** The beats of one cycle, in ms. */
-const HOLD_NAME = 4600
-const COVER = 460
-const HOLD_BLOCKS = 1500
-const REVEAL = 560
-const CYCLE = HOLD_NAME + COVER + HOLD_BLOCKS + REVEAL
-
-/** How far the second row lags the first, in ms. */
-const LAG = 110
-
-/**
- * The pause before the mark starts cycling, measured from page load rather
- * than from arrival on screen.
- *
- * The rail can afford to wait: it is beside the page, the reader is reading
- * something else, and the mark going off at 2.4 seconds is a thing noticed out
- * of the corner of an eye.
- *
- * The phone cannot. There the mark *is* the first screen, and the first thing
- * anyone does with a screen holding one word and an instruction to scroll is
- * scroll. Wait two and a half seconds and the animation plays to a page that
- * has already been left — see the `settle` prop.
- */
-const SETTLE = 2400
-
-/**
- * How soon after mounting it may go, however late hydration was.
- *
- * `settle` is counted from first paint, so hydration can land after it has
- * already elapsed. Firing in the same frame as hydration reads as a glitch
- * rather than as an entrance, so there is a floor under it.
- */
-const SETTLE_MIN = 150
-
-/** One ring of the hover ripple. */
-const STEP = 30
-/** How long a box holds the accent as the wavefront passes through it. */
-const PINK = 90
-/** The ripple's longest reach, corner to corner. */
-const REACH = N - 1 + (ROWS.length - 1)
-
-type Cell = 'on' | 'off' | 'edge'
-type Key = `${number}:${number}`
-
-const key = (r: number, i: number) => `${r}:${i}` as Key
-
-/** Rings, not radii. Two rows deep means Manhattan is as round as this gets. */
-function ringsApart(a: Key, b: Key) {
-  const [ar, ai] = a.split(':').map(Number)
-  const [br, bi] = b.split(':').map(Number)
-  return Math.abs(ar - br) + Math.abs(ai - bi)
-}
-
-/**
- * One row's cells at a moment in the cycle.
- *
- * Both sweeps run left to right, so the only difference between them is which
- * side of the edge keeps its letters.
- */
-function cellsAt(t: number): Cell[] {
-  const cycle = ((t % CYCLE) + CYCLE) % CYCLE
-
-  if (cycle < HOLD_NAME) return Array(N).fill('on')
-
-  const covering = cycle - HOLD_NAME
-  if (covering < COVER) {
-    const edge = Math.ceil((covering / COVER) * N)
-    return Array.from({ length: N }, (_, i) =>
-      i < edge - 1 ? 'off' : i === edge - 1 ? 'edge' : 'on',
-    )
-  }
-
-  const blocked = covering - COVER
-  if (blocked < HOLD_BLOCKS) return Array(N).fill('off')
-
-  const edge = Math.ceil(((blocked - HOLD_BLOCKS) / REVEAL) * N)
-  return Array.from({ length: N }, (_, i) => (i < edge - 1 ? 'on' : i === edge - 1 ? 'edge' : 'off'))
-}
-
-const field = (t: number) => ROWS.map((_, r) => cellsAt(t - r * LAG))
 
 export function NameMark({
   as = 'h1',
@@ -156,6 +71,9 @@ export function NameMark({
    * looking at it — and hydration lands well after the mark is on screen.
    * Counting from mount would make the wait longest exactly when the reader
    * has already been waiting.
+   *
+   * Only the first field on the page sets this; the rest inherit it, which is
+   * what keeps them in phase.
    */
   settle?: number
   /**
@@ -177,130 +95,7 @@ export function NameMark({
   interactive?: boolean
   className?: string
 } = {}) {
-  // Server and first paint show the name outright. Anything else would put a
-  // block of colour where the name goes for one frame on every cold load.
-  const [rows, setRows] = useState<Cell[][]>(() => ROWS.map(() => Array(N).fill('on')))
-  // A ref, not state: the rAF loop reads it every frame, and routing it through
-  // state would rebuild the loop on every pointer move between boxes.
-  const hover = useRef<Key | null>(null)
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-    /* Counted from first contentful paint, not from navigation.
-       `settle` is about how long the reader has been looking at the thing, and
-       on a slow load navigation start can be most of a second before anything
-       is on screen — anchor to it and the sweep can be over before the first
-       frame. Falls back to navigation where the entry is missing. */
-    const fcp =
-      performance.getEntriesByType('paint').find((p) => p.name === 'first-contentful-paint')
-        ?.startTime ?? 0
-    const wait = Math.max(SETTLE_MIN, settle - (performance.now() - fcp))
-    let start = performance.now() - (HOLD_NAME - wait)
-    let pausedAt: number | null = null
-    let frame = 0
-    let last = ''
-
-    /** The box being held, when it was taken, and the field as it was then. */
-    let held: Key | null = null
-    let heldAt = 0
-    let from: Cell[][] = ROWS.map(() => Array(N).fill('off'))
-    /** The unwind: what it radiates from, when it began, and where it lands. */
-    let unwind: { origin: Key; at: number; to: Cell[][] } | null = null
-
-    /** What is on screen this frame, so a ripple can start from it. */
-    let shown: Cell[][] = ROWS.map(() => Array(N).fill('on'))
-
-    const tick = (now: number) => {
-      const want = hover.current
-
-      if (want && want !== held) {
-        // Entering, or crossing to a neighbour. Either way the ripple restarts
-        // from the new box over the field exactly as it looks right now — so
-        // crossing from one box to the next covers the one just left after a
-        // single ring rather than blinking it out.
-        if (held === null) pausedAt = now
-        from = shown.map((row) => row.map((c): Cell => (c === 'on' ? 'on' : 'off')))
-        held = want
-        heldAt = now
-        unwind = null
-      }
-
-      if (!want && held !== null) {
-        unwind = { origin: held, at: now, to: field((pausedAt ?? now) - start) }
-        held = null
-      }
-
-      let next: Cell[][]
-
-      if (held) {
-        const age = now - heldAt
-        const origin = held
-        next = ROWS.map((_, r) =>
-          Array.from({ length: N }, (_, i): Cell => {
-            const k = key(r, i)
-            if (k === origin) return 'on'
-            const due = ringsApart(k, origin) * STEP
-            if (age < due) return from[r][i]
-            // The accent marks the wavefront and nothing else: a box carries
-            // it for three ring-steps as the ring passes through, then settles
-            // to white. Colouring every covered box would say the field is
-            // pink; colouring the front says something is moving through it.
-            return age < due + PINK ? 'edge' : 'off'
-          }),
-        )
-      } else if (unwind) {
-        const age = now - unwind.at
-        // Long enough for the last ring to finish holding the accent, not just
-        // to have been reached.
-        if (age >= REACH * STEP + PINK + STEP) {
-          // Only now is the borrowed time handed back, so the cycle picks up
-          // on its own beat rather than against a field still in motion.
-          if (pausedAt !== null) {
-            start += now - pausedAt
-            pausedAt = null
-          }
-          unwind = null
-          next = field(now - start)
-        } else {
-          const { origin, to } = unwind
-          next = ROWS.map((_, r) =>
-            Array.from({ length: N }, (_, i): Cell => {
-              const k = key(r, i)
-              // Outside in: the far corners come back first, and the box that
-              // was under the pointer is the last thing to let go.
-              const due = (REACH - ringsApart(k, origin)) * STEP
-              if (age < due) return k === origin ? 'on' : 'off'
-              // The box the pointer was on is already showing its letter, so
-              // there is no wavefront for it to carry — it just hands back.
-              if (k === origin) return to[r][i]
-              return age < due + PINK ? 'edge' : to[r][i]
-            }),
-          )
-        }
-      } else {
-        if (pausedAt !== null) {
-          start += now - pausedAt
-          pausedAt = null
-        }
-        next = field(now - start)
-      }
-
-      shown = next
-
-      // The cells only change a handful of times a second; re-rendering on
-      // every frame regardless would put React to work 60 times a second to
-      // produce the same twelve nodes.
-      const sig = next.map((row) => row.join('')).join('|')
-      if (sig !== last) {
-        last = sig
-        setRows(next)
-      }
-      frame = requestAnimationFrame(tick)
-    }
-    frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
-  }, [settle])
+  const { cells, handlers } = useBlockField(ROWS, { interactive, settle })
 
   return createElement(
     as,
@@ -324,39 +119,17 @@ export function NameMark({
          The grid's own leave fires whenever the pointer exits the whole mark,
          whichever cell it was over, and it has no neighbour to be confused by
          — so it needs no guard and cannot be outrun. */
-      onPointerLeave={
-        interactive
-          ? () => {
-              hover.current = null
-            }
-          : undefined
-      }
+      onPointerLeave={handlers?.leaveField}
     >
       {ROWS.map((word, r) => (
         <span className="sig-row" key={word}>
           {[...word].map((ch, i) => (
             <span
               className="sig-cell"
-              data-cell={rows[r][i]}
+              data-cell={cells[r][i]}
               key={`${word}-${i}`}
-              onPointerEnter={
-                interactive
-                  ? () => {
-                      hover.current = key(r, i)
-                    }
-                  : undefined
-              }
-              onPointerLeave={
-                interactive
-                  ? () => {
-                      // Guarded: moving between two boxes fires the leave of
-                      // the old one after the enter of the new one, and an
-                      // unguarded clear would blank the box the pointer is now
-                      // on.
-                      if (hover.current === key(r, i)) hover.current = null
-                    }
-                  : undefined
-              }
+              onPointerEnter={handlers?.enter(r, i)}
+              onPointerLeave={handlers?.leave(r, i)}
             >
               {ch}
             </span>
